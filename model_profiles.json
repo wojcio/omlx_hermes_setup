@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "profiles": {
+    "Qwen3.5-122B-A10B-MLX-9bit": {
+      "turbo": {
+        "name": "turbo",
+        "display_name": "turbo",
+        "api_name": "turbo",
+        "description": "High-performance profile with 256k context and TurboQuant KV compression.",
+        "created_at": "2026-07-21T20:48:14.267868+00:00",
+        "updated_at": "2026-08-30T20:20:00.000000+00:00",
+        "settings": {
+          "max_context_window": 262144,
+          "max_tokens": 32768,
+          "temperature": 0.6,
+          "top_p": 0.95,
+          "top_k": 20,
+          "repetition_penalty": 1.05,
+          "presence_penalty": 1.05,
+          "min_p": 0.01,
+          "mtp_enabled": false,
+          "enable_thinking": true,
+          "forced_ct_kwargs": [
+            "enable_thinking"
+          ],
+          "max_tool_result_tokens": 0,
+          "force_sampling": false,
+          "reasoning_parser": "qwen_3_5",
+          "thinking_budget_tokens": 8192,
+          "thinking_budget_enabled": false,
+          "qwen35_ane_prefill_enabled": false,
+          "dflash_enabled": false,
+          "vlm_mtp_enabled": false,
+          "specprefill_enabled": false,
+          "turboquant_kv_enabled": true,
+          "turboquant_kv_bits": 8,
+          "turboquant_skip_last": true,
+          "chat_template_kwargs": {
+            "enable_thinking": true
+          }
+        },
+        "source_template": null,
+        "expose_as_model": false
+      },
+      "work": {
+        "name": "work",
+        "display_name": "work",
+        "api_name": "work",
+        "description": "Standard work profile with 256k context, balanced reasoning budget and thinking enabled.",
+        "created_at": "2026-08-30T17:05:08.074923+00:00",
+        "updated_at": "2026-08-30T20:20:00.000000+00:00",
+        "settings": {
+          "max_context_window": 262144,
+          "max_tokens": 32768,
+          "temperature": 0.7,
+          "top_p": 0.95,
+          "top_k": 20,
+          "repetition_penalty": 1.05,
+          "presence_penalty": 1.05,
+          "min_p": 0.01,
+          "enable_thinking": true,
+          "thinking_budget_enabled": true,
+          "thinking_budget_tokens": 8192,
+          "reasoning_parser": "qwen_3_5",
+          "forced_ct_kwargs": [
+            "enable_thinking"
+          ],
+          "chat_template_kwargs": {
+            "enable_thinking": true
+          },
+          "turboquant_kv_enabled": true,
+          "turboquant_kv_bits": 8,
+          "turboquant_skip_last": true,
+          "max_tool_result_tokens": 0,
+          "mtp_enabled": false,
+          "vlm_mtp_enabled": false,
+          "dflash_enabled": false,
+          "specprefill_enabled": false,
+          "qwen35_ane_prefill_enabled": false,
+          "force_sampling": false
+        },
+        "source_template": null,
+        "expose_as_model": false
+      }
+    },
+    "Qwen3.8-Flash-Next-MLX-6bit": {
+      "setup": {
+        "name": "setup",
+        "display_name": "setup",
+        "api_name": "setup",
+        "description": "Fast setup profile with 256k context window and full reasoning capability.",
+        "created_at": "2026-08-27T21:39:16.683132+00:00",
+        "updated_at": "2026-08-30T20:20:00.000000+00:00",
+        "settings": {
+          "max_context_window": 262144,
+          "max_tokens": 32768,
+          "temperature": 0.7,
+          "top_p": 0.95,
+          "top_k": 20,
+          "repetition_penalty": 1.05,
+          "min_p": 0.01,
+          "mtp_enabled": false,
+          "enable_thinking": true,
+          "thinking_budget_enabled": false,
+          "thinking_budget_tokens": 8192,
+          "qwen35_ane_prefill_enabled": false,
+          "force_sampling": false,
+          "specprefill_enabled": false,
+          "turboquant_kv_enabled": false,
+          "dflash_enabled": false,
+          "vlm_mtp_enabled": false,
+          "max_tool_result_tokens": 0,
+          "chat_template_kwargs": {
+            "enable_thinking": true
+          }
+        },
+        "source_template": null,
+        "expose_as_model": false
+      }
+    }
+  }
+}
