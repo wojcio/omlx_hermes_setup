@@ -207,6 +207,8 @@ compression:
   hygiene_hard_message_limit: 400
   protect_first_n: 3
   abort_on_summary_failure: false
+  context_timeout_seconds: 300
+  context_total_ceiling_seconds: 1200
 prompt_caching:
   cache_ttl: 5m
 openrouter:
@@ -233,11 +235,11 @@ auxiliary:
     timeout: 120
     download_timeout: 30
   compression:
-    provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
-    timeout: 120
+    provider: omlx
+    model: Qwen3.5-122B-A10B-MLX-9bit
+    base_url: http://127.0.0.1:8000/v1
+    api_key: ${OMLX_API_KEY}
+    timeout: 360
   skills_hub:
     provider: auto
     model: ''
