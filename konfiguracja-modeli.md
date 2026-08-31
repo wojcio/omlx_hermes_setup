@@ -1,6 +1,6 @@
 # Konfiguracja Modeli: Hermes Agent & oMLX
 
-Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla modeli uruchamianych w oMLX i Hermes Agent.
+Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla modeli uruchamianych w oMLX i Hermes Agent na platformie Apple Silicon (MLX).
 
 ---
 
@@ -12,7 +12,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | **Qwen3.8-Flash-Next-MLX-6bit** | Qwen 4 Exp | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Szybki profil `setup`, pełne rozumowanie |
 | **Qwen3-Coder-Next-MLX-9bit** | Qwen 3 Next Coder | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.6` | `0.95` | `40` | `1.05` | `0.01` / `0.00` | RoPE theta 5M, TurboQuant KV 8-bit, generowanie długiego kodu i diffów |
 | **Qwen3-Coder-Next-MLX-8bit** | Qwen 3 Next Coder | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.6` | `0.95` | `40` | `1.05` | `0.01` / `0.00` | Wersja 8-bitowa dla optymalizacji pamięci RAM |
-| **Qwen3.8-27B-Uncensored-MLX** | Qwen 3.5 Dense | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Model ogólnego przeznaczenia bez cenzury |
+| **Qwen3.8-27B-Uncensored-MLX** | Qwen 3.5 Dense | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Lekki model (~15 GB), wariant 2 kompresora |
 | **Qwen3.8-27B-MTPLX-Optimized-FP16** | Qwen 3.5 Dense | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Najwyższa jakość wag FP16 |
 | **Ornith-1.5-35B-A3B-Abliterated-BF16** | Qwen 3.5 MoE | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Model MoE z pełnym oknem 256k |
 | **Step-3.5-Flash-4bit** | Step 3.5 MoE | **262 144** (256k) | **512** | **32 768** | `0.6` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Llama3 RoPE scaling (2.0x), sliding window 512 |
@@ -26,92 +26,67 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 
 ---
 
-## 2. Opis Parametrów i Uzasadnienie Wartości
+## 2. Warianty Architektury Kompresora w Hermesie
 
-### 1. `max_context` / `context_window` / `context_length`
-- **Wartość bazowa: 262 144 (256k tokenów)** dla modeli z rodziny Qwen3.5/3.8/Coder, DeepSeek-V4, Step-3.5, Laguna oraz UI-Venus.
-- **Wartości dedykowane**:
-  - **Bielik-11B-v3.0-Instruct**: `32 768` (32k) – natywny limit embeddings architektury LLaMA tego wariantu.
-  - **Qwen3-235B-A22B**: `40 960` (40k) – natywny limit warstwy `max_position_embeddings`.
-- **Znaczenie**: Definiuje całkowitą maksymalną liczbę tokenów (prompt wejściowy + historia konwersacji + wynik narzędzi), jaką silnik może przetworzyć bez odrzucenia żądania.
+Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
-### 2. `windows` (Sliding Window Attention)
-- **DeepSeek-V4 Flash**: `128` – natywne okno lokalnej uwagi w połączeniu z globalną kompresją YaRN.
-- **Step-3.5-Flash** oraz **Laguna-S-2.1**: `512` – sliding window optymalizujące prędkość prefillu przy długich kontekstach.
-- **Pozostałe modele**: `Brak (Dense attention)` – model przetwarza cały kontekst w pełnej macierzy uwagi.
+### 🏆 Wariant 1: Zero-Swap Monolith (Domyślny & Rekomendowany)
+* **Model główny:** `Qwen3.5-122B-A10B-MLX-9bit` (256k)
+* **Kompresor (`auxiliary.compression`):** `Qwen3.5-122B-A10B-MLX-9bit`
+* **Zasada działania:** Ten sam model obsługuje rozmowę i generuje podsumowania kompresji kontekstu.
+* **Zalety:**
+  - **0 sekund opóźnienia przełączania modeli (Zero Swap)** – model nie musi być przeładowywany z dysku SSD.
+  - Najwyższa jakość streszczeń i precyzja zachowania faktów technicznych.
+  - Idealna zgodność z demonem Watchdoga (`len(loaded) <= 1`).
 
-### 3. `max_tokens` (Maksymalna długość odpowiedzi)
-- **Modele 256k**: `32 768` tokenów. Umożliwia swobodne generowanie kompletnych plików źródłowych, rozległych analiz kodu, raportów oraz ścieżek rozumowania w trybie thinking/reasoning.
-- **UI-Venus (VLM)**: `16 384` tokenów – dopasowane do odpowiedzi multimodalnych i analizy interfejsów graficznych.
-- **Bielik & Qwen-235B**: `8 192` tokenów – zrównoważone proporcje odpowiedzi do rozmiaru okna kontekstowego (32k/40k).
-
-### 4. `temperature`
-- **`0.6` dla modeli programistycznych i ścisłych**: `Qwen3-Coder-Next`, `DeepSeek-V4 Flash`, `Step-3.5-Flash`, profil `turbo` w Qwen3.5. Zapewnia determinizm i poprawność składniową.
-- **`0.7` dla modeli ogólnych i asystenckich**: `Qwen3.5-122B`, `Qwen3.8-Flash-Next`, `Qwen3.8-27B`, `Bielik-11B`, `Laguna-S`. Optymalny balans kreatywności i precyzji logicznej.
-
-### 5. `top_p` (Nucleus Sampling) & `min_p`
-- **`top_p: 0.95`**: Standard branżowy dla modeli z rodziny Qwen, Step i DeepSeek.
-- **`top_p: 0.90`**: Dla modelu Bielik-11B.
-- **`top_p: 0.80`**: Dla modelu UI-Venus (zgodnie z natywną konfiguracją generacji).
-- **`min_p: 0.01`**: Odrzuca skrajnie mało prawdopodobne tokeny z "ogona" rozkładu prawdopodobieństwa, zapobiegając halucynacjom.
-
-### 6. `top_k`
-- **`40`**: Dla modeli kodujących (`Qwen3-Coder-Next`), DeepSeek-V4 oraz Bielik (szerszy zbiór alternatywnych tokenów technicznych).
-- **`20`**: Dla modeli konwersacyjnych i asystenckich.
-
-### 7. `repetition_penalty` & `presence_penalty`
-- **`1.00` (Brak kary)**: Modele **DeepSeek-V4** oraz **UI-Venus**. Architektury te są bardzo wrażliwe na kary powtórzeń; wyższe wartości mogą uszkadzać formatowanie JSON i generowanie bloków myślenia.
-- **`1.05`**: Standard dla modeli **Qwen3.5 / 3.8 / Step / Laguna**. Skutecznie eliminuje zapętlenia w długich odpowiedziach bez degradacji składni.
-- **`1.10`**: Model **Bielik-11B** (architektura LLaMA dobrze reaguje na nieco wyższą karę).
-- **`presence_penalty: 1.05`**: Skonfigurowane dla profilu roboczego `Qwen3.5-122B-A10B-MLX-9bit`.
+### ⚡ Wariant 2: Dual-Model Resident (Szybki Lekki Kompresor 27B)
+* **Model główny:** `Qwen3.5-122B-A10B-MLX-9bit` (256k)
+* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX` (256k, ~15 GB)
+* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu.
+* **Integracja z Watchdogiem:** Model 27B ma ustawioną flagę `"is_pinned": true` w `model_settings.json`, dzięki czemu demon Watchdoga nie wyładowuje go z pamięci.
+* **Pamięć RAM:** 128 GB (122B) + 15 GB (27B) = **~143 GB** (swobodnie mieści się w 192 GB Unified Memory).
+* **Zalety:** Szybszy prefill i odciążenie głównego modelu podczas kompresji.
 
 ---
 
-## 3. Szczegóły Konfiguracji Plików
+## 3. Przełączanie Wariantów (`switch-variant.sh`)
 
-### A. `config.yaml` (Hermes Agent)
-- Zapewnia Hermesowi informację o dostępnych oknach kontekstowych per model w oMLX.
-- Kluczowe ustawienia:
-  ```yaml
-  model:
-    default: Qwen3.5-122B-A10B-MLX-9bit
-    provider: omlx
-    context_window: 262144
-    context_length: 262144
-    max_tokens: 32768
-    base_url: http://127.0.0.1:8000/v1
-  providers:
-    omlx:
-      default_model: Qwen3.5-122B-A10B-MLX-9bit
-      models:
-        Qwen3.5-122B-A10B-MLX-9bit:
-          context_window: 262144
-          context_length: 262144
-          max_tokens: 32768
-        # ... wszystkie 15 modeli skonfigurowane
-  ```
+W katalogu projektu znajduje się skrypt umożliwiający błyskawiczną zmianę aktywnego wariantu:
 
-### B. `settings.json` (oMLX Global Server)
-- Globalne parametry domyślne serwera oMLX:
-  ```json
-  "sampling": {
-    "max_context_window": 262144,
-    "max_context_window_policy": null,
-    "max_tokens": 32768,
-    "temperature": 0.7,
-    "top_p": 0.95,
-    "top_k": 20,
-    "repetition_penalty": 1.05
-  }
-  ```
+```bash
+# Aktywacja Wariantu 1 (Domyślny):
+./switch-variant.sh 1
 
-### C. `model_profiles.json` (Profile oMLX)
-- Dedykowane profile wykonawcze:
-  - **Qwen3.5-122B `work`**: `max_context_window: 262144`, `max_tokens: 32768`, `temp: 0.7`, `thinking_budget_tokens: 8192`, `turboquant_kv_bits: 8`.
-  - **Qwen3.5-122B `turbo`**: `max_context_window: 262144`, `max_tokens: 32768`, `temp: 0.6`, `turboquant_kv_bits: 8`.
-  - **Qwen3.8-Flash-Next `setup`**: `max_context_window: 262144`, `max_tokens: 32768`, `temp: 0.7`.
+# Aktywacja Wariantu 2 (Dual-Model 27B):
+./switch-variant.sh 2
+```
 
-### D. `model_settings.json` (Rejestr modeli oMLX)
-- Precyzyjne wpisy per-model dla wszystkich modeli znajdujących się w katalogu `.lmstudio/models`.
-- Automatyczne ładowanie optymalnego parsera rozumowania (`reasoning_parser: "qwen_3_5"`, `"deepseek_v4"`, `"poolside_v1"`).
-- Włączenie kompresji pamięci KV TurboQuant (`turboquant_kv_bits: 8`) dla modeli o dużym zapotrzebowaniu na pamięć RAM.
+Skrypt automatycznie:
+1. Podmienia pliki `config.yaml` oraz `model_settings.json`.
+2. Kopiuje je do aktywnych katalogów systemowych `~/.hermes/` oraz `~/.omlx/`.
+
+---
+
+## 4. Timeouty i Rozwiązanie Problemu "Nieaktywnego Modelu"
+
+W logach Hermesa zidentyfikowano problem, w którym przy długim kontekście (~175k tokenów) proces kompresji był przerywany komunikatem:
+```text
+WARNING run_agent: Context compression made no progress for 120.0s; continuing without compression
+```
+**Przyczyny i zastosowane poprawki:**
+1. **Zwiększenie `context_timeout_seconds` do 300s:** Faza prefillu dla 175k tokenów na modelu 122B trwa 1.5–3 minuty. Zwiększenie timeoutu do 5 minut gwarantuje, że Hermes nie uzna modelu za zawieszony w trakcie prefillu.
+2. **`context_total_ceiling_seconds: 1200`:** Łączny bezpieczny czas na całą procedurę kompresji to 20 minut.
+3. **Odblokowanie pełnego 256k okna:** Usunięto błąd, w którym Hermes odrzucał model kompresora poniżej progu 64k.
+4. **Wymuszenie lokalnego oMLX:** Skierowano `auxiliary.compression.provider: omlx` zamiast `auto`, co wyeliminowało błędy braku kredytów (402) i przekroczenia okna (400) w OpenRouterze.
+
+---
+
+## 5. Zestawienie Plików Konfiguracyjnych
+
+- `config.yaml` / `config.variant1-single-model.yaml` – Konfiguracja Hermesa dla Wariantu 1.
+- `config.variant2-dual-model.yaml` – Konfiguracja Hermesa dla Wariantu 2.
+- `model_settings.json` / `model_settings.variant1-single-model.json` – Ustawienia modeli oMLX dla Wariantu 1.
+- `model_settings.variant2-dual-model.json` – Ustawienia modeli oMLX dla Wariantu 2 (`Qwen 27B` jako `pinned`).
+- `model_profiles.json` – Profile wykonawcze `work`, `turbo`, `setup` z pełnym oknem 256k.
+- `settings.json` – Globalne parametry serwera oMLX.
+- `switch-variant.sh` – Skrypt przełączania wariantów.

@@ -6,16 +6,47 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX** oraz **Hermes Agent** z precy
 
 ## 📖 Pełna dokumentacja
 
-Szczegółowy opis wszystkich 15 modeli, tabelę parametrów oraz uzasadnienie techniczne znajdziesz w pliku:
+Szczegółowy opis wszystkich 15 modeli, tabelę parametrów, analizę wariantów oraz uzasadnienie techniczne znajdziesz w pliku:
 
 👉 **[Konfiguracja Modeli (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
 
 ---
 
+## ⚡ Warianty Architektury
+
+Repozytorium udostępnia dwa gotowe warianty konfiguracji:
+
+1. **Wariant 1 (Domyślny & Rekomendowany): `Zero-Swap Monolith`**
+   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
+   - Kompresor: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
+   - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency).*
+
+2. **Wariant 2: `Dual-Model Resident`**
+   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
+   - Kompresor: `Qwen3.8-27B-Uncensored-MLX` (256k, ~15 GB w RAM, `is_pinned: true`)
+   - *Szybki, dedykowany model do podsumowań kontekstu współistniejący z modelem głównym.*
+
+### 🔄 Szybkie przełączanie wariantów:
+
+```bash
+# Przełączenie na Wariant 1 (rekomendowany):
+./switch-variant.sh 1
+
+# Przełączenie na Wariant 2:
+./switch-variant.sh 2
+```
+
+---
+
 ## 📁 Zawartość repozytorium
 
-- **[`config.yaml`](config.yaml)** – Główna konfiguracja agenta Hermes (odblokowane pełne okna kontekstowe per-model do 256k tokenów).
-- **[`settings.json`](settings.json)** – Globalne parametry serwera oMLX oraz domyślny sampling.
-- **[`model_settings.json`](model_settings.json)** – Rejestr konfiguracji per-model w oMLX (parser myślenia, TurboQuant KV 8-bit, parametry samplingu).
+- **[`config.yaml`](config.yaml)** – Aktywna konfiguracja agenta Hermes (domyślnie Wariant 1).
+- **[`config.variant1-single-model.yaml`](config.variant1-single-model.yaml)** – Konfiguracja Hermesa dla Wariantu 1.
+- **[`config.variant2-dual-model.yaml`](config.variant2-dual-model.yaml)** – Konfiguracja Hermesa dla Wariantu 2.
+- **[`model_settings.json`](model_settings.json)** – Aktywny rejestr modeli w oMLX.
+- **[`model_settings.variant1-single-model.json`](model_settings.variant1-single-model.json)** – Ustawienia modeli dla Wariantu 1.
+- **[`model_settings.variant2-dual-model.json`](model_settings.variant2-dual-model.json)** – Ustawienia modeli dla Wariantu 2 (`Qwen 27B` przypięty w RAM).
 - **[`model_profiles.json`](model_profiles.json)** – Dedykowane profile wykonawcze (`work`, `turbo`, `setup`).
-- **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja modeli i ich specyfikacji technicznej.
+- **[`settings.json`](settings.json)** – Globalne parametry serwera oMLX oraz domyślny sampling.
+- **[`switch-variant.sh`](switch-variant.sh)** – Skrypt bash do automatycznego przełączania wariantów.
+- **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja techniczna.
