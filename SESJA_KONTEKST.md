@@ -1,0 +1,76 @@
+# 🧠 Kontekst Sesji Projektowej: oMLX & Hermes Setup
+
+**Data sesji:** 30–31 sierpnia 2026  
+**Lokalizacja projektu:** `/Users/wojcio/Desktop/omlx_hermes_config`  
+**Zdalne repozytorium:** [https://github.com/wojcio/omlx_hermes_setup.git](https://github.com/wojcio/omlx_hermes_setup.git)  
+**Środowisko:** macOS Apple Silicon (Mac Studio M2 Ultra, 192 GB Unified Memory), oMLX Server, Hermes Agent.
+
+---
+
+## 🎯 1. Cel i Zakres Prac w Tej Sesji
+
+1. **Kalibracja okien kontekstu i parametrów samplingu:**
+   - Przeanalizowano wszystkie 15 modeli LLM/VLM zainstalowanych lokalnie w `/Users/wojcio/.lmstudio/models`.
+   - Odblokowano pełny natywny kontekst **262 144 tokenów (256k)** dla modelu głównego `Qwen3.5-122B-A10B-MLX-9bit` (wcześniej był sztucznie ograniczony do 70k).
+   - Skalibrowano parametry samplingu: `temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty` per model.
+
+2. **Analiza i weryfikacja Watchdoga oMLX:**
+   - Zidentyfikowano skrypt i usługę `launchd` pilnującą zasady *"at most ONE model loaded in memory at a time"*.
+   - Zweryfikowano odporność na długie generowanie (>180s) – potwierdzono brak ryzyka przedwczesnego wyładowania aktywnego modelu dzięki regule `len(loaded) <= 1`, aktualizacji `last_access` oraz blokadom `in_use lease` w silniku oMLX.
+   - Utworzono dokumentację projektu w Obsidianie: `Gemini/Projekty/Watchdog-oMLX.md`.
+
+3. **Diagnoza i naprawa problemów z kompresją kontekstu w Hermesie:**
+   - Na podstawie analizy logów `~/.hermes/logs/agent.log` zdiagnozowano 3 przyczyny uznawania modelu za nieaktywny podczas kompresji przy dużym kontekście (~175k tokenów):
+     1. Zbyt krótki timeout bezczynności (`context_timeout_seconds: 120s`) przy długim prefillu modelu 122B.
+     2. Wykrywanie okna kompresora jako 50k tokenów (poniżej wymaganego przez Hermesa progu 64k).
+     3. Awaryjne próby routingu do OpenRoutera kończące się błędami 402 (brak środków) i 400 (przekroczenie 32k okna).
+   - Zwiększono timeouty kompresji (`context_timeout_seconds: 300s`, `context_total_ceiling_seconds: 1200s`, `auxiliary.compression.timeout: 360s`) i skierowano kompresję na stałe do lokalnego oMLX z oknem 256k.
+
+4. **Architektura dwóch wariantów wykonawczych:**
+   - **Wariant 1 (Domyślny / Zero-Swap Monolith):** `Qwen3.5-122B` jako model główny i kompresor (0s opóźnienia przełączania).
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako główny + `Qwen3.8-27B-Uncensored-MLX` (~15 GB w RAM, `is_pinned: true`) jako szybki, lekki kompresor.
+   - Stworzono skrypt bash [`switch-variant.sh`](switch-variant.sh) do automatycznego przełączania wariantów.
+
+---
+
+## 🗂️ 2. Struktura Plików w Repozytorium
+
+| Plik | Opis i Przeznaczenie |
+| :--- | :--- |
+| **`config.yaml`** | Aktywna konfiguracja Hermes Agenta (`~/.hermes/config.yaml`). |
+| **`config.variant1-single-model.yaml`** | Wzorzec konfiguracji Hermesa dla Wariantu 1 (Zero-Swap). |
+| **`config.variant2-dual-model.yaml`** | Wzorzec konfiguracji Hermesa dla Wariantu 2 (Dual-Model 27B). |
+| **`model_settings.json`** | Aktywny rejestr modeli oMLX (`~/.omlx/model_settings.json`). |
+| **`model_settings.variant1-single-model.json`** | Ustawienia oMLX dla Wariantu 1. |
+| **`model_settings.variant2-dual-model.json`** | Ustawienia oMLX dla Wariantu 2 (`Qwen 27B` z `is_pinned: true`). |
+| **`model_profiles.json`** | Profile oMLX (`work`, `turbo`, `setup`) z pełnym 256k oknem i TurboQuant KV 8-bit (`~/.omlx/model_profiles.json`). |
+| **`settings.json`** | Globalne parametry serwera oMLX i sampling domyślny (`~/.omlx/settings.json`). |
+| **`switch-variant.sh`** | Skrypt CLI do przełączania wariantów (`./switch-variant.sh 1` lub `2`). |
+| **`konfiguracja-modeli.md`** | Pełna dokumentacja techniczna 15 modeli, tabel parametrów i wariantów. |
+| **`README.md`** | Główne wprowadzenie do repozytorium GitHub. |
+| **`SESJA_KONTEKST.md`** | Ten plik – zachowanie pełnego kontekstu wiedzy i decyzji sesji. |
+
+---
+
+## ⚙️ 3. Zależności i Ścieżki Systemowe
+
+- **Hermes Agent Config:** `/Users/wojcio/.hermes/config.yaml`
+- **Hermes Agent Logs:** `/Users/wojcio/.hermes/logs/agent.log`, `/Users/wojcio/.hermes/logs/errors.log`
+- **oMLX App & Server:** `/Applications/oMLX.app`, binarka `/Applications/oMLX.app/Contents/MacOS/oMLX`
+- **oMLX Config Directory:** `/Users/wojcio/.omlx/` (`settings.json`, `model_settings.json`, `model_profiles.json`)
+- **Modele LLM/MLX:** `/Users/wojcio/.lmstudio/models/`
+- **Watchdog Skrypt:** `/Users/wojcio/.hermes/scripts/omlx-single-model-guard.py`
+- **Watchdog Launchd Plist:** `/Users/wojcio/Library/LaunchAgents/com.hermes.omlx-single-model-guard.plist`
+- **Watchdog Log:** `/Users/wojcio/.omlx/logs/single-model-guard.log`
+- **Obsidian Vault (Gemini):** `/Users/wojcio/Library/Mobile Documents/iCloud~md~obsidian/Documents/Gemini/`
+  - Notatka projektu: `Gemini/Projekty/Watchdog-oMLX.md`
+  - Indeks główny: `Gemini/00-INDEX.md`
+
+---
+
+## 🤖 4. Wskazówki dla Asystenta AI (Dla Kolejnych Sesji)
+
+1. **Praca w katalogu projektu:** Wszelkie zmiany w konfiguracji Hermes/oMLX należy wprowadzać w `/Users/wojcio/Desktop/omlx_hermes_config` i synchronizować skryptem `./switch-variant.sh [1|2]` do katalogów domowych `~/.hermes` i `~/.omlx`.
+2. **Git Workflow:** Po edycji plików zawsze wykonuj commit i push do `https://github.com/wojcio/omlx_hermes_setup.git`.
+3. **Pamięć o Watchdogu:** Jeśli dodajesz nowy model pomocniczy do współistnienia w RAM obok modelu 122B, pamiętaj o ustawieniu `"is_pinned": true` w `model_settings.json`, aby demon `com.hermes.omlx-single-model-guard` go nie wyładował.
+4. **Duży kontekst (256k):** Modele Qwen3.5/3.8 mają pełne okno 262 144 tokenów. Przy operacjach na kontekście >100k tokenów prefill zajmuje do kilkudziesięciu sekund – timeouty w `compression` muszą wynosić minimum 300s.
