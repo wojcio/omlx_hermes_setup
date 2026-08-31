@@ -31,6 +31,14 @@
    - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako główny + `Qwen3.8-27B-Uncensored-MLX` (~15 GB w RAM, `is_pinned: true`) jako szybki, lekki kompresor.
    - Stworzono skrypt bash [`switch-variant.sh`](switch-variant.sh) do automatycznego przełączania wariantów.
 
+5. **Audyt i Kalibracja Parametrów Agentowych (Optymalizacje Jakości i Bezpieczeństwa):**
+   - **Korekta `presence_penalty: 0.0`:** Usunięto omyłkowo skopiowaną wartość `1.05` z repetition penalty. Agresywna kara presence penalty wypychała model ze stałych struktur JSON/XML, degradując wywołania narzędzi.
+   - **Budżet rozumowania (`thinking_budget_tokens: 32768` / `thinking_budget_enabled: false`):** Odblokowano pełny budżet myślenia, zapobiegając ucinaniu planowania w złożonych, wieloetapowych zadaniach agentowych.
+   - **Guardrails pętli narzędzi (`hard_stop_enabled: true`):** Włączono twardy stop zapobiegający nieskończonemu zapętleniu agenta na błędach narzędzi.
+   - **Migawki plików (`checkpoints.enabled: true`):** Włączono mechanizm automatycznych snapshotów plików przed mutacjami.
+   - **Bezpieczeństwo (`command_allowlist: []`, `allow_lazy_installs: false`):** Usunięto niebezpieczne wyjątki z allowlisty oraz zablokowano samowolne instalacje pakietów w tle.
+   - **Trwałość sesji i terminala (`lifetime_seconds: 1800`, `sessions.auto_prune: true`):** Wydłużono czas życia powłoki do 30 min oraz włączono bezpieczne czyszczenie sesji po 90 dniach.
+
 ---
 
 ## 🗂️ 2. Struktura Plików w Repozytorium

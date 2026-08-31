@@ -8,7 +8,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 
 | Model | Architektura | max_context (okno kontekstu) | windows (sliding window) | max_tokens (maks. wyjście) | Temperature | Top_p | Top_k | Repetition Penalty | Min_p / Pres. Pen. | Główne Cechy & Przeznaczenie |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Qwen3.5-122B-A10B-MLX-9bit** *(Domyślny)* | Qwen 3.5 MoE | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` *(work)* / `0.6` *(turbo)* | `0.95` | `20` | `1.05` | `0.01` / `1.05` | TurboQuant KV 8-bit, parser `qwen_3_5`, domyślny model główny |
+| **Qwen3.5-122B-A10B-MLX-9bit** *(Domyślny)* | Qwen 3.5 MoE | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` *(work)* / `0.6` *(turbo)* | `0.95` | `20` | `1.05` | `0.01` / `0.00` | TurboQuant KV 8-bit, parser `qwen_3_5`, domyślny model główny |
 | **Qwen3.8-Flash-Next-MLX-6bit** | Qwen 4 Exp | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Szybki profil `setup`, pełne rozumowanie |
 | **Qwen3-Coder-Next-MLX-9bit** | Qwen 3 Next Coder | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.6` | `0.95` | `40` | `1.05` | `0.01` / `0.00` | RoPE theta 5M, TurboQuant KV 8-bit, generowanie długiego kodu i diffów |
 | **Qwen3-Coder-Next-MLX-8bit** | Qwen 3 Next Coder | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.6` | `0.95` | `40` | `1.05` | `0.01` / `0.00` | Wersja 8-bitowa dla optymalizacji pamięci RAM |

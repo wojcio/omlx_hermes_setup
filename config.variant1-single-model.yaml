@@ -151,7 +151,7 @@ terminal:
   docker_extra_args: []
   docker_run_as_host_user: false
   persistent_shell: true
-  lifetime_seconds: 300
+  lifetime_seconds: 1800
 web:
   backend: ddgs
   search_backend: ''
@@ -175,7 +175,7 @@ browser:
   cloud_provider: local
   use_gateway: false
 checkpoints:
-  enabled: false
+  enabled: true
   max_snapshots: 20
   max_total_size_mb: 500
   max_file_size_mb: 10
@@ -190,7 +190,7 @@ tool_output:
   max_line_length: 2000
 tool_loop_guardrails:
   warnings_enabled: true
-  hard_stop_enabled: false
+  hard_stop_enabled: true
   warn_after:
     exact_failure: 2
     same_tool_failure: 3
@@ -475,10 +475,7 @@ approvals:
   cron_mode: deny
   mcp_reload_confirm: true
   destructive_slash_confirm: true
-command_allowlist:
-  - script execution via -e/-c flag
-  - script execution via heredoc
-  - recursive delete
+command_allowlist: []
 hooks:
   auto_tts_enabled: true
 hooks_auto_accept: false
@@ -494,7 +491,7 @@ security:
     domains: []
     shared_files: []
   acked_advisories: []
-  allow_lazy_installs: true
+  allow_lazy_installs: false
 cron:
   wrap_response: true
 kanban:
@@ -532,7 +529,7 @@ gateway:
 streaming:
   enabled: false
 sessions:
-  auto_prune: false
+  auto_prune: true
   retention_days: 90
   vacuum_after_prune: true
   min_interval_hours: 24
