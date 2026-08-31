@@ -6,9 +6,9 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX** oraz **Hermes Agent** z precy
 
 ## 📖 Pełna dokumentacja
 
-Szczegółowy opis wszystkich 15 modeli, tabelę parametrów, analizę wariantów oraz uzasadnienie techniczne znajdziesz w pliku:
+Szczegółowy opis wszystkich 15 modeli, bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów, analizę wariantów oraz uzasadnienie techniczne znajdziesz w pliku:
 
-👉 **[Konfiguracja Modeli (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
+👉 **[Konfiguracja Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
 
 ---
 

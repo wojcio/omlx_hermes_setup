@@ -10,7 +10,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla 15 modeli (okna 256k, sampling, parsery) znajduje się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla 15 modeli (okna 256k, sampling, parsery) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
    - **Wariant 1 (Domyślny / Zero-Swap):** `Qwen3.5-122B-A10B-MLX-9bit` (256k) obsługuje zarówno zapytania główne, jak i kompresję kontekstu (0s opóźnienia przełączania modeli).

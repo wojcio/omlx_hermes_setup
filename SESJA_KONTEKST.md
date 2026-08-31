@@ -39,6 +39,10 @@
    - **Bezpieczeństwo (`command_allowlist: []`, `allow_lazy_installs: false`):** Usunięto niebezpieczne wyjątki z allowlisty oraz zablokowano samowolne instalacje pakietów w tle.
    - **Trwałość sesji i terminala (`lifetime_seconds: 1800`, `sessions.auto_prune: true`):** Wydłużono czas życia powłoki do 30 min oraz włączono bezpieczne czyszczenie sesji po 90 dniach.
 
+6. **Mapowanie Repozytoriów Hugging Face dla Wszystkich Modeli:**
+   - Zidentyfikowano źródłowe repozytoria i organizacje na Hugging Face dla wszystkich 15 modeli lokalnych z `~/.lmstudio/models`.
+   - Zintegrowano bezpośrednie linki w tabeli zbiorczej oraz dodano dedykowaną sekcję wykazu repozytoriów w `konfiguracja-modeli.md` i zaktualizowano `README.md`.
+
 ---
 
 ## 🗂️ 2. Struktura Plików w Repozytorium
