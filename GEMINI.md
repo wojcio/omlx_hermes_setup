@@ -28,4 +28,5 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 5. **Synchronizacja i Git:**
    - Wszelkie modyfikacje plików konfiguracyjnych wykonuj w tym katalogu, a następnie synchronizuj do `~/.hermes/config.yaml` oraz `~/.omlx/` za pomocą `./switch-variant.sh`.
+   - Po przełączeniu wariantu skrypt automatycznie zsynchronizuje kompresora z modelem w RAM (`./scripts/omlx-compression-sync.py`) — patrz [[skill_kompresor]].
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.

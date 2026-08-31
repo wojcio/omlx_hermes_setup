@@ -48,5 +48,8 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 - **[`model_settings.variant2-dual-model.json`](model_settings.variant2-dual-model.json)** – Ustawienia modeli dla Wariantu 2 (`Qwen 27B` przypięty w RAM).
 - **[`model_profiles.json`](model_profiles.json)** – Dedykowane profile wykonawcze (`work`, `turbo`, `setup`).
 - **[`settings.json`](settings.json)** – Globalne parametry serwera oMLX oraz domyślny sampling.
-- **[`switch-variant.sh`](switch-variant.sh)** – Skrypt bash do automatycznego przełączania wariantów.
+- **[`switch-variant.sh`](switch-variant.sh)** – Skrypt bash do automatycznego przełączania wariantów. Po każdym switchu synchronizuje kompresora z modelem w RAM.
+- **[`scripts/omlx-compression-sync.py`](scripts/omlx-compression-sync.py)** – Skrypt synchronizujący `auxiliary.compression.model` z modelem aktywnym w RAM (źródło prawdy: oMLX `/api/status`). Idempotentny, zero-swap.
+- **[`com.hermes.omlx-compression-sync.plist`](com.hermes.omlx-compression-sync.plist)** – Watchdog launchd (co 60s) uruchamiający `omlx-compression-sync.py`.
+- **[`skill_kompresor.md`](skill_kompresor.md)** – Pełny opis skilla i mechanizmu „kompresor = model w RAM".
 - **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja techniczna.
