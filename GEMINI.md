@@ -13,8 +13,8 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Tabela parametrów dla 15 modeli (okna 256k, sampling, parsery) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap):** `Qwen3.5-122B-A10B-MLX-9bit` (256k) obsługuje zarówno zapytania główne, jak i kompresję kontekstu (0s opóźnienia przełączania modeli).
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX` (~15 GB w RAM, `is_pinned: true`) jako szybki kompresor.
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 15 modeli.
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX` (~15 GB w RAM, `is_pinned: true`) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2]`.
 
 3. **Watchdog oMLX (Single-Model Guard):**
@@ -28,5 +28,4 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 5. **Synchronizacja i Git:**
    - Wszelkie modyfikacje plików konfiguracyjnych wykonuj w tym katalogu, a następnie synchronizuj do `~/.hermes/config.yaml` oraz `~/.omlx/` za pomocą `./switch-variant.sh`.
-   - Po przełączeniu wariantu skrypt automatycznie zsynchronizuje kompresora z modelem w RAM (`./scripts/omlx-compression-sync.py`) — patrz [[skill_kompresor]].
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.

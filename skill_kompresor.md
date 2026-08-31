@@ -1,118 +1,60 @@
-# Skill: oMLX Compression Sync (kompresor = model w RAM)
+# Architektura Kompresji Kontekstu: Dynamiczny Model Sesji (Zero-Swap)
 
-**Data:** 31 sierpnia 2026
+**Data:** 31 sierpnia 2026  
 **Repozytorium:** `omlx_hermes_setup` (branch: `skill_kompresor`)
-**Źródło kodu:** `scripts/omlx-compression-sync.py` + watchdog launchd `com.hermes.omlx-compression-sync.plist`
 
 ---
 
-## 🎯 Problem
+## 🎯 Cel i Założenia
 
-Hermes używa modelu z konfiguracji `auxiliary.compression.model` do kompresji kontekstu.
-W tym repozytorium warianty `config.variant1-single-model.yaml` i `config.variant2-dual-model.yaml`
-**hardcodują** kompresora na stałą nazwę modelu (`Qwen3.5-122B` albo `Qwen3.8-27B`).
+Hermes Agent do podsumowywania wcześniejszej rozmowy (Context Compression / Auto-Compaction) korzysta z modułu `auxiliary.compression`.
 
-Gdy użytkownik przeładowuje model w oMLX (np. na `Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`),
-kompresor nadal wskazuje stary model. Skutek: **każda kompresja wymusza cold-reload drugiego
-modelu w RAM** — złamanie zasady „1 model w RAM" (watchdog single-model-guard) i ~1 min
-opóźnienia przeładowania ~130 GB modelu.
-
-## 🧠 Rozwiązanie
-
-Skrypt `omlx-compression-sync.py`:
-1. Czyta model **aktywny w RAM** z oMLX `/api/status` (`loaded_models[0]`) — to jedyne
-   niezawodne źródło prawdy o tym, który model fizycznie jest załadowany.
-2. Porównuje go z `auxiliary.compression.model` z `~/.hermes/config.yaml`.
-3. Gdy się różnią — ustawia `auxiliary.compression.model` na model z RAM przez
-   `hermes config set`.
-
-### Dlaczego to działa bez restartu
-
-Hermes czyta `auxiliary.compression.model` **per-call** (patrz
-`agent/auxiliary_client.py::_get_auxiliary_task_config`), z invalidacją cache po mtime pliku
-(config.py `_load_config_impl`). Zmiana w config.yamli → **live**, bez restartu Hermesa czy oMLX.
-
-Skrypt jest **idempotentny**: gdy model w RAM = kompresor, nic nie pisze.
-
-### Dlaczego zero-swap
-
-Model kompresora wskazuje na ten sam model, który jest już w RAM (Ornith).
-Użycie go do kompresji **nie wymaga przeładowania** — model jest już załadowany.
-Zero latency, zero ryzyka dla single-model-guard.
+W środowisku z restrykcyjnym zarządzaniem pamięcią RAM (1 model w RAM) kluczowe jest wyeliminowanie **Cold Swapu** – sytuacji, w której kompresja kontekstu wymusza załadowanie innego modelu z dysku SSD, wyładowując model aktywny.
 
 ---
 
-## 📂 Pliki w repozytorium
+## 🧠 Rozwiązanie: Natywna Dynamika Hermesa (`provider: auto`, `model: ""`)
 
-| Plik | Opis |
-|------|------|
-| `scripts/omlx-compression-sync.py` | Skrypt synchronizujący kompresora z modelem w RAM |
-| `com.hermes.omlx-compression-sync.plist` | Watchdog launchd (co 60s, RunAtLoad) — instalowany do `~/Library/LaunchAgents/` |
-| `switch-variant.sh` | **Zaktualizowany** — na końcu wywołuje `omlx-compression-sync.py` |
-| `skill_kompresor.md` | Ten dokument |
+Zamiast zewnętrznych skryptów cyklicznie forsujących nazwy modeli, Hermes posiada wbudowany łańcuch rozwiązywania modeli pomocniczych (`agent.auxiliary_client`):
 
----
-
-## ⚙️ Instalacja watchdoga (launchd)
-
-```bash
-# 1. Skrypt już jest w ~/.hermes/scripts/omlx-compression-sync.py
-# 2. Plist do LaunchAgents:
-cp scripts/com.hermes.omlx-compression-sync.plist ~/Library/LaunchAgents/
-
-# 3. Załaduj:
-launchctl unload ~/Library/LaunchAgents/com.hermes.omlx-compression-sync.plist 2>/dev/null
-launchctl load ~/Library/LaunchAgents/com.hermes.omlx-compression-sync.plist
-
-# 4. Sprawdź:
-launchctl list | grep compression-sync
-```
-
-Watchdog uruchamia się przy starcie (`RunAtLoad: true`) i co 60s.
-Logi: `~/.omlx/logs/omlx-compression-sync.log`.
+1. Gdy `auxiliary.compression.provider: auto` oraz `model: ""`, Hermes automatycznie pobiera **aktualny model oraz providera aktywnej sesji** (`main_runtime`).
+2. **Rezultat:**
+   - Rozmowa z `Ornith-1.5-35B` ➔ kompresję wykonuje `Ornith-1.5-35B`.
+   - Rozmowa z `Qwen3.5-122B` ➔ kompresję wykonuje `Qwen3.5-122B`.
+   - Rozmowa z `Qwen3-Coder` ➔ kompresję wykonuje `Qwen3-Coder`.
+3. **Zalety:**
+   - **0s opóźnienia przełączania modeli (Zero-Swap).**
+   - Prefill kompresji korzysta z istniejącej w RAM pamięci podręcznej KV.
+   - Brak ryzyka kolizji z demonem `com.hermes.omlx-single-model-guard`.
+   - Brak konieczności utrzymywania daemonów synchronizujących w tle.
 
 ---
 
-## 🧪 Testowanie (manualne)
+## ⚙️ Aktywna Konfiguracja (`~/.hermes/config.yaml`)
 
-```bash
-# Jednorazowe uruchomienie:
-python3 /Users/wojcio/.hermes/scripts/omlx-compression-sync.py
-echo $?   # 0 = OK
-
-# Idempotency check (powrót → „no change"):
-python3 /Users/wojcio/.hermes/scripts/omlx-compression-sync.py
-
-# Log:
-tail -3 /Users/wojcio/.omlx/logs/omlx-compression-sync.log
+```yaml
+auxiliary:
+  compression:
+    provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
+    timeout: 360
 ```
 
 ---
 
-## 🔑 Auth
+## 🧪 Weryfikacja Działania
 
-Skrypt czyta klucz API oMLX z `~/.omlx/settings.json` (`auth.api_key`) — **nigdy go nie wypisuje**.
-Do `/api/status` używa `Authorization: Bearer <key>` (zaakceptowane przez oMLX).
+Test dynamicznego resolvera w środowisku Hermesa:
+```bash
+/Users/wojcio/.hermes/hermes-agent/venv/bin/python -c '
+import sys
+sys.path.insert(0, "/Users/wojcio/.hermes/hermes-agent")
+from agent.auxiliary_client import get_text_auxiliary_client
 
----
-
-## ✅ Status implementacji (31.08.2026)
-
-- [x] Skrypt `omlx-compression-sync.py` — napisany, przetestowany (sync → applied → idempotent)
-- [x] Watchdog launchd `com.hermes.omlx-compression-sync.plist` — zainstalowany, aktywny (PID 45816)
-- [x] `auxiliary.compression.model` = `Ornith-1.5-35B-A3B-Abliterated-MLX-BF16` (model w RAM)
-- [x] Idempotency potwierdzona (re-run → „no change")
-- [x] Kod skilla dorzucony do repozytorium (`scripts/`)
-- [x] `skill_kompresor.md` — ten dokument
-- [ ] `switch-variant.sh` — aktualizacja (uruchamia sync na końcu) — DO ZROZENIA
-- [ ] Commit + push do brancha `skill_kompresor`
-
----
-
-## 🔮 Plan na kolejne kroki
-
-1. Zaktualizować `switch-variant.sh` — na końcu wywołać `omlx-compression-sync.py`,
-   żeby po każdym switchu wariantu kompresor zawsze = model w RAM.
-2. Commit + push do brancha `skill_kompresor`.
-3. (Opcja) Przepisać warianty configu tak, by nie hardcode'owały kompresora —
-   pozwolić skryptowi ustalić go dynamicznie.
+c, m = get_text_auxiliary_client("compression", main_runtime={"provider": "omlx", "model": "Ornith-1.5-35B-A3B-Abliterated-MLX-BF16", "base_url": "http://127.0.0.1:8000/v1"})
+print("Dynamic session compressor:", m, "->", c.base_url)
+'
+# Wynik: Dynamic session compressor: Ornith-1.5-35B-A3B-Abliterated-MLX-BF16 -> http://127.0.0.1:8000/v1/
+```

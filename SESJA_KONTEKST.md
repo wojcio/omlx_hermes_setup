@@ -43,6 +43,11 @@
    - Zidentyfikowano źródłowe repozytoria i organizacje na Hugging Face dla wszystkich 15 modeli lokalnych z `~/.lmstudio/models`.
    - Zintegrowano bezpośrednie linki w tabeli zbiorczej oraz dodano dedykowaną sekcję wykazu repozytoriów w `konfiguracja-modeli.md` i zaktualizowano `README.md`.
 
+7. **Rozwiązanie Problemu Kompresora (Dynamiczny Model Sesji / Zero-Swap):**
+   - Zdiagnozowano przyczynę ciągłego wymuszania modelu `Qwen3.5-122B`: demon w tle `com.hermes.omlx-compression-sync` co 60s nadpisywał `auxiliary.compression.model`.
+   - Wyłączono i usunięto demona `com.hermes.omlx-compression-sync`.
+   - W Wariancie 1 skonfigurowano `auxiliary.compression.provider: auto` i `model: ""` – dzięki temu Hermes natywnie i dynamicznie kompresuje kontekst za pomocą modelu aktualnie aktywnego w danej sesji (0s swap latency, zero przeładowań dla każdego z 15 modeli).
+
 ---
 
 ## 🗂️ 2. Struktura Plików w Repozytorium

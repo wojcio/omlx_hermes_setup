@@ -55,16 +55,16 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 
 Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
-### 🏆 Wariant 1: Zero-Swap Monolith (Domyślny & Rekomendowany)
-* **Model główny:** `Qwen3.5-122B-A10B-MLX-9bit` (256k)
-* **Kompresor (`auxiliary.compression`):** `Qwen3.5-122B-A10B-MLX-9bit`
-* **Zasada działania:** Ten sam model obsługuje rozmowę i generuje podsumowania kompresji kontekstu.
+### 🏆 Wariant 1: Zero-Swap Dynamic (Domyślny & Rekomendowany: Kompresor = Model Sesji)
+* **Model główny:** Dowolny z 15 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
+* **Kompresor (`auxiliary.compression`):** `provider: auto`, `model: ""`
+* **Zasada działania:** Hermes dynamicznie używa do kompresji tego samego modelu, który aktualnie prowadzi konwersację (Ornith, Qwen 122B, Coder itd.).
 * **Zalety:**
-  - **0 sekund opóźnienia przełączania modeli (Zero Swap)** – model nie musi być przeładowywany z dysku SSD.
-  - Najwyższa jakość streszczeń i precyzja zachowania faktów technicznych.
-  - Idealna zgodność z demonem Watchdoga (`len(loaded) <= 1`).
+  - **0 sekund opóźnienia przełączania modeli (Zero Swap)** – model jest już w RAM i w pamięci podręcznej KV.
+  - Pełna dynamika: zmiana modelu w Hermesie automatycznie zmienia model wykonujący kompresję.
+  - 100% zgodność z regułą pojedynczego modelu w RAM (`len(loaded) <= 1`).
 
-### ⚡ Wariant 2: Dual-Model Resident (Szybki Lekki Kompresor 27B)
+### ⚡ Wariant 2: Dual-Model Resident (Szybki Dedykowany Kompresor 27B)
 * **Model główny:** `Qwen3.5-122B-A10B-MLX-9bit` (256k)
 * **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX` (256k, ~15 GB)
 * **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu.
