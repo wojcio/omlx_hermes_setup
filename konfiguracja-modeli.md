@@ -23,6 +23,9 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | [**DeepSeek-V4-Flash-0731-AWQ**](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ) | DeepSeek V4 | **262 144** (256k) | **128** | **32 768** | `0.6` | `0.95` | `40` | `1.00` | `0.01` / `0.00` | YaRN RoPE (factor 16), sliding window 128 |
 | [**Bielik-11B-v3.0-Instruct-MLX-8bit**](https://huggingface.co/speakleash/Bielik-11B-v3.0-Instruct-MLX-8bit) | LLaMA | **32 768** (32k) | *Brak* | **8 192** | `0.7` | `0.90` | `40` | `1.10` | `0.01` / `0.00` | Natywne okno 32k, polski model językowy |
 | [**Qwen3-235B-A22B-MLX-4bit**](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit) | Qwen 3 MoE | **40 960** (40k) | *Brak* | **8 192** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Natywne okno bazowe 40 960 tokenów |
+| [**Qwen3.8-Flash-Next-oQ5e-mtp**](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | Qwen 4 Exp | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Format oQ5e iMatrix z MTP, pełne okno 256k, wysoka jakość kwantyzacji |
+| [**Qwen3.8-27B-FP16_huzar_v1**](file:///Users/wojcio/.lmstudio/models/huzar/Qwen3.8-27B-FP16_huzar_v1) | Qwen 3.5 Dense | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Fine-tune Huzar (baza wiedzy), pełna precyzja FP16 (~27 GB), okno 256k |
+| [**Bielik-11B-v3.0-Huzar-MLX-8bit-v1**](file:///Users/wojcio/.lmstudio/models/huzar/Bielik-11B-v3.0-Huzar-MLX-8bit-v1) | LLaMA | **32 768** (32k) | *Brak* | **8 192** | `0.7` | `0.90` | `40` | `1.10` | `0.01` / `0.00` | Fine-tune Huzar (baza wiedzy), natywne okno 32k, polski model językowy |
 
 ---
 
@@ -47,6 +50,9 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 | 13 | `DeepSeek-V4-Flash-0731-AWQ` | [True2456/DeepSeek-V4-Flash-0731-AWQ](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ) | `True2456` | AWQ / MLX | `~/.lmstudio/models/True2456/DeepSeek-V4-Flash-0731-AWQ` |
 | 14 | `Bielik-11B-v3.0-Instruct-MLX-8bit` | [speakleash/Bielik-11B-v3.0-Instruct-MLX-8bit](https://huggingface.co/speakleash/Bielik-11B-v3.0-Instruct-MLX-8bit) | `speakleash` | MLX 8-bit | `~/.lmstudio/models/speakleash/Bielik-11B-v3.0-Instruct-MLX-8bit` |
 | 15 | `Qwen3-235B-A22B-MLX-4bit` | [Qwen/Qwen3-235B-A22B-MLX-4bit](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit) | `Qwen` | MLX 4-bit MoE | `~/.lmstudio/models/Qwen/Qwen3-235B-A22B-MLX-4bit` |
+| 16 | `Qwen3.8-Flash-Next-oQ5e-mtp` | [GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | `GBP-DE` | MLX oQ5e iMatrix MTP | `~/.lmstudio/models/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp` |
+| 17 | `Qwen3.8-27B-FP16_huzar_v1` | *Lokalny Fine-tune Huzar (baza wiedzy)* | `huzar` / `wojcio` | MLX FP16 Dense (~27 GB) | `~/.lmstudio/models/huzar/Qwen3.8-27B-FP16_huzar_v1` |
+| 18 | `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` | *Lokalny Fine-tune Huzar (baza wiedzy)* | `huzar` / `wojcio` | MLX 8-bit LLaMA (~11 GB) | `~/.lmstudio/models/huzar/Bielik-11B-v3.0-Huzar-MLX-8bit-v1` |
 | *LoRA* | `salakash/Minimalism` *(Adapter)* | [salakash/Minimalism](https://huggingface.co/salakash/Minimalism) | `salakash` | LoRA Adapter (Qwen2.5-0.5B) | `~/.lmstudio/models/salakash/Minimalism` |
 
 ---
@@ -56,7 +62,7 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### 🏆 Wariant 1: Zero-Swap Dynamic (Domyślny & Rekomendowany: Kompresor = Model Sesji)
-* **Model główny:** Dowolny z 15 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
+* **Model główny:** Dowolny z 18 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
 * **Kompresor (`auxiliary.compression`):** `provider: auto`, `model: ""`
 * **Zasada działania:** Hermes dynamicznie używa do kompresji tego samego modelu, który aktualnie prowadzi konwersację (Ornith, Qwen 122B, Coder itd.).
 * **Zalety:**

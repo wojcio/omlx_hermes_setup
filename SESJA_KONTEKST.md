@@ -91,3 +91,21 @@
 2. **Git Workflow:** Po edycji plików zawsze wykonuj commit i push do `https://github.com/wojcio/omlx_hermes_setup.git`.
 3. **Pamięć o Watchdogu:** Jeśli dodajesz nowy model pomocniczy do współistnienia w RAM obok modelu 122B, pamiętaj o ustawieniu `"is_pinned": true` w `model_settings.json`, aby demon `com.hermes.omlx-single-model-guard` go nie wyładował.
 4. **Duży kontekst (256k):** Modele Qwen3.5/3.8 mają pełne okno 262 144 tokenów. Przy operacjach na kontekście >100k tokenów prefill zajmuje do kilkudziesięciu sekund – timeouty w `compression` muszą wynosić minimum 300s.
+
+---
+
+## 🆕 5. Aktualizacja: Rozszerzenie Bazy do 18 Modeli (Wrzesień 2026)
+
+W sesji wrześniowej zidentyfikowano i włączono do konfiguracji oMLX oraz Hermes Agenta 3 nowe modele zrzucone lokalnie do `~/.lmstudio/models`:
+1. **`Qwen3.8-Flash-Next-oQ5e-mtp` (`GBP-DE`)**:
+   - Format `oQ5e` (Optimum Quantized 5-bit z iMatrix) z akceleracją Multi-Token Prediction (MTP).
+   - Pełne okno kontekstu: 262 144 tokenów (256k), max output: 32 768.
+   - Architektura Qwen 4 Exp, wysoka wydajność i jakość.
+2. **`Qwen3.8-27B-FP16_huzar_v1` (`huzar`)**:
+   - Lokalny fine-tune bazy wiedzy Huzar na pełnych wagach FP16 (~27 GB RAM).
+   - Pełne okno kontekstu 256k z odblokowanym myśleniem (`enable_thinking: true`).
+3. **`Bielik-11B-v3.0-Huzar-MLX-8bit-v1` (`huzar`)**:
+   - Lokalny fine-tune bazy wiedzy Huzar na polskim modelu Bielik 11B (LLaMA architecture).
+   - Natywne okno 32 768 tokenów (32k), max output: 8 192.
+
+Wszystkie parametry zostały wprowadzone do obu wariantów (`variant1-single-model`, `variant2-dual-model`), zsynchronizowane za pomocą `./switch-variant.sh 1` i zweryfikowane w aktywnym serwerze oMLX oraz CLI Hermesa (`hermes config get providers.omlx.models`).
