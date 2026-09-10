@@ -34,7 +34,23 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 
 # Przełączenie na Wariant 2 (dedykowany kompresor 27B):
 ./switch-variant.sh 2
+
+# Wymuszenie trybu zdalnego (IP z pliku .env):
+./switch-variant.sh 1 --remote
+
+# Wymuszenie trybu lokalnego:
+./switch-variant.sh 1 --local
 ```
+
+### 🌐 Automatyczna Detekcja oMLX (Lokalny vs Zdalny Serwer)
+
+Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany na bieżącej maszynie:
+1. **Lokalny oMLX wykryty:** Konfiguruje Hermesa na `http://127.0.0.1:8000/v1` oraz synchronizuje pliki konfiguracyjne do `~/.omlx/`.
+2. **Brak lokalnego oMLX:** Automatycznie przełącza Hermesa na zdalny serwer oMLX, pobierając adres IP z pliku `.env` (domyślnie `100.123.37.101` – prywatny serwer właściciela repozytorium dostępny via **Tailscale VPN**). Pomija katalog `~/.omlx/`.
+
+> [!TIP]
+> **Posiadasz własny serwer oMLX?**  
+> Zmodyfikuj plik `.env`, wpisując własne IP serwera (`OMLX_IP=...`) oraz klucz (`OMLX_API_KEY=...`).
 
 ---
 

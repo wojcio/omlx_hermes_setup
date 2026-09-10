@@ -15,7 +15,8 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 2. **Dwa Dostępne Warianty Konfiguracji:**
    - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 18 modeli.
    - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX` (~15 GB w RAM, `is_pinned: true`) jako dedykowany szybki kompresor.
-   - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2]`.
+   - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
+   - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
 3. **Watchdog oMLX (Single-Model Guard):**
    - W systemie działa usługa `launchd` (`com.hermes.omlx-single-model-guard.plist`) wywołująca skrypt `~/.hermes/scripts/omlx-single-model-guard.py` co 180s.
@@ -31,9 +32,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Wrzesień 2026)
-- Rozszerzono bazę obsługiwanych modeli z 15 do 18 pozycji.
-- Dołączono do oMLX i Hermesa 3 nowe modele:
-  1. `Qwen3.8-Flash-Next-oQ5e-mtp` (GBP-DE, 256k okno, format oQ5e z iMatrix i MTP, architektura Qwen 4 Exp).
-  2. `Qwen3.8-27B-FP16_huzar_v1` (Lokalny fine-tune bazy wiedzy Huzar na wagach FP16, 256k okno, pełne myślenie).
-  3. `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` (Lokalny fine-tune bazy wiedzy Huzar na modelu Bielik 11B, 32k okno).
+- Rozszerzono bazę obsługiwanych modeli z 15 do 18 pozycji (`Qwen3.8-Flash-Next-oQ5e-mtp`, `Qwen3.8-27B-FP16_huzar_v1`, `Bielik-11B-v3.0-Huzar-MLX-8bit-v1`).
+- Dodano inteligentną detekcję lokalnego serwera oMLX w `switch-variant.sh` oraz wsparcie dla serwera zdalnego (IP pobierane z pliku `.env`, domyślnie `100.123.37.101` via Tailscale VPN).
+- Dodano flagi `--remote` oraz `--local` do skryptu przełączania wariantów.
 - Zaktualizowano konfiguracje wariantów 1 i 2 (`config.*.yaml`, `model_settings.*.json`), dokumentację techniczną oraz zsynchronizowano serwer oMLX i agenta Hermes.

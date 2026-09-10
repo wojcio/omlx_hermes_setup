@@ -109,3 +109,9 @@ W sesji wrześniowej zidentyfikowano i włączono do konfiguracji oMLX oraz Herm
    - Natywne okno 32 768 tokenów (32k), max output: 8 192.
 
 Wszystkie parametry zostały wprowadzone do obu wariantów (`variant1-single-model`, `variant2-dual-model`), zsynchronizowane za pomocą `./switch-variant.sh 1` i zweryfikowane w aktywnym serwerze oMLX oraz CLI Hermesa (`hermes config get providers.omlx.models`).
+
+4. **Wykrywanie oMLX i obsługa zdalnego serwera (`.env` / Tailscale VPN):**
+   - Skrypt `switch-variant.sh` wzbogacono o automatyczną detekcję lokalnej obecności oMLX (`omlx` w PATH, `/Applications/oMLX.app`, `~/.omlx/bin/omlx`).
+   - Gdy oMLX nie jest obecny lokalnie (lub gdy przekazano flagę `--remote`), skrypt automatycznie przełącza konfigurację Hermesa (`model.base_url`, `providers.omlx.base_url`, `compression.base_url`) na adres zdalny zdefiniowany w `.env` (domyślnie `100.123.37.101:8000` – prywatny serwer właściciela repozytorium via Tailscale VPN).
+   - Pomijane jest wtedy kopiowanie konfiguracji do `~/.omlx/`, a klucz `OMLX_API_KEY` jest automatycznie zapewniany w `~/.hermes/.env`.
+   - Utworzono pliki `.env` oraz `.env.example` z odpowiednim komentarzem informacyjnym dla innych użytkowników repozytorium.
