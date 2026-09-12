@@ -26,6 +26,8 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | [**Qwen3.8-Flash-Next-oQ5e-mtp**](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | Qwen 4 Exp | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Format oQ5e iMatrix z MTP, pełne okno 256k, wysoka jakość kwantyzacji |
 | [**Qwen3.8-27B-FP16_huzar_v1**](file:///Users/wojcio/.lmstudio/models/huzar/Qwen3.8-27B-FP16_huzar_v1) | Qwen 3.5 Dense | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Fine-tune Huzar (baza wiedzy), pełna precyzja FP16 (~27 GB), okno 256k |
 | [**Bielik-11B-v3.0-Huzar-MLX-8bit-v1**](file:///Users/wojcio/.lmstudio/models/huzar/Bielik-11B-v3.0-Huzar-MLX-8bit-v1) | LLaMA | **32 768** (32k) | *Brak* | **8 192** | `0.7` | `0.90` | `40` | `1.10` | `0.01` / `0.00` | Fine-tune Huzar (baza wiedzy), natywne okno 32k, polski model językowy |
+| [**olmOCR-2-7B-1025-8bit**](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit) | Qwen 2.5 VL | **128 000** (128k) | *Brak (Dense)* | **8 192** | `0.2` | `0.90` | `20` | `1.05` | `0.01` / `0.00` | Model VLM zoptymalizowany pod kątem zaawansowanego OCR dokumentów PDF, tabel, wzorów i układów wielokolumnowych |
+| [**Unlimited-OCR-8bit**](https://huggingface.co/mlx-community/Unlimited-OCR-8bit) | UnlimitedOCR (DeepSeek MoE) | **32 768** (32k) | **128** | **8 192** | `0.2` | `0.90` | `20` | `1.05` | `0.01` / `0.00` | Model VLM OCR bez limitu rozdzielczości obrazu (downsampling/tiling 2D), odczyt faktur i etykiet, wymaga `trust_remote_code` |
 
 ---
 
@@ -53,6 +55,8 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 | 16 | `Qwen3.8-Flash-Next-oQ5e-mtp` | [GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | `GBP-DE` | MLX oQ5e iMatrix MTP | `~/.lmstudio/models/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp` |
 | 17 | `Qwen3.8-27B-FP16_huzar_v1` | *Lokalny Fine-tune Huzar (baza wiedzy)* | `huzar` / `wojcio` | MLX FP16 Dense (~27 GB) | `~/.lmstudio/models/huzar/Qwen3.8-27B-FP16_huzar_v1` |
 | 18 | `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` | *Lokalny Fine-tune Huzar (baza wiedzy)* | `huzar` / `wojcio` | MLX 8-bit LLaMA (~11 GB) | `~/.lmstudio/models/huzar/Bielik-11B-v3.0-Huzar-MLX-8bit-v1` |
+| 19 | `olmOCR-2-7B-1025-8bit` | [mlx-community/olmOCR-2-7B-1025-8bit](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit) | `mlx-community` / `allenai` | MLX 8-bit VLM (~8.8 GB) | `~/.lmstudio/models/mlx-community/olmOCR-2-7B-1025-8bit` |
+| 20 | `Unlimited-OCR-8bit` | [mlx-community/Unlimited-OCR-8bit](https://huggingface.co/mlx-community/Unlimited-OCR-8bit) | `mlx-community` / `baidu` | MLX 8-bit MoE VLM (~3.7 GB) | `~/.lmstudio/models/mlx-community/Unlimited-OCR-8bit` |
 | *LoRA* | `salakash/Minimalism` *(Adapter)* | [salakash/Minimalism](https://huggingface.co/salakash/Minimalism) | `salakash` | LoRA Adapter (Qwen2.5-0.5B) | `~/.lmstudio/models/salakash/Minimalism` |
 
 ---

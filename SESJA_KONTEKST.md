@@ -115,3 +115,26 @@ Wszystkie parametry zostały wprowadzone do obu wariantów (`variant1-single-mod
    - Gdy oMLX nie jest obecny lokalnie (lub gdy przekazano flagę `--remote`), skrypt automatycznie przełącza konfigurację Hermesa (`model.base_url`, `providers.omlx.base_url`, `compression.base_url`) na adres zdalny zdefiniowany w `.env` (domyślnie `100.123.37.101:8000` – prywatny serwer właściciela repozytorium via Tailscale VPN).
    - Pomijane jest wtedy kopiowanie konfiguracji do `~/.omlx/`, a klucz `OMLX_API_KEY` jest automatycznie zapewniany w `~/.hermes/.env`.
    - Utworzono pliki `.env` oraz `.env.example` z odpowiednim komentarzem informacyjnym dla innych użytkowników repozytorium.
+
+---
+
+## 🔍 4. Rozszerzenie Bazy o Modele Wizyjne OCR (Wrzesień 2026)
+
+Do ekosystemu dołączono dwa wyspecjalizowane modele typu **VLM (Vision-Language Model)** dedykowane zaawansowanemu OCR dokumentów, faktur i tabel, rozszerzając zestaw z 18 do **20 modeli**:
+
+1. **`olmOCR-2-7B-1025-8bit` (`mlx-community` / `allenai`)**:
+   - Model multimodalny bazujący na architekturze `qwen2_5_vl` (`Qwen2_5_VLForConditionalGeneration`).
+   - Zoptymalizowany przez AllenAI do precyzyjnej transkrypcji skomplikowanych dokumentów PDF, tabel, wielokolumnowych układów i wzorów matematycznych bezpośrednio do Markdowna.
+   - Kontekst: **128 000 tokenów (128k)**, limit wyjściowy: **8 192 tokenów**.
+   - Sampling OCR: `temperature: 0.2`, `top_p: 0.90`, `top_k: 20`, `repetition_penalty: 1.05`, `model_type_override: "vlm"`.
+   - Waga modelu: kwantyzacja MLX 8-bit (~8.8 GB).
+
+2. **`Unlimited-OCR-8bit` (`mlx-community` / `baidu`)**:
+   - Model multimodalny `unlimited-ocr` (`UnlimitedOCRForCausalLM`) bazujący na szkielecie DeepSeek-V2 MoE z autorskim enkoderem wizyjnym `DeepEncoder` (tiling/downsampling 2D).
+   - Umożliwia przetwarzanie dokumentów o dowolnej rozdzielczości bez ograniczeń rozmiaru siatki pikseli, wyspecjalizowany w odczycie faktur, paragonów, etykiet i drobnego druku.
+   - Kontekst: **32 768 tokenów (32k)**, limit wyjściowy: **8 192 tokenów**.
+   - Sampling OCR: `temperature: 0.2`, `top_p: 0.90`, `top_k: 20`, `repetition_penalty: 1.05`, `model_type_override: "vlm"`, `trust_remote_code: true`.
+   - Waga modelu: kwantyzacja MLX 8-bit (~3.7 GB).
+
+Obydwa modele zostały skonfigurowane w `model_settings.json` (warianty 1 i 2) jako `vlm` oraz zarejestrowane w Hermesie w `providers.omlx.models` z flagą `supports_vision: true`. Dodatkowo oznaczono model `UI-Venus-1.5-30B-A3B-qx86-hi-mlx` jako `supports_vision: true`.
+
