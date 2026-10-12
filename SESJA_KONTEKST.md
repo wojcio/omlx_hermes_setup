@@ -138,3 +138,21 @@ Do ekosystemu dołączono dwa wyspecjalizowane modele typu **VLM (Vision-Languag
 
 Obydwa modele zostały skonfigurowane w `model_settings.json` (warianty 1 i 2) jako `vlm` oraz zarejestrowane w Hermesie w `providers.omlx.models` z flagą `supports_vision: true`. Dodatkowo oznaczono model `UI-Venus-1.5-30B-A3B-qx86-hi-mlx` jako `supports_vision: true`.
 
+---
+
+## 🚀 5. Aktualizacja: Włączenie DeepSeek-V4-Flash-0731-MXFP4-MLX (Październik 2026)
+
+Do rejestru oMLX i konfiguracji Hermes Agenta dołączono flagowy model MoE, rozszerzając bazę z 20 do **21 modeli**:
+
+1. **`DeepSeek-V4-Flash-0731-MXFP4-MLX` (`TensorFold`)**:
+   - Model MoE architektury `deepseek_v4` (256 routed experts, 6 aktywnych na token, 1 shared expert).
+   - Waga modelu w pamięci RAM: wagi MXFP4 zajmujące **155.69 GB** w Unified Memory (zoptymalizowane pod kątem platformy Mac Studio 192 GB).
+   - Natywny kontekst: **1 048 576 tokenów (1M context)** z YaRN RoPE (factor 16, sliding window 128) oraz limitem wyjściowym `max_tokens: 32768`.
+   - Akceleracja KV Cache: kompresja **TurboQuant KV 6-bit** (`turboquant_kv_bits: 6.0`), umożliwiająca stabilną obsługę bardzo długich promptów bez przekroczenia limitu RAM.
+   - Sprzętowe MTP: Multi-Token Prediction o adaptacyjnej głębokości 3 (`mtp_enabled: true`, `mtp_adaptive_max_depth: 3`).
+   - Parsowanie rozumowania: `reasoning_parser: "deepseek_v4"`, odblokowane myślenie (`enable_thinking: true`, `thinking_budget_enabled: false`, budżet bazowy 32k tokenów).
+   - Kalibracja samplingu: `temperature: 0.6`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.00`, `presence_penalty: 0.00`, `min_p: 0.01`.
+   - Profile wykonawcze: zdefiniowano profil `work` z pełnym oknem 1M w `model_profiles.json`.
+   - Weryfikacja: pomyślnie przetestowano bezpośrednie wywołanie agenta z linii poleceń (`hermes -m DeepSeek-V4-Flash-0731-MXFP4-MLX -z "..."`), uzyskując poprawną odpowiedź w języku polskim z natywnym blokiem `reasoning_content`.
+
+

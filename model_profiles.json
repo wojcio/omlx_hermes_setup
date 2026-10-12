@@ -33,7 +33,7 @@
           "vlm_mtp_enabled": false,
           "specprefill_enabled": false,
           "turboquant_kv_enabled": true,
-          "turboquant_kv_bits": 8,
+          "turboquant_kv_bits": 8.0,
           "turboquant_skip_last": true,
           "chat_template_kwargs": {
             "enable_thinking": true
@@ -69,7 +69,7 @@
             "enable_thinking": true
           },
           "turboquant_kv_enabled": true,
-          "turboquant_kv_bits": 8,
+          "turboquant_kv_bits": 8.0,
           "turboquant_skip_last": true,
           "max_tool_result_tokens": 0,
           "mtp_enabled": false,
@@ -113,6 +113,112 @@
           "chat_template_kwargs": {
             "enable_thinking": true
           }
+        },
+        "source_template": null,
+        "expose_as_model": false
+      }
+    },
+    "Qwen3.8-Flash-Next-oQ5e-mtp": {
+      "turbo": {
+        "name": "turbo",
+        "display_name": "turbo",
+        "api_name": "turbo",
+        "description": null,
+        "created_at": "2026-09-14T04:53:50.444702+00:00",
+        "updated_at": "2026-09-14T04:54:20.418647+00:00",
+        "settings": {
+          "dflash_enabled": false,
+          "force_sampling": false,
+          "mtp_enabled": true,
+          "chat_template_kwargs": {
+            "enable_thinking": true
+          },
+          "max_tool_result_tokens": 0,
+          "specprefill_enabled": false,
+          "temperature": 0.7,
+          "thinking_budget_enabled": false,
+          "repetition_penalty": 1.05,
+          "thinking_budget_tokens": 8192,
+          "forced_ct_kwargs": [
+            "enable_thinking"
+          ],
+          "max_tokens": 32768,
+          "max_context_window": 262144,
+          "turboquant_kv_enabled": true,
+          "qwen35_ane_prefill_enabled": false,
+          "top_k": 20,
+          "qwen35_oq_a8_enabled": false,
+          "vlm_mtp_enabled": false,
+          "top_p": 0.95,
+          "enable_thinking": true,
+          "min_p": 0.01,
+          "turboquant_kv_bits": 8.0
+        },
+        "source_template": null,
+        "expose_as_model": false
+      }
+    },
+    "DeepSeek-V4-Flash-0731-MXFP4-MLX": {
+      "p-97a56f0f-e0a8-4b62-abb4-4f85": {
+        "name": "p-97a56f0f-e0a8-4b62-abb4-4f85",
+        "display_name": "profile-1",
+        "api_name": "profile-1",
+        "description": null,
+        "created_at": "2026-10-12T10:50:01.442963+00:00",
+        "updated_at": "2026-10-12T10:50:01.442963+00:00",
+        "settings": {
+          "force_sampling": false,
+          "max_tool_result_tokens": 0,
+          "enable_thinking": true,
+          "thinking_budget_enabled": false,
+          "thinking_budget_tokens": 8192,
+          "mtp_adaptive_max_depth": 3,
+          "turboquant_kv_enabled": true,
+          "turboquant_kv_bits": 6.0,
+          "qwen35_ane_prefill_enabled": false,
+          "qwen35_oq_a8_enabled": false,
+          "specprefill_enabled": false,
+          "dflash_enabled": false,
+          "mtp_enabled": true,
+          "vlm_mtp_enabled": false
+        },
+        "source_template": null,
+        "expose_as_model": false
+      },
+      "work": {
+        "name": "work",
+        "display_name": "work",
+        "api_name": "work",
+        "description": "Full 1M context reasoning profile with TurboQuant KV 6-bit and MTP acceleration.",
+        "created_at": "2026-10-12T23:30:00.000000+00:00",
+        "updated_at": "2026-10-12T23:30:00.000000+00:00",
+        "settings": {
+          "max_context_window": 1048576,
+          "max_tokens": 32768,
+          "temperature": 0.6,
+          "top_p": 0.95,
+          "top_k": 40,
+          "repetition_penalty": 1.0,
+          "presence_penalty": 0.0,
+          "min_p": 0.01,
+          "force_sampling": false,
+          "enable_thinking": true,
+          "thinking_budget_enabled": false,
+          "thinking_budget_tokens": 32768,
+          "reasoning_parser": "deepseek_v4",
+          "turboquant_kv_enabled": true,
+          "turboquant_kv_bits": 6.0,
+          "turboquant_skip_last": true,
+          "mtp_enabled": true,
+          "mtp_adaptive_max_depth": 3,
+          "chat_template_kwargs": {
+            "enable_thinking": true
+          },
+          "max_tool_result_tokens": 0,
+          "qwen35_ane_prefill_enabled": false,
+          "specprefill_enabled": false,
+          "dflash_enabled": false,
+          "vlm_mtp_enabled": false
         },
         "source_template": null,
         "expose_as_model": false
