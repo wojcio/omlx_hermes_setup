@@ -180,3 +180,11 @@ Usunięto model testowy `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` ze wszystkich konfig
 - Model ten służył wyłącznie do celów badawczo-testowych i nie jest przeznaczony do developmentu agentowego w Hermesie.
 - Jako oficjalny polski model językowy w środowisku pozostaje `Bielik-11B-v3.0-Instruct-MLX-8bit`.
 - Aktualna liczba aktywnych modeli w rejestrze wynosi **21 modeli produkcyjnych**.
+
+---
+
+## 🚀 8. Aktualizacja: Usunięcie lokalnego fine-tune Qwen3.8-27B-FP16_huzar_v1 (Październik 2026)
+
+Usunięto lokalny model fine-tune `Qwen3.8-27B-FP16_huzar_v1` ze wszystkich konfiguracji oMLX i Hermesa (`config.*.yaml`, `model_settings.*.json`, `~/.hermes/config.yaml`, `~/.omlx/model_settings.json`).
+- W rejestrze modeli 27B/Flash pozostają oficjalne, zoptymalizowane wersje produkcyjne: `Qwen3.8-27B-Uncensored-MLX`, `Qwen3.8-27B-MTPLX-Optimized-Quality-FP16`, `Qwen3.8-Flash-Next-oQ5e-mtp` oraz `Qwen3.8-Flash-Next-MLX-6bit`.
+- Aktualna liczba aktywnych modeli produkcyjnych wynosi **20 modeli**.

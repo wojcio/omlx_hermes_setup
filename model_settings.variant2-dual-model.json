@@ -408,31 +408,6 @@
       "is_favorite": true,
       "trust_remote_code": true
     },
-    "Qwen3.8-27B-FP16_huzar_v1": {
-      "max_context_window": 262144,
-      "max_tokens": 32768,
-      "temperature": 0.7,
-      "top_p": 0.95,
-      "top_k": 20,
-      "repetition_penalty": 1.05,
-      "min_p": 0.01,
-      "force_sampling": false,
-      "chat_template_kwargs": {
-        "enable_thinking": true
-      },
-      "forced_ct_kwargs": [
-        "enable_thinking"
-      ],
-      "enable_thinking": true,
-      "model_type_override": "llm",
-      "is_pinned": false,
-      "is_default": false,
-      "is_hidden": false,
-      "is_favorite": true,
-      "trust_remote_code": true,
-      "turboquant_kv_enabled": true,
-      "turboquant_kv_bits": 8.0
-    },
     "Qwen3.8-Flash-Next-oQ5e-mtp": {
       "max_context_window": 262144,
       "max_tokens": 32768,
