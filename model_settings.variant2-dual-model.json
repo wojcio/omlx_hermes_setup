@@ -408,23 +408,6 @@
       "is_favorite": true,
       "trust_remote_code": true
     },
-    "Bielik-11B-v3.0-Huzar-MLX-8bit-v1": {
-      "max_context_window": 32768,
-      "max_tokens": 8192,
-      "temperature": 0.7,
-      "top_p": 0.9,
-      "top_k": 40,
-      "repetition_penalty": 1.1,
-      "min_p": 0.01,
-      "force_sampling": false,
-      "enable_thinking": false,
-      "model_type_override": "llm",
-      "is_pinned": false,
-      "is_default": false,
-      "is_hidden": false,
-      "is_favorite": true,
-      "trust_remote_code": true
-    },
     "Qwen3.8-27B-FP16_huzar_v1": {
       "max_context_window": 262144,
       "max_tokens": 32768,

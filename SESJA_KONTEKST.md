@@ -171,3 +171,12 @@ Do rejestru oMLX i konfiguracji Hermes Agenta dołączono multimodalny model MoE
    - Kalibracja samplingu: `temperature: 1.0`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.00`, `presence_penalty: 0.00`, `min_p: 0.01`.
    - Flaga wizji: `supports_vision: true` w konfiguracji Hermesa (`config.yaml`).
    - Synchronizacja: wdrożono przez `./switch-variant.sh 1` do `~/.hermes/config.yaml` oraz `~/.omlx/model_settings.json`.
+
+---
+
+## 🚀 7. Aktualizacja: Usunięcie modelu testowego Bielik-11B-v3.0-Huzar-MLX-8bit-v1 (Październik 2026)
+
+Usunięto model testowy `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` ze wszystkich konfiguracji oMLX i Hermes Agenta (`config.*.yaml`, `model_settings.*.json`, `~/.hermes/config.yaml`, `~/.omlx/model_settings.json`). 
+- Model ten służył wyłącznie do celów badawczo-testowych i nie jest przeznaczony do developmentu agentowego w Hermesie.
+- Jako oficjalny polski model językowy w środowisku pozostaje `Bielik-11B-v3.0-Instruct-MLX-8bit`.
+- Aktualna liczba aktywnych modeli w rejestrze wynosi **21 modeli produkcyjnych**.

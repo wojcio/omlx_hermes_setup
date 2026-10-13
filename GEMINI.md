@@ -10,10 +10,10 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla 22 modeli (okna do 1M, sampling, parsery, VLM/OCR) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla 21 modeli (okna do 1M, sampling, parsery, VLM/OCR) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 22 modeli.
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 21 modeli.
    - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX` (~15 GB w RAM, `is_pinned: true`) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
@@ -32,7 +32,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
-- Rozszerzono bazę modeli z 21 do **22 pozycji** o model MoE VL:
+- Rozszerzono bazę modeli do **21 pozycji** (dodano `MiniMax-M3-ConfigI-MLX`, usunięto testowy `Bielik-11B-v3.0-Huzar-MLX-8bit-v1`):
   * `MiniMax-M3-ConfigI-MLX` (`thetom-ai/MiniMax-M3-ConfigI-MLX`): 60 warstw, 128 ekspertów (top-4), multimodalny (VL), kwantyzacja ConfigI (wagi ~156 GB), okno kontekstu **131 072 tokenów (128k; natywnie 1M, ograniczone ze względu na 192 GB RAM)**, parser rozumowania `minimax_m3` (`<mm:think>`), sampling: `temperature: 1.0`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.00`, włączona obsługa wizji w Hermesie (`supports_vision: true`).
 - Zaktualizowano konfiguracje Hermesa (`config.*.yaml`, `config.yaml`, `~/.hermes/config.yaml`) i oMLX (`model_settings.*.json`, `~/.omlx/model_settings.json`).
 - Zaktualizowano dokumentację techniczną (`konfiguracja-modeli.md`, `README.md`, `SESJA_KONTEKST.md`) i zsynchronizowano środowisko przez `./switch-variant.sh 1`.

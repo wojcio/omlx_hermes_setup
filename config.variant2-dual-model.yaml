@@ -74,10 +74,6 @@ providers:
         context_window: 40960
         context_length: 40960
         max_tokens: 8192
-      Bielik-11B-v3.0-Huzar-MLX-8bit-v1:
-        context_window: 32768
-        context_length: 32768
-        max_tokens: 8192
       Qwen3.8-27B-FP16_huzar_v1:
         context_window: 262144
         context_length: 262144
