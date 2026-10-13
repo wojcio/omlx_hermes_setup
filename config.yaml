@@ -100,6 +100,11 @@ providers:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
+      MiniMax-M3-ConfigI-MLX:
+        context_window: 131072
+        context_length: 131072
+        max_tokens: 32768
+        supports_vision: true
 fallback_providers: []
 toolsets:
   - hermes-cli

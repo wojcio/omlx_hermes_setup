@@ -156,3 +156,18 @@ Do rejestru oMLX i konfiguracji Hermes Agenta dołączono flagowy model MoE, roz
    - Weryfikacja: pomyślnie przetestowano bezpośrednie wywołanie agenta z linii poleceń (`hermes -m DeepSeek-V4-Flash-0731-MXFP4-MLX -z "..."`), uzyskując poprawną odpowiedź w języku polskim z natywnym blokiem `reasoning_content`.
 
 
+
+---
+
+## 🚀 6. Aktualizacja: Włączenie MiniMax-M3-ConfigI-MLX (Październik 2026)
+
+Do rejestru oMLX i konfiguracji Hermes Agenta dołączono multimodalny model MoE, rozszerzając bazę z 21 do **22 modeli**:
+
+1. **`MiniMax-M3-ConfigI-MLX` (`thetom-ai`)**:
+   - Model MoE architektury `minimax_m3_vl` (60 warstw, 128 lokalnych ekspertów, top-4 routed experts, 1 shared expert, multimodalny projektor VLM).
+   - Waga modelu w pamięci RAM: wagi ConfigI zajmujące **~156 GB** w Unified Memory (atencja 4/8-bit, eksperty 2–3-bit).
+   - Okno kontekstu: **131 072 tokenów (128k; natywnie 1M, zredukowane ze względu na 192 GB RAM)** z limitem wyjściowym `max_tokens: 32768`.
+   - Parsowanie rozumowania: `reasoning_parser: "minimax_m3"`, natywne tagi `<mm:think>` i `</mm:think>`, odblokowane myślenie (`enable_thinking: true`).
+   - Kalibracja samplingu: `temperature: 1.0`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.00`, `presence_penalty: 0.00`, `min_p: 0.01`.
+   - Flaga wizji: `supports_vision: true` w konfiguracji Hermesa (`config.yaml`).
+   - Synchronizacja: wdrożono przez `./switch-variant.sh 1` do `~/.hermes/config.yaml` oraz `~/.omlx/model_settings.json`.
