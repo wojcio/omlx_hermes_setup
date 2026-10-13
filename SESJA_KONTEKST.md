@@ -198,3 +198,24 @@ Model nie ładował się w oMLX (`Received 1378 parameters not in model`, nastę
 2. **Brak wpisów kwantyzacji `switch_mlp.gate_up_proj`** – loader łączy `gate_proj` i `up_proj` w `gate_up_proj`, a per-warstwowa kwantyzacja ConfigI (eksperty 2-bit) nie zawierała takiego klucza, więc przyjmowano domyślne 4 bity. Dodano 114 wpisów (w `quantization` i `quantization_config`) z bitami `gate_proj`.
 
 Zmiany są w pliku poza repozytorium (`~/.lmstudio/models/thetom-ai/MiniMax-M3-ConfigI-MLX/config.json`, kopia oryginału: `config.json.bak-no-vision_config`) i trzeba je powtórzyć po ponownym pobraniu modelu. Po `POST /admin/api/reload` model jest wykrywany jako `vlm` i ładuje się poprawnie; test: odpowiedź po polsku z blokiem rozumowania, ~23.6 tok/s.
+
+---
+
+## 🚀 10. Konsolidacja i eliminacja duplikatów modeli (Październik 2026)
+
+Przeprowadzono gruntowną optymalizację rejestru modeli, redukując liczbę pozycji z 20 do **15 kluczowych, wyspecjalizowanych modeli produkcyjnych**. Wyeliminowano zbędne warianty kwantyzacji dublujące te same modele bazowe:
+
+1. **DeepSeek-V4-Flash**:
+   - Pozostawiono: flagowy `DeepSeek-V4-Flash-0731-MXFP4-MLX` (~155 GB, najwyższa jakość, MTP depth 3) oraz lżejszy `DeepSeek-V4-Flash-0731-AWQ` (~100 GB z MTP).
+   - Usunięto z konfiguracji: `DeepSeek-V4-Flash-MLX-mixed-4_8bit` oraz `DeepSeek-V4-Flash-ConfigI-MLX`.
+2. **Qwen3-Coder-Next**:
+   - Pozostawiono: `Qwen3-Coder-Next-MLX-9bit` (wyższa precyzja wag kodera dla 192 GB RAM).
+   - Usunięto z konfiguracji: `Qwen3-Coder-Next-MLX-8bit`.
+3. **Qwen3.8-Flash-Next**:
+   - Pozostawiono: `Qwen3.8-Flash-Next-oQ5e-mtp` (lżejszy, iMatrix oraz sprzętowa akceleracja MTP).
+   - Usunięto z konfiguracji: `Qwen3.8-Flash-Next-MLX-6bit`.
+4. **Klasa 27B**:
+   - Pozostawiono: `Qwen3.8-27B-Uncensored-MLX` jako dedykowany i stały kompresor wariantu 2.
+   - Usunięto z konfiguracji: `Qwen3.8-27B-MTPLX-Optimized-Quality-FP16`.
+
+Zsynchronizowano konfiguracje oMLX i Hermesa za pomocą `./switch-variant.sh 1`.

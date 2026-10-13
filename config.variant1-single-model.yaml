@@ -17,23 +17,11 @@ providers:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
-      Qwen3.8-Flash-Next-MLX-6bit:
-        context_window: 262144
-        context_length: 262144
-        max_tokens: 32768
       Qwen3-Coder-Next-MLX-9bit:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
-      Qwen3-Coder-Next-MLX-8bit:
-        context_window: 262144
-        context_length: 262144
-        max_tokens: 32768
       Qwen3.8-27B-Uncensored-MLX:
-        context_window: 262144
-        context_length: 262144
-        max_tokens: 32768
-      Qwen3.8-27B-MTPLX-Optimized-Quality-FP16:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
@@ -58,14 +46,6 @@ providers:
         context_window: 32768
         context_length: 32768
         max_tokens: 8192
-      DeepSeek-V4-Flash-MLX-mixed-4_8bit:
-        context_window: 262144
-        context_length: 262144
-        max_tokens: 32768
-      DeepSeek-V4-Flash-ConfigI-MLX:
-        context_window: 262144
-        context_length: 262144
-        max_tokens: 32768
       DeepSeek-V4-Flash-0731-AWQ:
         context_window: 262144
         context_length: 262144
