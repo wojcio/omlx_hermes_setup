@@ -82,8 +82,8 @@
       "thinking_budget_enabled": false,
       "thinking_budget_tokens": 8192,
       "guided_grammar_enabled": false,
-      "turboquant_kv_enabled": false,
-      "turboquant_kv_bits": 6,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0,
       "turboquant_skip_last": true,
       "qwen35_ane_prefill_enabled": false,
       "qwen35_ane_prefill_sequence_length": 2048,
@@ -188,7 +188,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0
     },
     "Qwen3.8-27B-MTPLX-Optimized-Quality-FP16": {
       "max_context_window": 262144,
@@ -208,7 +210,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0
     },
     "Ornith-1.5-35B-A3B-Abliterated-MLX-BF16": {
       "max_context_window": 262144,
@@ -228,7 +232,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0
     },
     "Step-3.5-Flash-4bit": {
       "max_context_window": 262144,
@@ -248,7 +254,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0
     },
     "UI-Venus-1.5-30B-A3B-qx86-hi-mlx": {
       "max_context_window": 262144,
@@ -288,7 +296,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0
     },
     "DeepSeek-V4-Flash-MLX-mixed-4_8bit": {
       "max_context_window": 262144,
@@ -309,7 +319,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 6.0
     },
     "DeepSeek-V4-Flash-ConfigI-MLX": {
       "max_context_window": 262144,
@@ -330,7 +342,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 6.0
     },
     "DeepSeek-V4-Flash-0731-AWQ": {
       "max_context_window": 262144,
@@ -351,7 +365,11 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 6.0,
+      "mtp_enabled": true,
+      "mtp_adaptive_max_depth": 3
     },
     "Bielik-11B-v3.0-Instruct-MLX-8bit": {
       "max_context_window": 32768,
@@ -428,7 +446,9 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_enabled": true,
+      "turboquant_kv_bits": 8.0
     },
     "Qwen3.8-Flash-Next-oQ5e-mtp": {
       "max_context_window": 262144,
@@ -451,17 +471,18 @@
       "thinking_budget_enabled": false,
       "thinking_budget_tokens": 8192,
       "guided_grammar_enabled": false,
-      "turboquant_kv_enabled": false,
+      "turboquant_kv_enabled": true,
       "specprefill_enabled": false,
       "dflash_enabled": false,
-      "mtp_enabled": false,
+      "mtp_enabled": true,
       "vlm_mtp_enabled": false,
       "model_type_override": "llm",
       "is_pinned": false,
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "turboquant_kv_bits": 8.0
     },
     "olmOCR-2-7B-1025-8bit": {
       "max_context_window": 128000,

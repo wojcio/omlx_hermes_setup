@@ -38,3 +38,4 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 - Zaktualizowano ustawienia oMLX (`model_settings.*.json`, `~/.omlx/model_settings.json`) o precyzyjny sampling (`temperature: 0.6`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.00`, TurboQuant KV 6-bit, MTP).
 - Dodano profil `work` w `model_profiles.json` (`~/.omlx/model_profiles.json`) dla `DeepSeek-V4-Flash-0731-MXFP4-MLX`.
 - Zsynchronizowano system za pomocą `./switch-variant.sh 1` i pomyślnie zweryfikowano zapytaniem testowym CLI w Hermesie.
+- Optymalizacja oMLX: włączono TurboQuant KV (8-bit dla Qwen/Ornith/Step/Laguna, 6-bit dla DeepSeek V4) oraz MTP dla modeli z faktycznymi wagami MTP (`Qwen3.8-Flash-Next-oQ5e-mtp`, `DeepSeek-V4-Flash-0731-AWQ`, depth 3). Okno DeepSeek MXFP4 ograniczono do 256k.
