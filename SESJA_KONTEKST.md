@@ -188,3 +188,13 @@ Usunięto model testowy `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` ze wszystkich konfig
 Usunięto lokalny model fine-tune `Qwen3.8-27B-FP16_huzar_v1` ze wszystkich konfiguracji oMLX i Hermesa (`config.*.yaml`, `model_settings.*.json`, `~/.hermes/config.yaml`, `~/.omlx/model_settings.json`).
 - W rejestrze modeli 27B/Flash pozostają oficjalne, zoptymalizowane wersje produkcyjne: `Qwen3.8-27B-Uncensored-MLX`, `Qwen3.8-27B-MTPLX-Optimized-Quality-FP16`, `Qwen3.8-Flash-Next-oQ5e-mtp` oraz `Qwen3.8-Flash-Next-MLX-6bit`.
 - Aktualna liczba aktywnych modeli produkcyjnych wynosi **20 modeli**.
+
+---
+
+## 🚀 9. Naprawa: ładowanie MiniMax-M3-ConfigI-MLX w oMLX (Październik 2026)
+
+Model nie ładował się w oMLX (`Received 1378 parameters not in model`, następnie `Expected shape (129, 6144, 768) but received (129, 6144, 384)`). Przyczyny leżały w `config.json` kwantyzacji `thetom-ai/MiniMax-M3-ConfigI-MLX`:
+1. **Brak `vision_config`** – oMLX klasyfikował model jako text-only (`type: llm`) i budował go bez wieży wizyjnej, mimo że wagi zawierają `vision_tower` (515 tensorów). Dodano `vision_config` z oryginalnego `MiniMaxAI/MiniMax-M3` (hidden 1280, 32 warstwy, FFN 5120 – zgodne z wagami).
+2. **Brak wpisów kwantyzacji `switch_mlp.gate_up_proj`** – loader łączy `gate_proj` i `up_proj` w `gate_up_proj`, a per-warstwowa kwantyzacja ConfigI (eksperty 2-bit) nie zawierała takiego klucza, więc przyjmowano domyślne 4 bity. Dodano 114 wpisów (w `quantization` i `quantization_config`) z bitami `gate_proj`.
+
+Zmiany są w pliku poza repozytorium (`~/.lmstudio/models/thetom-ai/MiniMax-M3-ConfigI-MLX/config.json`, kopia oryginału: `config.json.bak-no-vision_config`) i trzeba je powtórzyć po ponownym pobraniu modelu. Po `POST /admin/api/reload` model jest wykrywany jako `vlm` i ładuje się poprawnie; test: odpowiedź po polsku z blokiem rozumowania, ~23.6 tok/s.
