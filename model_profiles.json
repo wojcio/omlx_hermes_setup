@@ -193,7 +193,7 @@
         "created_at": "2026-10-12T23:30:00.000000+00:00",
         "updated_at": "2026-10-12T23:30:00.000000+00:00",
         "settings": {
-          "max_context_window": 1048576,
+          "max_context_window": 262144,
           "max_tokens": 32768,
           "temperature": 0.6,
           "top_p": 0.95,

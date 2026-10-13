@@ -97,8 +97,8 @@ providers:
         max_tokens: 8192
         supports_vision: true
       DeepSeek-V4-Flash-0731-MXFP4-MLX:
-        context_window: 1048576
-        context_length: 1048576
+        context_window: 262144
+        context_length: 262144
         max_tokens: 32768
 fallback_providers: []
 toolsets:

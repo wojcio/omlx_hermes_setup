@@ -33,7 +33,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
 - Rozszerzono bazę modeli z 20 do **21 pozycji** o flagowy model:
-  * `DeepSeek-V4-Flash-0731-MXFP4-MLX` (`TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX`): MoE 256 ekspertów, natywne okno **1 048 576 tokenów (1M context)**, wagi MXFP4 (~155.69 GB w RAM), TurboQuant KV 6-bit, Multi-Token Prediction (MTP) depth 3, parser `deepseek_v4`.
+  * `DeepSeek-V4-Flash-0731-MXFP4-MLX` (`TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX`): MoE 256 ekspertów, natywne okno **262 144 tokenów (256k; natywnie 1M, ograniczone ze względu na RAM)**, wagi MXFP4 (~155.69 GB w RAM), TurboQuant KV 6-bit, Multi-Token Prediction (MTP) depth 3, parser `deepseek_v4`.
 - Zaktualizowano konfiguracje Hermesa (`config.*.yaml`, `config.yaml`, `~/.hermes/config.yaml`) o wpis modelu z oknem 1M i max 32k tokenami wyjściowymi.
 - Zaktualizowano ustawienia oMLX (`model_settings.*.json`, `~/.omlx/model_settings.json`) o precyzyjny sampling (`temperature: 0.6`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.00`, TurboQuant KV 6-bit, MTP).
 - Dodano profil `work` w `model_profiles.json` (`~/.omlx/model_profiles.json`) dla `DeepSeek-V4-Flash-0731-MXFP4-MLX`.

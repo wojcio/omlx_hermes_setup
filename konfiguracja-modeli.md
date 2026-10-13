@@ -28,7 +28,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | [**Bielik-11B-v3.0-Huzar-MLX-8bit-v1**](file:///Users/wojcio/.lmstudio/models/huzar/Bielik-11B-v3.0-Huzar-MLX-8bit-v1) | LLaMA | **32 768** (32k) | *Brak* | **8 192** | `0.7` | `0.90` | `40` | `1.10` | `0.01` / `0.00` | Fine-tune Huzar (baza wiedzy), natywne okno 32k, polski model językowy |
 | [**olmOCR-2-7B-1025-8bit**](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit) | Qwen 2.5 VL | **128 000** (128k) | *Brak (Dense)* | **8 192** | `0.2` | `0.90` | `20` | `1.05` | `0.01` / `0.00` | Model VLM zoptymalizowany pod kątem zaawansowanego OCR dokumentów PDF, tabel, wzorów i układów wielokolumnowych |
 | [**Unlimited-OCR-8bit**](https://huggingface.co/mlx-community/Unlimited-OCR-8bit) | UnlimitedOCR (DeepSeek MoE) | **32 768** (32k) | **128** | **8 192** | `0.2` | `0.90` | `20` | `1.05` | `0.01` / `0.00` | Model VLM OCR bez limitu rozdzielczości obrazu (downsampling/tiling 2D), odczyt faktur i etykiet, wymaga `trust_remote_code` |
-| [**DeepSeek-V4-Flash-0731-MXFP4-MLX**](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX) | DeepSeek V4 MoE | **1 048 576** (1M) | **128** | **32 768** | `0.6` | `0.95` | `40` | `1.00` | `0.01` / `0.00` | YaRN RoPE (factor 16), sliding window 128, TurboQuant KV 6-bit, MTP depth 3, parser `deepseek_v4`, wagi MXFP4 (~155 GB) |
+| [**DeepSeek-V4-Flash-0731-MXFP4-MLX**](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX) | DeepSeek V4 MoE | **262 144** (256k) | **128** | **32 768** | `0.6` | `0.95` | `40` | `1.00` | `0.01` / `0.00` | YaRN RoPE (factor 16), sliding window 128, TurboQuant KV 6-bit, MTP depth 3, parser `deepseek_v4`, wagi MXFP4 (~155 GB) |
 
 ---
 

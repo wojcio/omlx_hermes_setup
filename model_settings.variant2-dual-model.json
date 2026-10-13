@@ -496,7 +496,7 @@
       "trust_remote_code": true
     },
     "DeepSeek-V4-Flash-0731-MXFP4-MLX": {
-      "max_context_window": 1048576,
+      "max_context_window": 262144,
       "max_tokens": 32768,
       "temperature": 0.6,
       "top_p": 0.95,

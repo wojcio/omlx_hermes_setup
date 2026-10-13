@@ -147,7 +147,7 @@ Do rejestru oMLX i konfiguracji Hermes Agenta dołączono flagowy model MoE, roz
 1. **`DeepSeek-V4-Flash-0731-MXFP4-MLX` (`TensorFold`)**:
    - Model MoE architektury `deepseek_v4` (256 routed experts, 6 aktywnych na token, 1 shared expert).
    - Waga modelu w pamięci RAM: wagi MXFP4 zajmujące **155.69 GB** w Unified Memory (zoptymalizowane pod kątem platformy Mac Studio 192 GB).
-   - Natywny kontekst: **1 048 576 tokenów (1M context)** z YaRN RoPE (factor 16, sliding window 128) oraz limitem wyjściowym `max_tokens: 32768`.
+   - Natywny kontekst: **262 144 tokenów (256k; natywnie 1M, ograniczone ze względu na RAM)** z YaRN RoPE (factor 16, sliding window 128) oraz limitem wyjściowym `max_tokens: 32768`.
    - Akceleracja KV Cache: kompresja **TurboQuant KV 6-bit** (`turboquant_kv_bits: 6.0`), umożliwiająca stabilną obsługę bardzo długich promptów bez przekroczenia limitu RAM.
    - Sprzętowe MTP: Multi-Token Prediction o adaptacyjnej głębokości 3 (`mtp_enabled: true`, `mtp_adaptive_max_depth: 3`).
    - Parsowanie rozumowania: `reasoning_parser: "deepseek_v4"`, odblokowane myślenie (`enable_thinking: true`, `thinking_budget_enabled: false`, budżet bazowy 32k tokenów).
