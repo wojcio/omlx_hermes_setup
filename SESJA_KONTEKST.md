@@ -244,3 +244,27 @@ Włączono do konfiguracji Hermesa i serwera oMLX dwa nowe, wyspecjalizowane mod
 
 Zaktualizowano pliki `config.*.yaml`, `model_settings.*.json`, `konfiguracja-modeli.md`, `README.md` oraz `GEMINI.md`.
 
+---
+
+## 🚀 14. Naprawa: ładowanie Qwen3.8-Flash-Next-MTPLX-Optimized-Speed w oMLX (Październik 2026)
+
+Model `Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` zgłaszał błąd ładowania `HTTP 409: Model failed to load: VLM load failed: Received 1 parameters not in model: language_model.model.layers.1.ple.conv_weight.; LLM fallback also failed: Model type qwen4_exp not supported.`
+
+### Zdiagnozowane przyczyny i wdrożone rozwiązania:
+1. **Niezgodność nazwy wagi splotu 1D w warstwie PLE (`conv_weight` vs `conv1d.weight`):**
+   - W pliku `model-00018-of-00019.safetensors` oraz `model.safetensors.index.json` klucz tensora splotu warstwy 1 PLE został wyeksportowany pod nazwą `language_model.model.layers.1.ple.conv_weight`.
+   - Moduł architektury MLX (`Qwen4ExpPLELayer` w `language.py`) definiuje moduł splotu jako `self.conv1d = nn.Conv1d(...)`, ściśle oczekując klucza `language_model.model.layers.1.ple.conv1d.weight`.
+   - Utworzono kopię zapasową shardu 18 (`.bak`) oraz indeksu, i zaktualizowano klucz tensora na `conv1d.weight`.
+
+2. **N-gram Embedding: Format monolityczny MTPLX vs shardy oMLX (`Missing 128 parameters`):**
+   - Po rozwiązaniu problemu splotu, oMLX zgłosił brak 128 parametrów: `language_model.model.layers.1.ple.ple_embedding.ngram_embedding.shards.0.weight` .. `shards.127.weight`.
+   - Repozytorium upstreamowe `Youssofal` zostało przygotowane pod autorski silnik MTPLX i scaliło 128 shardów N-gram do pojedynczego pliku monolitycznego `ngram-table.safetensors` (zawierającego `ngram.weight`, `ngram.scales`, `ngram.biases` o 320 001 536 wierszach), usuwając podział na shardy z indeksu i pliku konfiguracyjnego.
+   - oMLX (poprzez moduł zgodności `mlx_vlm_qwen4_exp_compat`) w trybach `resident` i `mmap` wymaga standardowego podziału tabeli N-gram na 128 shardów (po 2 500 012 wierszy na shard), obecności konfiguracji kwantyzacji (`bits: 4, group_size: 32, mode: affine`) w `config.json` oraz mapowania w `model.safetensors.index.json`.
+   - Wygenerowano natywnie w MLX 8 zbalansowanych plików safetensors (`model-ngram-00001-of-00008.safetensors` do `00008`, po 16 shardów / ~3.73 GB każdy) zawierających precyzyjne wycinki tabeli (`weight`, `scales`, `biases`).
+   - Zaktualizowano `config.json` o 128 wpisów `shards.{i}` w sekcji `quantization` (kopia oryginału w `config.json.bak`).
+   - Do `model.safetensors.index.json` dodano 384 nowe klucze mapujące tenzory N-gram do nowych plików shardów.
+
+### Wyniki weryfikacji:
+- Endpoint oMLX `POST /admin/api/reload` pomyślnie zaindeksował model.
+- Test inferencji `/v1/chat/completions`: model załadował się do Unified Memory w 36s, osiągając generowanie **41.1 tok/s** z czasem do pierwszego tokenu (TTFT) zaledwie **0.16s**.
+- Test Hermes CLI: `hermes -z "Napisz jedno słowo: SUKCES" -m "Qwen3.8-Flash-Next-MTPLX-Optimized-Speed"` zwrócił poprawnie `SUKCES`.
