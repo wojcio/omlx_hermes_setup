@@ -219,3 +219,28 @@ Przeprowadzono gruntowną optymalizację rejestru modeli, redukując liczbę poz
    - Usunięto z konfiguracji: `Qwen3.8-27B-MTPLX-Optimized-Quality-FP16`.
 
 Zsynchronizowano konfiguracje oMLX i Hermesa za pomocą `./switch-variant.sh 1`.
+
+---
+
+## 🚀 11. Rozszerzenie bazy do 17 modeli: Cyber-Tiel-Coder-35B oraz Qwen3.8-Flash-Next-MTPLX-Speed (Październik 2026)
+
+Włączono do konfiguracji Hermesa i serwera oMLX dwa nowe, wyspecjalizowane modele pobrane do `~/.lmstudio/models`:
+
+1. **`Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`** (`peculiar-ragdoll`):
+   - Architektura: `qwen3_5_moe` (`Qwen3_5MoeForConditionalGeneration`), 40 warstw, 256 ekspertów (top-8 routed, zaledwie ~3B aktywnych parametrów na token).
+   - Kwantyzacja: `oQ6e` (OpenQuant 6-bit) kalibrowana na zbiorze `oqe_code_multilingual` (iMatrix).
+   - Rozmiar: ~31.7 GB w RAM (tekst: ~30.8 GB, wizja: ~0.9 GB).
+   - Okno kontekstu: 262 144 (256k), wyjście 32 768 tokenów.
+   - Multimodalność i reasoning: VLM (`supports_vision: true`), standardowy parser rozumowania `qwen_3_5` (`<think>` / `</think>`).
+   - Rola: lekki, błyskawiczny Coder w pętlach agentowych (`run_command`, edycja plików), stanowiący lżejszą i szybszą alternatywę dla gęstego modelu `Qwen3-Coder-Next-MLX-9bit`.
+
+2. **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** (`Youssofal`):
+   - Architektura: `qwen4_exp` (`Qwen4ExpForConditionalGeneration`), 48 warstw, 512 ekspertów (top-10 routed).
+   - Kwantyzacja & Akceleracja: zintegrowany `mtplx_runtime.json` (v2.9.3) z wielopoziomowym schematem (4-bit rdzeń, 8-bit krytyczne warstwy, zachowane BF16), MTP depth 3 oraz dedykowana tablica ngramów (`ngram-table.safetensors`, 32 GB).
+   - Rozmiar: ~120.8 GB w RAM.
+   - Prędkość: pomiary wykazują aż **~73.5 tok/s** (1.68x przyspieszenie względem autoregresji 43.8 tok/s).
+   - Okno kontekstu: 262 144 (256k), wyjście 32 768 tokenów, VLM (`supports_vision: true`), parser `qwen_3_5`.
+   - Rola: profil maksymalnego throughputu generowania do długich, interaktywnych sesji z agentem. Współistnieje obok dokładniejszego modelu `Qwen3.8-Flash-Next-oQ5e-mtp` (GBP-DE).
+
+Zaktualizowano pliki `config.*.yaml`, `model_settings.*.json`, `konfiguracja-modeli.md`, `README.md` oraz `GEMINI.md`.
+

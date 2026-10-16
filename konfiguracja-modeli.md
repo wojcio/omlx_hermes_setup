@@ -23,6 +23,8 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | [**Unlimited-OCR-8bit**](https://huggingface.co/mlx-community/Unlimited-OCR-8bit) | UnlimitedOCR (DeepSeek MoE) | **32 768** (32k) | **128** | **8 192** | `0.2` | `0.90` | `20` | `1.05` | `0.01` / `0.00` | Model VLM OCR bez limitu rozdzielczości obrazu (downsampling/tiling 2D), odczyt faktur i etykiet, wymaga `trust_remote_code` |
 | [**DeepSeek-V4-Flash-0731-MXFP4-MLX**](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX) | DeepSeek V4 MoE | **262 144** (256k) | **128** | **32 768** | `0.6` | `0.95` | `40` | `1.00` | `0.01` / `0.00` | YaRN RoPE (factor 16), sliding window 128, TurboQuant KV 6-bit, MTP depth 3, parser `deepseek_v4`, wagi MXFP4 (~155 GB) |
 | [**MiniMax-M3-ConfigI-MLX**](https://huggingface.co/thetom-ai/MiniMax-M3-ConfigI-MLX) | MiniMax M3 MoE (VL) | **131 072** (128k; natywnie 1M) | **128** | **32 768** | `1.0` | `0.95` | `40` | `1.00` | `0.01` / `0.00` | 60 warstw, 128 ekspertów (top-4), sparse attention, kwantyzacja mieszana ConfigI (atencja 4/8-bit, eksperty 2–3-bit), parser rozumowania `minimax_m3` (`<mm:think>`), wagi ~156 GB, bez wag MTP |
+| [**Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP**](https://huggingface.co/peculiar-ragdoll/Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP) | Qwen 3.5 MoE (VL) | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.6` | `0.95` | `40` | `1.05` | `0.01` / `0.00` | 256 ekspertów (top-8 routed, ~3B aktywnych), kwantyzacja oQ6e iMatrix pod kod, MTP, wieża wizyjna, wagi ~31.7 GB, szybki agent programistyczny |
+| [**Qwen3.8-Flash-Next-MTPLX-Optimized-Speed**](https://huggingface.co/Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed) | Qwen 4 Exp (VL) | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | 512 ekspertów (top-10 routed), MTPLX runtime v2.9.3, MTP depth 3 + 32GB tablica ngramów (~73.5 tok/s, 1.68x speedup), wagi ~120.8 GB |
 
 ---
 
@@ -47,6 +49,8 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 | 13 | `Unlimited-OCR-8bit` | [mlx-community/Unlimited-OCR-8bit](https://huggingface.co/mlx-community/Unlimited-OCR-8bit) | `mlx-community` / `baidu` | MLX 8-bit MoE VLM (~3.7 GB) | `~/.lmstudio/models/mlx-community/Unlimited-OCR-8bit` |
 | 14 | `DeepSeek-V4-Flash-0731-MXFP4-MLX` | [TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX) | `TensorFold` | MLX MXFP4 MoE (~155 GB) | `~/.lmstudio/models/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX` |
 | 15 | `MiniMax-M3-ConfigI-MLX` | [thetom-ai/MiniMax-M3-ConfigI-MLX](https://huggingface.co/thetom-ai/MiniMax-M3-ConfigI-MLX) | `thetom-ai` | MLX ConfigI MoE VL (~156 GB) | `~/.lmstudio/models/thetom-ai/MiniMax-M3-ConfigI-MLX` |
+| 16 | `Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP` | [peculiar-ragdoll/Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP](https://huggingface.co/peculiar-ragdoll/Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP) | `peculiar-ragdoll` | MLX oQ6e iMatrix MTP (~31.7 GB) | `~/.lmstudio/models/peculiar-ragdoll/Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP` |
+| 17 | `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` | [Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed](https://huggingface.co/Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed) | `Youssofal` | MLX MTPLX Speed (~120.8 GB) | `~/.lmstudio/models/Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` |
 | *LoRA* | `salakash/Minimalism` *(Adapter)* | [salakash/Minimalism](https://huggingface.co/salakash/Minimalism) | `salakash` | LoRA Adapter (Qwen2.5-0.5B) | `~/.lmstudio/models/salakash/Minimalism` |
 
 ---
@@ -56,7 +60,7 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### 🏆 Wariant 1: Zero-Swap Dynamic (Domyślny & Rekomendowany: Kompresor = Model Sesji)
-* **Model główny:** Dowolny z 15 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
+* **Model główny:** Dowolny z 17 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
 * **Kompresor (`auxiliary.compression`):** `provider: auto`, `model: ""`
 * **Zasada działania:** Hermes dynamicznie używa do kompresji tego samego modelu, który aktualnie prowadzi konwersację (Ornith, Qwen 122B, Coder itd.).
 * **Zalety:**

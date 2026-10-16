@@ -77,6 +77,16 @@ providers:
         context_length: 131072
         max_tokens: 32768
         supports_vision: true
+      Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      Qwen3.8-Flash-Next-MTPLX-Optimized-Speed:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
 fallback_providers: []
 toolsets:
   - hermes-cli

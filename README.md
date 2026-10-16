@@ -4,11 +4,12 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX** oraz **Hermes Agent** z precy
 
 ---
 
-## 📖 Pełna dokumentacja
+## 📖 Pełna dokumentacja i Przewodnik Użytkownika
 
-Szczegółowy opis wszystkich 15 modeli (w tym zaawansowanego modelu MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 1M oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów, analizę wariantów oraz uzasadnienie techniczne znajdziesz w pliku:
+Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 1M, `Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP` zoptymalizowanego pod kątem kodu, akcelerowanego `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` z tablicą ngramów i ~73 tok/s, oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
 
-👉 **[Konfiguracja Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
+👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
+👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
 
 ---
 
@@ -17,9 +18,9 @@ Szczegółowy opis wszystkich 15 modeli (w tym zaawansowanego modelu MoE `DeepSe
 Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 
 1. **Wariant 1 (Domyślny & Rekomendowany): `Zero-Swap Dynamic` (Kompresor = Model Sesji)**
-   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (lub dowolny inny wybrany model, np. `DeepSeek-V4-Flash-0731-MXFP4-MLX`)
+   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (lub dowolny inny wybrany model, np. `DeepSeek-V4-Flash-0731-MXFP4-MLX`, `Cyber-Tiel-Coder-35B` czy `Qwen3.8-Flash-Next-Speed`)
    - Kompresor: **Dynamiczny** (`auxiliary.compression.provider: auto`, `model: ''`) — zawsze kompresuje ten model, z którym aktualnie prowadzona jest rozmowa.
-   - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency) dla wszystkich 15 modeli.*
+   - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency) dla wszystkich 17 modeli.*
 
 2. **Wariant 2: `Dual-Model Resident` (Dedykowany Szybki Kompresor 27B)**
    - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
@@ -56,6 +57,8 @@ Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany
 
 ## 📁 Zawartość repozytorium
 
+- **[`HowTo_JakUzywac.md`](HowTo_JakUzywac.md)** – Praktyczny przewodnik jak uruchamiać Hermesa oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych.
+- **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja techniczna 17 modeli i linki Hugging Face.
 - **[`config.yaml`](config.yaml)** – Aktywna konfiguracja agenta Hermes (domyślnie Wariant 1).
 - **[`config.variant1-single-model.yaml`](config.variant1-single-model.yaml)** – Konfiguracja Hermesa dla Wariantu 1 (kompresor dynamiczny).
 - **[`config.variant2-dual-model.yaml`](config.variant2-dual-model.yaml)** – Konfiguracja Hermesa dla Wariantu 2 (kompresor 27B).
@@ -65,4 +68,3 @@ Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany
 - **[`model_profiles.json`](model_profiles.json)** – Dedykowane profile wykonawcze (`work`, `turbo`, `setup`).
 - **[`settings.json`](settings.json)** – Globalne parametry serwera oMLX oraz domyślny sampling.
 - **[`switch-variant.sh`](switch-variant.sh)** – Skrypt bash do automatycznego przełączania wariantów.
-- **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja techniczna 15 modeli i linki Hugging Face.
