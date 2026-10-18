@@ -223,22 +223,30 @@
       "mtp_enabled": true,
       "mtp_adaptive_max_depth": 3
     },
-    "Bielik-11B-v3.0-Instruct-MLX-8bit": {
-      "max_context_window": 32768,
-      "max_tokens": 8192,
+    "Qwen3.8-27B-FP16_huzar_v1": {
+      "max_context_window": 262144,
+      "max_tokens": 32768,
       "temperature": 0.7,
-      "top_p": 0.9,
-      "top_k": 40,
-      "repetition_penalty": 1.1,
+      "top_p": 0.95,
+      "top_k": 20,
+      "repetition_penalty": 1.05,
       "min_p": 0.01,
+      "presence_penalty": 0.0,
       "force_sampling": false,
-      "enable_thinking": false,
+      "enable_thinking": true,
+      "chat_template_kwargs": {
+        "enable_thinking": true
+      },
+      "thinking_budget_enabled": false,
+      "thinking_budget_tokens": 32768,
+      "reasoning_parser": "qwen_3_5",
+      "dflash_enabled": true,
       "model_type_override": "llm",
       "is_pinned": false,
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": false
     },
     "Qwen3-235B-A22B-MLX-4bit": {
       "max_context_window": 40960,
@@ -376,7 +384,7 @@
       "is_favorite": true,
       "trust_remote_code": true
     },
-    "Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP": {
+    "Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2": {
       "max_context_window": 262144,
       "max_tokens": 32768,
       "temperature": 0.6,
@@ -398,6 +406,9 @@
       "turboquant_kv_bits": 8.0,
       "turboquant_skip_last": true,
       "mtp_enabled": true,
+      "mtp_adaptive_max_depth": 3,
+      "vlm_mtp_enabled": true,
+      "dflash_enabled": true,
       "model_type_override": "vlm",
       "is_pinned": false,
       "is_default": false,

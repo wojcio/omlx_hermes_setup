@@ -13,21 +13,21 @@ Domyślnie Hermes startuje z modelem głównym `Qwen3.5-122B-A10B-MLX-9bit`. Aby
 # Start z domyślnym modelem (Qwen3.5-122B)
 hermes
 
-# Start z ultra-szybkim modelem kodistycznym Cyber-Tiel (35B MoE, 3B aktywne)
-hermes -m Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP
+# Start z ultra-szybkim modelem kodistycznym Coder390 (27B VLM, ~34.6 tok/s, MTP + DFlash)
+hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2
 
 # Start z najszybszym modelem ogólnym (~73.5 tok/s z tablicą ngramów)
 hermes -m Qwen3.8-Flash-Next-MTPLX-Optimized-Speed
 
-#Jednorazowe polecenie z linii komend (bez wchodzenia w tryb interaktywny)
-hermes -m Bielik-11B-v3.0-Instruct-MLX-8bit -z "Napisz oficjalne pismo o przedłużenie terminu umowy"
+# Jednorazowe polecenie z linii komend po polsku (model 27B Huzar z oknem 256k)
+hermes -m Qwen3.8-27B-FP16_huzar_v1 -z "Napisz oficjalne pismo o przedłużenie terminu umowy"
 ```
 
 ### Zmiana modelu i parametrów w trakcie rozmowy
 W otwartej sesji czatu Hermesa możesz w każdej chwili przełączyć model bez utraty historii rozmowy:
 * `/model` – otwiera interaktywne menu wyboru modelu lub pozwala wpisać nazwę, np.:
   ```text
-  /model Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP
+  /model Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2
   ```
 * **Poziom rozumowania (`--reasoning`):** Możesz sterować głębokością myślenia (`<think>`):
   ```bash
@@ -62,13 +62,13 @@ Poniżej znajduje się zestawienie **7 ról użytkowników** wraz z przypisaniem
 flowchart TD
     Roles["Role Użytkowników w Hermesie"]
     
-    Roles --> Dev["👨‍💻 Programista<br/>Cyber-Tiel-35B / Coder-Next-9bit / DeepSeek-V4"]
+    Roles --> Dev["👨‍💻 Programista<br/>Coder390-27B VLM / Coder-Next-9bit / DeepSeek-V4"]
     Roles --> UI["🎨 UI Designer<br/>UI-Venus-1.5-30B / Qwen3.8-Flash-Speed"]
-    Roles --> Web["🌐 Web Developer<br/>Cyber-Tiel-35B (VLM) + UI-Venus-1.5-30B"]
+    Roles --> Web["🌐 Web Developer<br/>Coder390-27B (VLM) + UI-Venus-1.5-30B"]
     Roles --> Ops["⚙️ DevOps / SysAdmin<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B"]
-    Roles --> Sec["🛡️ Security Manager<br/>Cyber-Tiel-35B / Ornith-35B-Abliterated / Qwen-27B-Uncensored"]
-    Roles --> User["🧑‍💼 Zwykły Użytkownik<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B / Bielik-11B"]
-    Roles --> Office["🗂️ Sekretarka Biura<br/>olmOCR-2-7B / Unlimited-OCR / Bielik-11B"]
+    Roles --> Sec["🛡️ Security Manager<br/>Coder390-27B / Ornith-35B-Abliterated / Qwen-27B-Uncensored"]
+    Roles --> User["🧑‍💼 Zwykły Użytkownik<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B / Qwen-27B Huzar"]
+    Roles --> Office["🗂️ Sekretarka Biura<br/>olmOCR-2-7B / Unlimited-OCR / Qwen-27B Huzar"]
 ```
 
 ---
@@ -79,14 +79,14 @@ Programista potrzebuje dwóch trybów pracy: **błyskawicznej pętli edycji kodu
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Codzienny coding, szybkie diffy, TDD, tool-calling** | **`Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`** | Architektura MoE (35B łącznie, tylko **3B aktywnych na token**), kwantyzacja `oQ6e` iMatrix pod wielojęzyczny kod. Zajmuje tylko ~31.7 GB RAM, działa błyskawicznie i ma pełne okno 256k. |
+| **Codzienny coding, szybkie diffy, TDD, tool-calling** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Wagi unquantized BF16 (~30.6 GB RAM), multimodalny VLM z MTP i akceleracją DFlash2. Generuje kod z prędkością aż **~34.6 tok/s** (4x szybciej niż modele MoE), czerpiąc z destylacji Opus 5.5, GPT-6 Astra, Grok 4.7 i DeepSeek V4 Pro. |
 | **Ciężki refaktoring wielu plików, wysoka precyzja składni** | **`Qwen3-Coder-Next-MLX-9bit`** | Niemal bezstratna kwantyzacja 9-bitowa z rozszerzonym RoPE (theta 5M). Niezwykle stabilny przy generowaniu bardzo długich plików źródłowych i złożonych struktur. |
 | **Złożona architektura, trudne algorytmy, analiza bugów** | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** *(lub lżejszy `AWQ`)* | Flagowy model MoE (~155 GB, MTP depth 3) z potężnym łańcuchem rozumowania (`deepseek_v4`) i oknem 256k (natywnie do 1M). Najlepszy do rozwiązywania problemów, na których inne modele utknęły. |
 
 **Przykładowe użycie:**
 ```bash
 # Szybka sesja programistyczna i naprawa testów
-hermes -m Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP -z "Przeanalizuj błędy w pytest, znajdź przyczynę wyścigu wątków w module worker.py i zastosuj poprawkę."
+hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 -z "Przeanalizuj błędy w pytest, znajdź przyczynę wyścigu wątków w module worker.py i zastosuj poprawkę."
 
 # Głęboki przegląd architektury na osobnej gałęzi roboczej
 hermes -m DeepSeek-V4-Flash-0731-MXFP4-MLX --worktree --reasoning high
@@ -118,14 +118,14 @@ Web Developer łączy świat UI Designera i Programisty: musi przekształcić pr
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Tworzenie komponentów React/Vue/Tailwind + podgląd wizji** | **`Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`** | Jako jeden z nielicznych modeli Coder posiada **aktywną wieżę wizyjną (`supports_vision: true`)**! Możesz wkleić mu screenshot rozjechanego modala w przeglądarce, a on sam przejrzy kod CSS i naprawi flexbox/grid. |
+| **Tworzenie komponentów React/Vue/Tailwind + podgląd wizji** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Model programistyczny z **aktywną wieżą wizyjną (`supports_vision: true`)** i pełną precyzją BF16! Możesz wkleić mu screenshot rozjechanego modala w przeglądarce, a on sam przejrzy kod CSS i naprawi flexbox/grid. |
 | **Konwersja makiety na kod (Screenshot-to-Code)** | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | Najdokładniej odwzorowuje układ przestrzenny z obrazka na strukturę DOM i klasy Tailwind CSS. |
 | **Budowa złożonego API, integracja bazy danych, SSR/Auth** | **`Qwen3-Coder-Next-MLX-9bit`** | Wysoka dokładność przy wielowarstwowych zmianach (Frontend + Backend + schematy Prisma/SQL + typy TypeScript). |
 
 **Przykładowe użycie:**
 ```bash
 # Debugowanie wizualne + kodowe jednocześnie (VLM Coder)
-hermes -m Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP -z "Zobacz zrzut ekranu ./bug_mobile_nav.png – menu nachodzi na hero section na ekranie 375px. Sprawdź plik src/components/Navbar.tsx i napraw klasy Tailwind."
+hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 -z "Zobacz zrzut ekranu ./bug_mobile_nav.png – menu nachodzi na hero section na ekranie 375px. Sprawdź plik src/components/Navbar.tsx i napraw klasy Tailwind."
 ```
 
 ---
@@ -138,7 +138,7 @@ Praca DevOpsa w Hermesie to wykonywanie dziesiątek komend diagnostycznych w ter
 | :--- | :--- | :--- |
 | **Interaktywne debugowanie serwerów, szybkie komendy CLI** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Prędkość **~73.5 tok/s** i pełne okno **256k tokenów**. Błyskawicznie analizuje wyjścia komend systemowych i wykonuje kolejne kroki diagnostyczne bez czekania. |
 | **Analiza potężnych zrzutów logów i plików konfiguracyjnych** | **`Qwen3.5-122B-A10B-MLX-9bit`** *(lub `Step-3.5-Flash-4bit`)* | Domyślny model główny z 8-bitowym TurboQuant KV cache. Świetnie radzi sobie przy kontekście przekraczającym 150k–200k tokenów logów systemowych. |
-| **Skrypty Bash, potoki GitHub Actions / GitLab CI, Terraform** | **`Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`** | Niska temperatura (`0.6`) i kalibracja pod kod sprawiają, że generuje czyste, bezpieczne skrypty powłoki i konfiguracje YAML. |
+| **Skrypty Bash, potoki GitHub Actions / GitLab CI, Terraform** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Niska temperatura (`0.6`) i wysoka precyzja BF16 sprawiają, że generuje czyste, bezpieczne skrypty powłoki i bezbłędne konfiguracje YAML. |
 
 **Przykładowe użycie:**
 ```bash
@@ -154,14 +154,14 @@ Specjaliści ds. bezpieczeństwa często napotykają problem w komercyjnych lub 
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Audyt bezpieczeństwa kodu (SAST), testy CTF / CyBench** | **`Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`** | Model trenowany i walidowany na benchmarkach cyberbezpieczeństwa (**CyBench**, **HarmBench**, **SWE-bench**). Doskonale rozumie wektory ataków w kodzie i luki logiczne. |
+| **Audyt bezpieczeństwa kodu (SAST), testy CTF / CyBench** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Topowy model kodujący (BF16) z destylacjami Opus 5.5, GPT-6 Astra, Grok 4.7 i DeepSeek V4 Pro. Błyskawicznie (~34.6 tok/s) wykrywa podatności, analizuje kod i proponuje łaty. |
 | **Scenariusze Red-Team, analiza exploitów i malware (bez cenzury)** | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | Pełna precyzja **BF16** z usuniętymi wektorami odmów (*Abliterated*). Nie prawi morałów – rzeczowo analizuje złośliwy kod, uprawnienia i scenariusze penetracyjne. |
 | **Szybkie zapytania o polityki bezpieczeństwa i testy bez blokad** | **`Qwen3.8-27B-Uncensored-MLX`** | Lekki (~15 GB), bardzo szybki model *Uncensored* z oknem 256k. Idealny do szybkiej weryfikacji reguł, pisania raportów po audycie i analizy incydentów. |
 
 **Przykładowe użycie:**
 ```bash
 # Audyt kodu pod kątem OWASP Top 10 bez fałszywych blokad
-hermes -m Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP -z "Przeprowadź audyt bezpieczeństwa katalogu ./api pod kątem SQL Injection, IDOR oraz wycieku sekretów. Wypisz podatne linie i przygotuj łatki."
+hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 -z "Przeprowadź audyt bezpieczeństwa katalogu ./api pod kątem SQL Injection, IDOR oraz wycieku sekretów. Wypisz podatne linie i przygotuj łatki."
 
 # Analiza scenariusza Red-Team / analiza podejrzanego skryptu
 hermes -m Ornith-1.5-35B-A3B-Abliterated-MLX-BF16 -z "Zdekoduj i przeanalizuj działanie tego zaciemnionego skryptu PowerShell znalezionego podczas analizy incydentu. Jakie IoC (Indicators of Compromise) zostawia w systemie?"
@@ -177,7 +177,7 @@ Do codziennych pytań, burzy mózgów, planowania podróży, tłumaczeń, stresz
 | :--- | :--- | :--- |
 | **Błyskawiczny czat na każdy temat (0 czekania)** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Odpowiada niemal natychmiast (~73.5 tok/s). Posiada ogromną wiedzę (512 ekspertów) i potrafi także analizować wrzucone zdjęcia. |
 | **Najwyższa jakość odpowiedzi, złożone pytania i analizy** | **`Qwen3.5-122B-A10B-MLX-9bit`** *(lub `Qwen3.8-Flash-Next-oQ5e-mtp`)* | Nasz domyślny złoty środek (9-bitowa precyzja) lub wariant `oQ5e` od GBP-DE. Bardzo dojrzałe, wyważone i szczegółowe odpowiedzi. |
-| **Pytania o polskie realia, kulturę, język i styl** | **`Bielik-11B-v3.0-Instruct-MLX-8bit`** | Polski model językowy od SpeakLeash. Najlepiej czuje polską frazeologię, idiomy i lokalny kontekst kulturowo-prawny. |
+| **Pytania o polskie realia, bazę wiedzy Huzar, język i styl** | **`Qwen3.8-27B-FP16_huzar_v1`** | Model 27B dostrojony na bazie wiedzy Huzar (zbiór pytań i odpowiedzi Bielik 3.0). Posiada pełne okno **262 144 tokenów (256k)**, akcelerację DFlash i głębokie myślenie. |
 
 **Przykładowe użycie:**
 ```bash
@@ -195,7 +195,7 @@ W pracy biurowej kluczowe są dwa obszary: **bezbłędne odczytywanie tekstu z t
 | :--- | :--- | :--- |
 | **Odczyt skomplikowanych PDF-ów, umów, tabel i układów wielokolumnowych** | **`olmOCR-2-7B-1025-8bit`** | Wyspecjalizowany model VLM stworzony przez AllenAI ściśle do konwersji trudnych dokumentów PDF i skanów na czysty tekst i tabele Markdown (niska temperatura `0.2` zapobiega zmyślaniu cyfr). |
 | **Odczyt faktur, paragonów, etykiet kurierskich i zdjęć w wysokiej rozdzielczości** | **`Unlimited-OCR-8bit`** | Model OCR bez limitu rozdzielczości obrazu (wykorzystuje tiling 2D). Odczyta nawet drobny druk na sfotografowanej fakturze czy tabeli kosztorysowej. |
-| **Redagowanie pism urzędowych, maili do klientów, korekta językowa PL** | **`Bielik-11B-v3.0-Instruct-MLX-8bit`** | Generuje najbardziej naturalną, oficjalną polszczyznę biurową i urzędową, wolną od niezgrabnych kalk językowych z angielskiego. |
+| **Redagowanie pism urzędowych, maili do klientów, korekta językowa PL** | **`Qwen3.8-27B-FP16_huzar_v1`** | Generuje naturalną, oficjalną polszczyznę biurową i urzędową, bez ograniczeń krótkiego kontekstu (pełne 256k okno vs 32k w starym Bieliku). |
 
 **Przykładowe użycie:**
 ```bash
@@ -203,7 +203,7 @@ W pracy biurowej kluczowe są dwa obszary: **bezbłędne odczytywanie tekstu z t
 hermes -m Unlimited-OCR-8bit -z "Odczytaj wszystkie pozycje z faktury ./skan_faktury_04.jpg. Zwróć dane w tabeli: Nazwa towaru, Ilość, Cena netto, VAT, Kwota brutto oraz podaj NIP sprzedawcy i numer konta."
 
 # Krok 2: Przygotowanie oficjalnego pisma po polsku
-hermes -m Bielik-11B-v3.0-Instruct-MLX-8bit -z "Napisz uprzejme, ale stanowcze wezwanie do zapłaty zaległej faktury nr FV/2026/10/04 na kwotę 4500 zł brutto z terminem 7 dni."
+hermes -m Qwen3.8-27B-FP16_huzar_v1 -z "Napisz uprzejme, ale stanowcze wezwanie do zapłaty zaległej faktury nr FV/2026/10/04 na kwotę 4500 zł brutto z terminem 7 dni."
 ```
 
 ---
@@ -217,7 +217,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 | 1 | **`Qwen3.5-122B-A10B-MLX-9bit`** | 🏆 Główny / Ogólny | 256k | ~128 GB | Nie | **Domyślny model.** Najlepszy balans wysokiej inteligencji, 9-bitowej precyzji i stabilności. |
 | 2 | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | ⚡ Ultra-Fast Agent | 256k | ~121 GB | **Tak** | Gdy liczy się **maksymalna prędkość (~73.5 tok/s)** w długich sesjach agentowych i obsługa obrazów. |
 | 3 | **`Qwen3.8-Flash-Next-oQ5e-mtp`** | 🎯 Główny / Precyzja | 256k | ~135 GB | Nie | Gdy wolisz nieco wyższą precyzję wag (`oQ5e` iMatrix) niż w wersji Speed. |
-| 4 | **`Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`** | 💻 Szybki Coder + Sec | 256k | ~32 GB | **Tak** | **Codzienne programowanie**, szybkie pętle testów, WebDev ze zrzutami ekranu oraz audyty Security. |
+| 4 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~31 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, MTP, DFlash). |
 | 5 | **`Qwen3-Coder-Next-MLX-9bit`** | 💻 Ciężki Coder | 256k | ~95 GB | Nie | Duże refaktoringi, generowanie długich plików kodu w jakości 9-bitowej. |
 | 6 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~155 GB | Nie | Najtrudniejsze problemy algorytmiczne, matematyczne i architektoniczne (MTP depth 3). |
 | 7 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4, gdy potrzebujesz mniejszego zużycia RAM. |
@@ -227,7 +227,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 | 11 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
 | 12 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
 | 13 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
-| 14 | **`Bielik-11B-v3.0-Instruct-MLX-8bit`** | 🇵🇱 Język Polski | 32k | ~12 GB | Nie | Pisma urzędowe, korespondencja biurowa i zadania wymagające naturalnej polszczyzny. |
+| 14 | **`Qwen3.8-27B-FP16_huzar_v1`** | 🇵🇱 Język Polski & Huzar | 256k | ~28 GB | Nie | Pisma urzędowe, baza wiedzy Huzar, 256k kontekstu i naturalna polszczyzna z DFlash. |
 | 15 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) do pracy narzędziowej. |
 | 16 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z parserem `poolside_v1` i sliding window 512 do zadań inżynierskich. |
 | 17 | **`Qwen3-235B-A22B-MLX-4bit`** | 🏛️ Kolos 235B | 40k | ~130 GB | Nie | Największa liczba parametrów (235B) do krótszych sesji (okno bazowe 40k) wymagających szerokiej erudycji. |
@@ -241,7 +241,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
    - Dzięki temu możesz swobodnie przełączać się między gigantycznymi modelami (np. z `MiniMax-M3` 156 GB na `DeepSeek-V4` 155 GB) bez ryzyka zapchania pamięci Unified Memory.
 
 2. **Kiedy wybrać Wariant 1, a kiedy Wariant 2?**
-   - **Wybierz Wariant 1 (`./switch-variant.sh 1` – Domyślny):** Gdy często zmieniasz modele w zależności od roli (np. rano używasz `Cyber-Tiel` do kodu, w południe `olmOCR` do faktur, a po południu `Qwen3.8-Flash-Speed`). Kompresję długiej rozmowy wykona ten sam model, który masz już załadowany w pamięci (**Zero Swap**).
+   - **Wybierz Wariant 1 (`./switch-variant.sh 1` – Domyślny):** Gdy często zmieniasz modele w zależności od roli (np. rano używasz `Coder390` do kodu, w południe `olmOCR` do faktur, a po południu `Qwen3.8-Flash-Speed`). Kompresję długiej rozmowy wykona ten sam model, który masz już załadowany w pamięci (**Zero Swap**).
    - **Wybierz Wariant 2 (`./switch-variant.sh 2`):** Gdy przez cały dzień pracujesz wyłącznie na głównym modelu `Qwen3.5-122B` i chcesz, aby streszczaniem długiego kontekstu zajmował się przypięty na stałe w RAM mały model `Qwen3.8-27B-Uncensored-MLX` (~15 GB).
 
 3. **Praca z bardzo dużymi modelami (>150 GB RAM):**

@@ -33,15 +33,16 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
-- Utworzono praktyczny przewodnik użytkownika [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md) opisujący komendy CLI Hermesa (`hermes -m`, `/model`, `--reasoning`, `--worktree`, `./switch-variant.sh`) oraz macierz doboru wszystkich 17 modeli pod kątem 7 ról: Programista, UI Designer, Web Developer, DevOps, Security Manager, Zwykły Użytkownik oraz Sekretarka Biura.
-- Rozszerzono bazę modeli do **17 pozycji** (włączono 2 nowe wyspecjalizowane modele pobrane do `~/.lmstudio/models`):
-  * `Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP` (`peculiar-ragdoll/Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP`): lekki model programistyczny MoE (40 warstw, 256 ekspertów, top-8 routed, zaledwie ~3B aktywnych parametrów na token), kwantyzacja `oQ6e` iMatrix pod kod wielojęzyczny, okno **262 144 tokenów (256k)**, VLM (`supports_vision: true`), sampling: `temperature: 0.6`, `top_p: 0.95`, `top_k: 40`, `repetition_penalty: 1.05`, MTP, wagi ~31.7 GB w RAM.
-  * `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (`Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`): ultra-szybki model ogólny MoE (48 warstw, 512 ekspertów, top-10 routed), wdrożony runtime MTPLX z 32 GB tablicą ngramów i spekulatywnym MTP depth 3 dający aż **~73.5 tok/s** (1.68x przyspieszenie), okno **262 144 tokenów (256k)**, VLM (`supports_vision: true`), sampling: `temperature: 0.7`, `top_p: 0.95`, `top_k: 20`, wagi ~120.8 GB w RAM.
-- Poprzednie zmiany:
-  * Naprawiono ładowanie `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` w oMLX:
-    - Poprawiono niezgodność nazwy wagi splotu PLE w shardzie 18 i indeksie (`language_model.model.layers.1.ple.conv_weight` -> `conv1d.weight`).
-    - Wygenerowano 8 standardowych shardów safetensors (`model-ngram-00001-of-00008.safetensors` .. `00008`) ze zmonolityzowanej tabeli `ngram-table.safetensors`, uzupełniono `config.json` o 128 wpisów kwantyzacji `shards.{i}` (4-bit, group_size 32, affine) oraz zaktualizowano `model.safetensors.index.json` o 384 nowe klucze.
-    - Zweryfikowano działanie bezpośrednio w oMLX (TTFT 0.16s, 41.1 tok/s) oraz przez Hermes CLI (`hermes -z`).
-  * Dodano `MiniMax-M3-ConfigI-MLX` (60 warstw, 128 ekspertów top-4, 128k okno, ~156 GB). Naprawiono ładowanie w oMLX (`vision_config` + 114 wpisów `gate_up_proj` w lokalnym pliku `config.json`).
-- Zaktualizowano konfiguracje Hermesa (`config.*.yaml`, `config.yaml`, `~/.hermes/config.yaml`) i oMLX (`model_settings.*.json`, `~/.omlx/model_settings.json`).
-- Zaktualizowano dokumentację techniczną (`konfiguracja-modeli.md`, `README.md`, `SESJA_KONTEKST.md`, `HowTo_JakUzywac.md`) i zsynchronizowano środowisko przez `./switch-variant.sh 1`.
+- **Audyt nowych modeli oMLX i eliminacja duplikatów (Optymalizacja katalogu 17 modeli):**
+  * Zbadano 4 nowe modele obecne w `~/.lmstudio/models` i oMLX:
+    - Pominięto `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` zgodnie z wytyczną użytkownika.
+    - Zastąpiono `Bielik-11B-v3.0-Instruct-MLX-8bit` (wąskie okno 32k) flagowym modelem **`Qwen3.8-27B-FP16_huzar_v1`** (`huzar/Qwen3.8-27B-FP16_huzar_v1`): wagi 8-bit (~28 GB RAM), pełne okno **262 144 tokenów (256k)**, akceleracja DFlash, wytrenowany na bazie wiedzy Huzar (`bielik3.0-dataset.jsonl`).
+    - Zastąpiono wolniejszy model `Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP` (~9.1 tok/s) modelem **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** (`nerkyor/`): pełna precyzja BF16 (~30.6 GB RAM), multimodalna wieża wizyjna VLM (`supports_vision: true`), MTP depth 3, DFlash2, generowanie aż **~34.6 tok/s (niemal 4x szybciej)**, zaawansowane destylacje (Opus 5.5, GPT-6 Astra, Grok 4.7, DeepSeek V4 Pro).
+    - Pominięto `Qwen3.8-27B-Coder390-...-oQ4e` (`hermitdave/`) jako redundantny, 4-krotnie wolniejszy (~9 tok/s) dubel wersji BF16 pozbawiony wizji.
+    - Zachowano `Qwen3.8-27B-Uncensored-MLX` jako optymalny i ultra-szybki (33.1 tok/s) przypięty kompresor Wariantu 2.
+  * Zaktualizowano konfiguracje Hermesa (`config.variant1-single-model.yaml`, `config.variant2-dual-model.yaml`, `config.yaml`, `~/.hermes/config.yaml`) oraz oMLX (`model_settings.*.json`, `model_settings.json`, `~/.omlx/model_settings.json`).
+  * Zaktualizowano przewodnik ról [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md), specyfikację techniczną [`konfiguracja-modeli.md`](konfiguracja-modeli.md) oraz [`README.md`](README.md).
+  * Zsynchronizowano środowisko skryptem `./switch-variant.sh 1` i zweryfikowano poprawne działanie obu modeli bezpośrednio przez `hermes -m ... -z`.
+- Wcześniejsze zmiany:
+  * Utworzono praktyczny przewodnik użytkownika `HowTo_JakUzywac.md` opisujący komendy CLI Hermesa oraz macierz doboru modeli dla 7 ról.
+  * Wdrożono i naprawiono ładowanie `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (73.5 tok/s) oraz `MiniMax-M3-ConfigI-MLX` (156 GB).

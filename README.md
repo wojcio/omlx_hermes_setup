@@ -6,7 +6,7 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX** oraz **Hermes Agent** z precy
 
 ## 📖 Pełna dokumentacja i Przewodnik Użytkownika
 
-Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 1M, `Cyber-Tiel-Coder-35B-A3B-MLX-oQ6e-MTP` zoptymalizowanego pod kątem kodu, akcelerowanego `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` z tablicą ngramów i ~73 tok/s, oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
+Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 1M, `Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2` (VLM, MTP, DFlash), polskiego `Qwen3.8-27B-FP16_huzar_v1` (256k), akcelerowanego `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` z tablicą ngramów i ~73.5 tok/s, oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
 
 👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
 👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
@@ -18,7 +18,7 @@ Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSe
 Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 
 1. **Wariant 1 (Domyślny & Rekomendowany): `Zero-Swap Dynamic` (Kompresor = Model Sesji)**
-   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (lub dowolny inny wybrany model, np. `DeepSeek-V4-Flash-0731-MXFP4-MLX`, `Cyber-Tiel-Coder-35B` czy `Qwen3.8-Flash-Next-Speed`)
+   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (lub dowolny inny wybrany model, np. `DeepSeek-V4-Flash-0731-MXFP4-MLX`, `Coder390-27B` czy `Qwen3.8-Flash-Next-Speed`)
    - Kompresor: **Dynamiczny** (`auxiliary.compression.provider: auto`, `model: ''`) — zawsze kompresuje ten model, z którym aktualnie prowadzona jest rozmowa.
    - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency) dla wszystkich 17 modeli.*
 
