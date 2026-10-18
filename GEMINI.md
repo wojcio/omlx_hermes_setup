@@ -43,6 +43,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
   * Zaktualizowano konfiguracje Hermesa (`config.variant1-single-model.yaml`, `config.variant2-dual-model.yaml`, `config.yaml`, `~/.hermes/config.yaml`) oraz oMLX (`model_settings.*.json`, `model_settings.json`, `~/.omlx/model_settings.json`).
   * Zaktualizowano przewodnik ról [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md), specyfikację techniczną [`konfiguracja-modeli.md`](konfiguracja-modeli.md) oraz [`README.md`](README.md).
   * Zsynchronizowano środowisko skryptem `./switch-variant.sh 1` i zweryfikowano poprawne działanie obu modeli bezpośrednio przez `hermes -m ... -z`.
+  * **Oczyszczenie dysku i rejestru oMLX:** Usunięto z `~/.lmstudio/models/` fizyczne wagi 4 zdublowanych/zastąpionych modeli (`Bielik-11B-Instruct`, `Bielik-11B-Huzar`, `Cyber-Tiel-Coder-35B`, `Coder390-oQ4e`), zwalniając **65.48 GB** miejsca na dysku. Po przeładowaniu oMLX (`POST /admin/api/reload`) osiągnięto pełną, stuprocentową zgodność 1:1 między oMLX (`/v1/models`) a Hermesem (dokładnie **17 modeli**).
 - Wcześniejsze zmiany:
   * Utworzono praktyczny przewodnik użytkownika `HowTo_JakUzywac.md` opisujący komendy CLI Hermesa oraz macierz doboru modeli dla 7 ról.
   * Wdrożono i naprawiono ładowanie `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (73.5 tok/s) oraz `MiniMax-M3-ConfigI-MLX` (156 GB).
