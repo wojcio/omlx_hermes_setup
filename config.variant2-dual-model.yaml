@@ -42,7 +42,7 @@ providers:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
-      Qwen3.8-27B-FP16_huzar_v1:
+      Qwen3.8-27B-Uncensored-MLX-SPLASH:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
@@ -250,7 +250,7 @@ auxiliary:
     download_timeout: 30
   compression:
     provider: omlx
-    model: Qwen3.8-27B-Uncensored-MLX
+    model: Qwen3.8-27B-Uncensored-MLX-SPLASH
     base_url: http://127.0.0.1:8000/v1
     api_key: ${OMLX_API_KEY}
     timeout: 180

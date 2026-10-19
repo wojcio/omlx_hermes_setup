@@ -33,6 +33,25 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+- **Wdrożenie i pełna integracja silnika Splash 1.3.2-m1.1 z akceleracją DFlash2 na Apple M2 Ultra:**
+  * **Diagnoza architektury GPU i aktualizacja `splash-m1`:**
+    - Wykryto, że oficjalny pakiet `splash 1.3.2` z Homebrew wymaga układu Apple GPU family 9 (M3/M4) i odrzuca procesor M2 Ultra (GPU family 8).
+    - Starsza zainstalowana wersja `splash-m1 1.0.2-m1` była odrzucana przez oMLX (`MIN_SPLASH_VERSION = (1, 3, 0)`).
+    - Zaktualizowano `splash-m1` do najnowszej wersji **`1.3.2-m1.1`** (`paperniuk/splash`), która posiada pełne wsparcie dla GPU family 8 (M1/M2), spełnia wymogi oMLX $\ge$ 1.3.0 i jest automatycznie wybierana przez silnik oMLX jako pierwszy priorytet na maszynach M1/M2.
+  * **Pobranie wag pomocniczych DFlash2 Draft:**
+    - Utworzono katalog `~/.lmstudio/models/incoai/Qwen3.8-27B-DFlash2/` i pobrano wagi `config.json` oraz `model.safetensors` (~3.85 GB), co odblokowało w oMLX status `compatible: true` dla modeli Qwen 27B.
+  * **Zerokosztowe symlinki `-SPLASH` w `~/.lmstudio/models`:**
+    - Utworzono dowiązania:
+      * `orcarouter/Qwen3.8-27B-Uncensored-MLX-SPLASH` -> `Qwen3.8-27B-Uncensored-MLX`
+      * `huzar/Qwen3.8-27B-FP16_huzar_v1-SPLASH` -> `Qwen3.8-27B-FP16_huzar_v1`
+    - W oMLX włączono dla nich `"external_engine": "splash"`.
+  * **Aktualizacja konfiguracji Hermesa (17 modeli) i Wariantu 2:**
+    - Do konfiguracji Hermesa wprowadzono model **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** (w tym jako przypięty `is_pinned: true`, ultraszybki kompresor w Wariancie 2).
+    - Zgodnie z wytyczną użytkownika, model Huzar (`Qwen3.8-27B-FP16_huzar_v1`) został całkowicie usunięty z konfiguracji Hermesa (pozostaje dostępny bezpośrednio w oMLX jako model lokalny).
+    - Liczba modeli w konfiguracji Hermesa wynosi dokładnie **17**.
+  * **Weryfikacja działania:**
+    - Zweryfikowano poprawność kompilacji grafu Metal/ANE FFN split (share 0.24, 60 rdzeni GPU) oraz działanie cache KV na SSD.
+    - Przetestowano zapytania strumieniowe i one-shot CLI Hermesa (`hermes -m Qwen3.8-27B-Uncensored-MLX-SPLASH -z "..."`), uzyskując natychmiastowe odpowiedzi (~4s całkowitego czasu procesu).
 - **Audyt nowych modeli oMLX i eliminacja duplikatów (Optymalizacja katalogu 17 modeli):**
   * Zbadano 4 nowe modele obecne w `~/.lmstudio/models` i oMLX:
     - Pominięto `Bielik-11B-v3.0-Huzar-MLX-8bit-v1` zgodnie z wytyczną użytkownika.

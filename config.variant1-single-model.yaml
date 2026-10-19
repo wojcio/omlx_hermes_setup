@@ -42,7 +42,7 @@ providers:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768
-      Qwen3.8-27B-FP16_huzar_v1:
+      Qwen3.8-27B-Uncensored-MLX-SPLASH:
         context_window: 262144
         context_length: 262144
         max_tokens: 32768

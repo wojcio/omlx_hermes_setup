@@ -6,7 +6,7 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX** oraz **Hermes Agent** z precy
 
 ## 📖 Pełna dokumentacja i Przewodnik Użytkownika
 
-Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 1M, `Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2` (VLM, MTP, DFlash), polskiego `Qwen3.8-27B-FP16_huzar_v1` (256k), akcelerowanego `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` z tablicą ngramów i ~73.5 tok/s, oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
+Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 1M, `Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2` (VLM, MTP, DFlash), ultraszybkiego `Qwen3.8-27B-Uncensored-MLX-SPLASH` (silnik Splash 1.3.2 z DFlash2 draft), akcelerowanego `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` z tablicą ngramów i ~73.5 tok/s, oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
 
 👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
 👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
@@ -24,8 +24,8 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 
 2. **Wariant 2: `Dual-Model Resident` (Dedykowany Szybki Kompresor 27B)**
    - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
-   - Kompresor: `Qwen3.8-27B-Uncensored-MLX` (256k, ~15 GB w RAM, `is_pinned: true`)
-   - *Szybki, dedykowany model do podsumowań kontekstu współistniejący z modelem głównym.*
+   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik Splash 1.3.2)
+   - *Ultraszybki (~50–70+ tok/s), dedykowany model Splash z akceleracją DFlash2 do podsumowań kontekstu współistniejący z modelem głównym.*
 
 ### 🔄 Szybkie przełączanie wariantów:
 

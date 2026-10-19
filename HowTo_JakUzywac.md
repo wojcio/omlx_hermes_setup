@@ -19,8 +19,8 @@ hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-
 # Start z najszybszym modelem ogólnym (~73.5 tok/s z tablicą ngramów)
 hermes -m Qwen3.8-Flash-Next-MTPLX-Optimized-Speed
 
-# Jednorazowe polecenie z linii komend po polsku (model 27B Huzar z oknem 256k)
-hermes -m Qwen3.8-27B-FP16_huzar_v1 -z "Napisz oficjalne pismo o przedłużenie terminu umowy"
+# Błyskawiczne polecenie z linii komend napędzane silnikiem Splash (~50–70+ tok/s)
+hermes -m Qwen3.8-27B-Uncensored-MLX-SPLASH -z "Przedstaw w 3 punktach podsumowanie kluczowych zalet silnika Splash w oMLX."
 ```
 
 ### Zmiana modelu i parametrów w trakcie rozmowy
@@ -67,8 +67,8 @@ flowchart TD
     Roles --> Web["🌐 Web Developer<br/>Coder390-27B (VLM) + UI-Venus-1.5-30B"]
     Roles --> Ops["⚙️ DevOps / SysAdmin<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B"]
     Roles --> Sec["🛡️ Security Manager<br/>Coder390-27B / Ornith-35B-Abliterated / Qwen-27B-Uncensored"]
-    Roles --> User["🧑‍💼 Zwykły Użytkownik<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B / Qwen-27B Huzar"]
-    Roles --> Office["🗂️ Sekretarka Biura<br/>olmOCR-2-7B / Unlimited-OCR / Qwen-27B Huzar"]
+    Roles --> User["🧑‍💼 Zwykły Użytkownik<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B / Qwen-27B-SPLASH"]
+    Roles --> Office["🗂️ Sekretarka Biura<br/>olmOCR-2-7B / Unlimited-OCR / Qwen3.5-122B"]
 ```
 
 ---
@@ -177,7 +177,7 @@ Do codziennych pytań, burzy mózgów, planowania podróży, tłumaczeń, stresz
 | :--- | :--- | :--- |
 | **Błyskawiczny czat na każdy temat (0 czekania)** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Odpowiada niemal natychmiast (~73.5 tok/s). Posiada ogromną wiedzę (512 ekspertów) i potrafi także analizować wrzucone zdjęcia. |
 | **Najwyższa jakość odpowiedzi, złożone pytania i analizy** | **`Qwen3.5-122B-A10B-MLX-9bit`** *(lub `Qwen3.8-Flash-Next-oQ5e-mtp`)* | Nasz domyślny złoty środek (9-bitowa precyzja) lub wariant `oQ5e` od GBP-DE. Bardzo dojrzałe, wyważone i szczegółowe odpowiedzi. |
-| **Pytania o polskie realia, bazę wiedzy Huzar, język i styl** | **`Qwen3.8-27B-FP16_huzar_v1`** | Model 27B dostrojony na bazie wiedzy Huzar (zbiór pytań i odpowiedzi Bielik 3.0). Posiada pełne okno **262 144 tokenów (256k)**, akcelerację DFlash i głębokie myślenie. |
+| **Pytania i pisma po polsku, styl i redagowanie** | **`Qwen3.5-122B-A10B-MLX-9bit`** | Znakomita erudycja i styl językowy (9-bitowa precyzja, 256k okno). W samym oMLX dostępny jest również wyspecjalizowany model `Qwen3.8-27B-FP16_huzar_v1-SPLASH`. |
 
 **Przykładowe użycie:**
 ```bash
@@ -195,7 +195,7 @@ W pracy biurowej kluczowe są dwa obszary: **bezbłędne odczytywanie tekstu z t
 | :--- | :--- | :--- |
 | **Odczyt skomplikowanych PDF-ów, umów, tabel i układów wielokolumnowych** | **`olmOCR-2-7B-1025-8bit`** | Wyspecjalizowany model VLM stworzony przez AllenAI ściśle do konwersji trudnych dokumentów PDF i skanów na czysty tekst i tabele Markdown (niska temperatura `0.2` zapobiega zmyślaniu cyfr). |
 | **Odczyt faktur, paragonów, etykiet kurierskich i zdjęć w wysokiej rozdzielczości** | **`Unlimited-OCR-8bit`** | Model OCR bez limitu rozdzielczości obrazu (wykorzystuje tiling 2D). Odczyta nawet drobny druk na sfotografowanej fakturze czy tabeli kosztorysowej. |
-| **Redagowanie pism urzędowych, maili do klientów, korekta językowa PL** | **`Qwen3.8-27B-FP16_huzar_v1`** | Generuje naturalną, oficjalną polszczyznę biurową i urzędową, bez ograniczeń krótkiego kontekstu (pełne 256k okno vs 32k w starym Bieliku). |
+| **Redagowanie pism urzędowych, maili do klientów, korekta językowa PL** | **`Qwen3.5-122B-A10B-MLX-9bit`** | Generuje naturalną, oficjalną polszczyznę biurową i urzędową z pełnym 256k oknem kontekstu i wysoką precyzją 9-bitową. |
 
 **Przykładowe użycie:**
 ```bash
@@ -203,7 +203,7 @@ W pracy biurowej kluczowe są dwa obszary: **bezbłędne odczytywanie tekstu z t
 hermes -m Unlimited-OCR-8bit -z "Odczytaj wszystkie pozycje z faktury ./skan_faktury_04.jpg. Zwróć dane w tabeli: Nazwa towaru, Ilość, Cena netto, VAT, Kwota brutto oraz podaj NIP sprzedawcy i numer konta."
 
 # Krok 2: Przygotowanie oficjalnego pisma po polsku
-hermes -m Qwen3.8-27B-FP16_huzar_v1 -z "Napisz uprzejme, ale stanowcze wezwanie do zapłaty zaległej faktury nr FV/2026/10/04 na kwotę 4500 zł brutto z terminem 7 dni."
+hermes -m Qwen3.5-122B-A10B-MLX-9bit -z "Napisz uprzejme, ale stanowcze wezwanie do zapłaty zaległej faktury nr FV/2026/10/04 na kwotę 4500 zł brutto z terminem 7 dni."
 ```
 
 ---
@@ -227,7 +227,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 | 11 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
 | 12 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
 | 13 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
-| 14 | **`Qwen3.8-27B-FP16_huzar_v1`** | 🇵🇱 Język Polski & Huzar | 256k | ~28 GB | Nie | Pisma urzędowe, baza wiedzy Huzar, 256k kontekstu i naturalna polszczyzna z DFlash. |
+| 14 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik Splash 1.3.2 (Metal/ANE + DFlash2, ~50–70+ tok/s); dedykowany kompresor Wariantu 2. |
 | 15 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) do pracy narzędziowej. |
 | 16 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z parserem `poolside_v1` i sliding window 512 do zadań inżynierskich. |
 | 17 | **`Qwen3-235B-A22B-MLX-4bit`** | 🏛️ Kolos 235B | 40k | ~130 GB | Nie | Największa liczba parametrów (235B) do krótszych sesji (okno bazowe 40k) wymagających szerokiej erudycji. |
@@ -242,7 +242,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 
 2. **Kiedy wybrać Wariant 1, a kiedy Wariant 2?**
    - **Wybierz Wariant 1 (`./switch-variant.sh 1` – Domyślny):** Gdy często zmieniasz modele w zależności od roli (np. rano używasz `Coder390` do kodu, w południe `olmOCR` do faktur, a po południu `Qwen3.8-Flash-Speed`). Kompresję długiej rozmowy wykona ten sam model, który masz już załadowany w pamięci (**Zero Swap**).
-   - **Wybierz Wariant 2 (`./switch-variant.sh 2`):** Gdy przez cały dzień pracujesz wyłącznie na głównym modelu `Qwen3.5-122B` i chcesz, aby streszczaniem długiego kontekstu zajmował się przypięty na stałe w RAM mały model `Qwen3.8-27B-Uncensored-MLX` (~15 GB).
+   - **Wybierz Wariant 2 (`./switch-variant.sh 2`):** Gdy przez cały dzień pracujesz wyłącznie na głównym modelu `Qwen3.5-122B` i chcesz, aby streszczaniem długiego kontekstu zajmował się przypięty na stałe w RAM mały, ultraszybki model `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB, silnik Splash).
 
 3. **Praca z bardzo dużymi modelami (>150 GB RAM):**
    - Podczas korzystania z `DeepSeek-V4-Flash-0731-MXFP4-MLX` (~155 GB) lub `MiniMax-M3-ConfigI-MLX` (~156 GB) zawsze używaj **Wariantu 1**, aby cała reszta ze 192 GB RAM była dostępna na bufor KV Cache przy długich rozmowach.

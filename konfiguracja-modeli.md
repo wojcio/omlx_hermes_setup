@@ -16,7 +16,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | [**UI-Venus-1.5-30B-A3B-qx86-hi-mlx**](https://huggingface.co/nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx) | Qwen 3 VL MoE | **262 144** (256k) | *Brak (Dense)* | **16 384** | `0.7` | `0.80` | `20` | `1.00` | `0.01` / `0.00` | Model multimodalny Vision / UI, typ `vlm` |
 | [**Laguna-S-2.1-MLX-8bit**](https://huggingface.co/Vontra/Laguna-S-2.1-MLX-8bit) | Laguna | **262 144** (256k) | **512** | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Sliding window 512, parser `poolside_v1` |
 | [**DeepSeek-V4-Flash-0731-AWQ**](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ) | DeepSeek V4 | **262 144** (256k) | **128** | **32 768** | `0.6` | `0.95` | `40` | `1.00` | `0.01` / `0.00` | YaRN RoPE (factor 16), sliding window 128 |
-| [**Qwen3.8-27B-FP16_huzar_v1**](https://huggingface.co/huzar/Qwen3.8-27B-FP16_huzar_v1) | Qwen 3.5 Dense | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Pełne okno 256k, fine-tune na bazie wiedzy Huzar (dataset Bielik 3.0), DFlash, wagi 8-bit (~28 GB RAM) |
+| [**Qwen3.8-27B-Uncensored-MLX-SPLASH**](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX) | Qwen 3.5 Dense (Splash) | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Silnik Splash 1.3.2 (Metal/ANE + spekulatywne dekodowanie DFlash2 draft), ~50–70+ tok/s, dedykowany kompresor Wariantu 2 |
 | [**Qwen3-235B-A22B-MLX-4bit**](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit) | Qwen 3 MoE | **40 960** (40k) | *Brak* | **8 192** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Natywne okno bazowe 40 960 tokenów |
 | [**Qwen3.8-Flash-Next-oQ5e-mtp**](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | Qwen 4 Exp | **262 144** (256k) | *Brak (Dense)* | **32 768** | `0.7` | `0.95` | `20` | `1.05` | `0.01` / `0.00` | Format oQ5e iMatrix z MTP, pełne okno 256k, wysoka jakość kwantyzacji |
 | [**olmOCR-2-7B-1025-8bit**](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit) | Qwen 2.5 VL | **128 000** (128k) | *Brak (Dense)* | **8 192** | `0.2` | `0.90` | `20` | `1.05` | `0.01` / `0.00` | Model VLM zoptymalizowany pod kątem zaawansowanego OCR dokumentów PDF, tabel, wzorów i układów wielokolumnowych |
@@ -42,7 +42,7 @@ Poniższa tabela zawiera pełny wykaz modeli zarejestrowanych w oMLX wraz z bezp
 | 6 | `UI-Venus-1.5-30B-A3B-qx86-hi-mlx` | [nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx](https://huggingface.co/nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx) | `nightmedia` | MLX qx86 Vision | `~/.lmstudio/models/nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx` |
 | 7 | `Laguna-S-2.1-MLX-8bit` | [Vontra/Laguna-S-2.1-MLX-8bit](https://huggingface.co/Vontra/Laguna-S-2.1-MLX-8bit) | `Vontra` | MLX 8-bit | `~/.lmstudio/models/Vontra/Laguna-S-2.1-MLX-8bit` |
 | 8 | `DeepSeek-V4-Flash-0731-AWQ` | [True2456/DeepSeek-V4-Flash-0731-AWQ](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ) | `True2456` | AWQ / MLX | `~/.lmstudio/models/True2456/DeepSeek-V4-Flash-0731-AWQ` |
-| 9 | `Qwen3.8-27B-FP16_huzar_v1` | [huzar/Qwen3.8-27B-FP16_huzar_v1](https://huggingface.co/huzar/Qwen3.8-27B-FP16_huzar_v1) | `huzar` | MLX 8-bit (~28 GB) | `~/.lmstudio/models/huzar/Qwen3.8-27B-FP16_huzar_v1` |
+| 9 | `Qwen3.8-27B-Uncensored-MLX-SPLASH` | [orcarouter/Qwen3.8-27B-Uncensored-MLX](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX) | `orcarouter` | MLX Dense 4-bit (~15 GB) + Splash DFlash2 | `~/.lmstudio/models/orcarouter/Qwen3.8-27B-Uncensored-MLX-SPLASH` |
 | 10 | `Qwen3-235B-A22B-MLX-4bit` | [Qwen/Qwen3-235B-A22B-MLX-4bit](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit) | `Qwen` | MLX 4-bit MoE | `~/.lmstudio/models/Qwen/Qwen3-235B-A22B-MLX-4bit` |
 | 11 | `Qwen3.8-Flash-Next-oQ5e-mtp` | [GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | `GBP-DE` | MLX oQ5e iMatrix MTP | `~/.lmstudio/models/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp` |
 | 12 | `olmOCR-2-7B-1025-8bit` | [mlx-community/olmOCR-2-7B-1025-8bit](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit) | `mlx-community` / `allenai` | MLX 8-bit VLM (~8.8 GB) | `~/.lmstudio/models/mlx-community/olmOCR-2-7B-1025-8bit` |
@@ -70,11 +70,11 @@ Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### ⚡ Wariant 2: Dual-Model Resident (Szybki Dedykowany Kompresor 27B)
 * **Model główny:** `Qwen3.5-122B-A10B-MLX-9bit` (256k)
-* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX` (256k, ~15 GB)
-* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu.
-* **Integracja z Watchdogiem:** Model 27B ma ustawioną flagę `"is_pinned": true` w `model_settings.json`, dzięki czemu demon Watchdoga nie wyładowuje go z pamięci.
-* **Pamięć RAM:** 128 GB (122B) + 15 GB (27B) = **~143 GB** (swobodnie mieści się w 192 GB Unified Memory).
-* **Zalety:** Szybszy prefill i odciążenie głównego modelu podczas kompresji.
+* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB, silnik Splash 1.3.2)
+* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu napędzany ultraszybkim silnikiem Splash z akceleracją spekulatywną DFlash2.
+* **Integracja z Watchdogiem:** Model 27B Splash ma ustawioną flagę `"is_pinned": true` w `model_settings.json`, dzięki czemu demon Watchdoga nie wyładowuje go z pamięci obok modelu głównego.
+* **Pamięć RAM:** 128 GB (122B) + 15 GB (27B) + ~1.3 GB (DFlash2 draft) = **~144 GB** (swobodnie mieści się w 192 GB Unified Memory).
+* **Zalety:** Błyskawiczny prefill, generowanie ~50–70+ tok/s i zerowe obciążenie głównego modelu podczas kompresji.
 
 ---
 
