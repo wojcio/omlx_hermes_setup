@@ -33,6 +33,14 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+- **Aktualizacja silnika do Splash 1.3.2-m1.2 z udoskonalonym podziałem Neural Engine / GPU:**
+  * **Aktualizacja binariów:**
+    - Zaktualizowano `splash-m1` z wersji `1.3.2-m1.1` do najnowszej wersji **`1.3.2-m1.2`** (`paperniuk/splash`) poprzez dedykowany instalator.
+    - W `/opt/homebrew/bin/splash-m1` dostępna jest teraz wersja `Splash 1.3.2-m1.2`, w pełni kompatybilna z GPU family 8 (Apple M2 Ultra).
+  * **Weryfikacja w oMLX i Hermes Agent:**
+    - Moduł `omlx.engine.splash.find_splash_binary()` automatycznie wykrywa nową wersję (`version='1.3.2-m1.2'`).
+    - Ponowna kalibracja Neural Engine FFN split zoptymalizowała udział ANE do **share 0.26** dla bloków $\ge$ 533 wierszy, redukując czas warstwy FFN z 70.5 ms (sam GPU) do **53.1 ms** (GPU + ANE).
+    - Zweryfikowano działanie modelu `Qwen3.8-27B-Uncensored-MLX-SPLASH` z cache KV na SSD (256k kontekstu) oraz wykonano zapytanie weryfikacyjne w Hermes CLI (`hermes -m ... -z`), uzyskując prędkość generowania do **42.7 tok/s**.
 - **Wdrożenie i pełna integracja silnika Splash 1.3.2-m1.1 z akceleracją DFlash2 na Apple M2 Ultra:**
   * **Diagnoza architektury GPU i aktualizacja `splash-m1`:**
     - Wykryto, że oficjalny pakiet `splash 1.3.2` z Homebrew wymaga układu Apple GPU family 9 (M3/M4) i odrzuca procesor M2 Ultra (GPU family 8).
