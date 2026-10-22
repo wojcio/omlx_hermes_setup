@@ -33,6 +33,18 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+- **Pełny audyt i optymalizacja wszystkich 17 modeli Hermesa (+ 2 lokalnych Huzar) pod oMLX 0.7.2 i Splash 1.3.2-m1.2:**
+  * **`Qwen3.8-27B-Coder390-...-MTP-DFlash2` (naprawa krytycznego konfliktu walidacji oMLX 0.7.2):**
+    - Usunięto konflikt równoczesnego włączenia `mtp_enabled: true`, `dflash_enabled: true` i `vlm_mtp_enabled: true`, który powodował odrzucenie całej konfiguracji modelu przez `ModelSettings.from_dict()` przy starcie oMLX.
+    - Pozostawiono natywne **`mtp_enabled: true`** (wbudowana głowica `mtp-bf16.safetensors` dopasowana do destylacji Coder390) oraz `turboquant_kv_enabled: true` (`8.0` bit, `skip_last: true`).
+  * **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (naprawa błędu HTTP 400 w UI/API i akceleracja GDN):**
+    - Wyłączono `mtp_enabled: false` (plik sidecar `mtp.safetensors` ma kontrakt `qwen4-next`, co blokowało zapisywanie jakichkolwiek ustawień modelu w oMLX 0.7.2 błędem 400; model korzysta z natywnej tablicy `ngram-table.safetensors`).
+    - Włączono nową flagę oMLX 0.7.2 **`qwen4_gdn_decode_wide_proj: true`**, dopuszczającą projekcje 4-bit/gs32 do scalonego kernela dekodowania GDN (`Qwen4 fused B1/T1 GDN decode prework`).
+  * **`Qwen3.8-27B-Uncensored-MLX` oraz `Qwen3.8-27B-FP16_huzar_v1` (natywne warianty MLX):**
+    - Podpięto lokalny model pomocniczy **`dflash_draft_model: "Qwen3.8-27B-DFlash2"`** przy `dflash_enabled: true` (wcześniej brak jawnego `dflash_draft_model` powodował wyłączenie DFlash przy starcie) oraz ujednolicono kompresję KV 8-bit (`turboquant_skip_last: true`).
+  * **`Qwen3-235B-A22B-MLX-4bit`, `Laguna-S-2.1-MLX-8bit`, `Qwen3.5-122B-A10B-MLX-9bit` i pozostałe modele:**
+    - Włączono kompresję KV 8-bit (`turboquant_kv_enabled: true`, `bits: 8.0`, `skip_last: true`) dla giganta `Qwen3-235B-A22B-MLX-4bit` (oszczędność połowy pamięci KV przy oknie 256k).
+    - Usunięto przestarzałe klucze `dflash_in_memory_cache*`/`dflash_ssd_cache*` z `Qwen3.5-122B` oraz nieobsługiwany w xgrammar `reasoning_parser: "poolside_v1"` z `Laguna-S-2.1` (oMLX 0.7.2 automatycznie przypisuje natywny parser `laguna`), dzięki czemu wszystkie 19 modeli przechodzi walidację `PUT /admin/api/models/{id}/settings` ze statusem `200 OK`.
 - **Diagnostyka i naprawa ładowania `Qwen3.8-Flash-Next-oQ5e-mtp` oraz audyt akceleracji Affine/MTP:**
   * **Naprawa silnika ładowania:**
     - Wykryto, że `Qwen3.8-Flash-Next-oQ5e-mtp` miał ustawiony `model_type_override: "llm"`, co powodowało próbę ładowania przez `mlx_lm` i błąd `ValueError: Model type qwen4_exp not supported`.
