@@ -33,8 +33,9 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
-- **Aktualizacja dokumentacji projektu (`.md`) pod oMLX 0.7.2 i Splash 1.3.2-m1.2:**
+- **Aktualizacja dokumentacji projektu (`.md`) pod oMLX 0.7.2 i Splash 1.3.2-m1.2 oraz przebudowa tabel pod GitHub:**
   * Zaktualizowano [`README.md`](README.md), [`konfiguracja-modeli.md`](konfiguracja-modeli.md), [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md) oraz [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md) o wszystkie wprowadzone optymalizacje akceleracji sprzętowej (Splash 1.3.2-m1.2 z podziałem GPU/ANE `share 0.26`, Lightning MTP, DFlash2, Fused MoE & GDN `qwen4_gdn_decode_wide_proj`, 100 skompilowanych ścieżek Affine `hc_fused` w `Qwen3.8-Flash-Next-oQ5e-mtp`, TurboQuant KV `skip_last` oraz natywny parser `laguna`).
+  * Przebudowano obie tabele w [`konfiguracja-modeli.md`](konfiguracja-modeli.md) (redukcja z 11 do 5 kolumn w Tabeli 1 oraz z 6 do 4 kolumn w Tabeli 2, złamanie 95-znakowych identyfikatorów `Coder390`), aby mieściły się w 100% szerokości widoku GitHub bez ucinania prawej krawędzi.
 - **Pełny audyt i optymalizacja wszystkich 17 modeli Hermesa (+ 2 lokalnych Huzar) pod oMLX 0.7.2 i Splash 1.3.2-m1.2:**
   * **`Qwen3.8-27B-Coder390-...-MTP-DFlash2` (naprawa krytycznego konfliktu walidacji oMLX 0.7.2):**
     - Usunięto konflikt równoczesnego włączenia `mtp_enabled: true`, `dflash_enabled: true` i `vlm_mtp_enabled: true`, który powodował odrzucenie całej konfiguracji modelu przez `ModelSettings.from_dict()` przy starcie oMLX.
