@@ -214,23 +214,23 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 
 | # | Nazwa Modelu (`hermes -m ...`) | Kategoria | Okno | Rozmiar RAM | Vision (VLM) | Kiedy wybierać? |
 | :-: | :--- | :--- | :---: | :---: | :---: | :--- |
-| 1 | **`Qwen3.5-122B-A10B-MLX-9bit`** | 🏆 Główny / Ogólny | 256k | ~128 GB | Nie | **Domyślny model.** Najlepszy balans wysokiej inteligencji, 9-bitowej precyzji i stabilności. |
-| 2 | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | ⚡ Ultra-Fast Agent | 256k | ~121 GB | **Tak** | Gdy liczy się **maksymalna prędkość (~73.5 tok/s)** w długich sesjach agentowych i obsługa obrazów. |
-| 3 | **`Qwen3.8-Flash-Next-oQ5e-mtp`** | 🎯 Główny / Precyzja | 256k | ~135 GB | Nie | Gdy wolisz nieco wyższą precyzję wag (`oQ5e` iMatrix) niż w wersji Speed. |
-| 4 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~31 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, MTP, DFlash). |
-| 5 | **`Qwen3-Coder-Next-MLX-9bit`** | 💻 Ciężki Coder | 256k | ~95 GB | Nie | Duże refaktoringi, generowanie długich plików kodu w jakości 9-bitowej. |
-| 6 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~155 GB | Nie | Najtrudniejsze problemy algorytmiczne, matematyczne i architektoniczne (MTP depth 3). |
-| 7 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4, gdy potrzebujesz mniejszego zużycia RAM. |
+| 1 | **`Qwen3.5-122B-A10B-MLX-9bit`** | 🏆 Główny / Ogólny | 256k | ~128 GB | Nie | **Domyślny model.** Najlepszy balans wysokiej inteligencji, 9-bitowej precyzji, Fused MoE i stabilności. |
+| 2 | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | ⚡ Ultra-Fast Agent | 256k | ~121 GB | **Tak** | Gdy liczy się **maksymalna prędkość (~73.5 tok/s, Fused GDN Decode + 128 shardów N-gram)** w długich sesjach agentowych i obsługa obrazów. |
+| 3 | **`Qwen3.8-Flash-Next-oQ5e-mtp`** | 🎯 Główny / Precyzja VLM | 256k | ~135 GB | **Tak** | Gdy zależy Ci na wyższej precyzji wag (`oQ5e` iMatrix), **100 skompilowanych ścieżkach Affine `hc_fused`** oraz **Lightning MTP (72.5% akceptacji)**. |
+| 4 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~31 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, natywne Lightning MTP `mtp-bf16`, 8-bit KV Cache). |
+| 5 | **`Qwen3-Coder-Next-MLX-9bit`** | 💻 Ciężki Coder | 256k | ~95 GB | Nie | Duże refaktoringi, generowanie długich plików kodu w jakości 9-bitowej (Fused MoE + 8-bit KV Cache). |
+| 6 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~155 GB | Nie | Najtrudniejsze problemy algorytmiczne, matematyczne i architektoniczne (Lightning MTP depth 3, 6-bit KV Cache). |
+| 7 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4 (Lightning MTP + MLA), gdy potrzebujesz mniejszego zużycia RAM. |
 | 8 | **`MiniMax-M3-ConfigI-MLX`** | 🌐 Multimodal MoE | 128k | ~156 GB | **Tak** | Potężny model 60-warstwowy z własnym stylem rozumowania (`<mm:think>`) i analizą obrazu. |
 | 9 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury. |
-| 10 | **`Qwen3.8-27B-Uncensored-MLX`** | 🔓 Szybki Uncensored / Kompresor | 256k | ~15 GB | Nie | Bardzo lekki model bez cenzury; w Wariancie 2 pełni rolę przypiętego w RAM kompresora kontekstu. |
+| 10 | **`Qwen3.8-27B-Uncensored-MLX`** | 🔓 Szybki Uncensored (MLX) | 256k | ~15 GB | Nie | Bardzo lekki model bez cenzury z natywnym dekodowaniem spekulatywnym **DFlash2 (`Qwen3.8-27B-DFlash2`)** i 8-bit KV Cache. |
 | 11 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
 | 12 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
 | 13 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
-| 14 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik Splash 1.3.2 (Metal/ANE + DFlash2, ~50–70+ tok/s); dedykowany kompresor Wariantu 2. |
-| 15 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) do pracy narzędziowej. |
-| 16 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z parserem `poolside_v1` i sliding window 512 do zadań inżynierskich. |
-| 17 | **`Qwen3-235B-A22B-MLX-4bit`** | 🏛️ Kolos 235B | 40k | ~130 GB | Nie | Największa liczba parametrów (235B) do krótszych sesji (okno bazowe 40k) wymagających szerokiej erudycji. |
+| 14 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.3.2-m1.2** (Metal/ANE split `0.26` + DFlash2, ~43–70+ tok/s); przypięty kompresor Wariantu 2. |
+| 15 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) i Fused MoE do pracy narzędziowej. |
+| 16 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z natywnym parserem `laguna` w oMLX 0.7.2, Fused MoE i sliding window 512 do zadań inżynierskich. |
+| 17 | **`Qwen3-235B-A22B-MLX-4bit`** | 🏛️ Kolos 235B | 40k | ~130 GB | Nie | Największa liczba parametrów (235B, Fused MoE, 8-bit KV Cache) do sesji wymagających szerokiej erudycji. |
 
 ---
 

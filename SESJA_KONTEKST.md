@@ -268,3 +268,24 @@ Model `Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` zgłaszał błąd ła
 - Endpoint oMLX `POST /admin/api/reload` pomyślnie zaindeksował model.
 - Test inferencji `/v1/chat/completions`: model załadował się do Unified Memory w 36s, osiągając generowanie **41.1 tok/s** z czasem do pierwszego tokenu (TTFT) zaledwie **0.16s**.
 - Test Hermes CLI: `hermes -z "Napisz jedno słowo: SUKCES" -m "Qwen3.8-Flash-Next-MTPLX-Optimized-Speed"` zwrócił poprawnie `SUKCES`.
+
+---
+
+## 🚀 15. Aktualizacja do oMLX 0.7.2 oraz Splash M1 1.3.2-m1.2 i pełny audyt 19 modeli (Październik 2026)
+
+### 1. Aktualizacja silnika Splash do wersji `1.3.2-m1.2` (`paperniuk/splash`):
+- Zaktualizowano binarkę `/opt/homebrew/bin/splash-m1` z `1.3.2-m1.1` do **`1.3.2-m1.2`** (wsparcie dla Apple GPU family 8 – M2 Ultra).
+- Nowy algorytm kalibracji Neural Engine FFN split zwiększył udział ANE z `0.24` do **`0.26`** dla bloków $\ge 533$ wierszy, skracając czas warstwy FFN z `70.5 ms` (sam GPU) do **`53.1 ms`** (GPU + ANE).
+- Zweryfikowano działanie `Qwen3.8-27B-Uncensored-MLX-SPLASH` z cache KV na SSD i w Hermes CLI (~42.7 tok/s).
+
+### 2. Diagnostyka i naprawa `Qwen3.8-Flash-Next-oQ5e-mtp` (Affine `hc_fused` + Lightning MTP):
+- Naprawiono ładowanie modelu poprzez zmianę `model_type_override` z `"llm"` na `"vlm"` (architektura `qwen4_exp` wymaga silnika `mlx_vlm`), dodano `reasoning_parser: "qwen_3_5"`, `thinking_budget_tokens: 32768`, `presence_penalty: 0.0` oraz `turboquant_skip_last: true`.
+- Potwierdzono, że w przeciwieństwie do wersji `Speed` (gdzie wagi miksera HC są w nieskwantyzowanym BF16), wariant `oQ5e` posiada wszystkie 296 tensorów Hyper-Connection w formacie **Affine 6-bit / group 64**, dzięki czemu oMLX 0.7.2 kompiluje dla niego **100 dedykowanych ścieżek `hc_fused`** na GPU.
+- Wbudowane tensory `mtp.` uruchamiają natywne **Lightning MTP**, osiągając **72.5% akceptacji draftów** (2.50 tok/cykl).
+
+### 3. Kompleksowy audyt i optymalizacja wszystkich 19 modeli pod oMLX 0.7.2:
+- **`Qwen3.8-27B-Coder390-...-MTP-DFlash2`:** Usunięto konflikt jednoczesnego włączenia `mtp_enabled: true`, `dflash_enabled: true` i `vlm_mtp_enabled: true` (powodował odrzucenie całego wpisu przez walidator `ModelSettings.from_dict()` w oMLX 0.7.2). Pozostawiono natywną głowicę **`mtp_enabled: true`** (`mtp-bf16.safetensors` dopasowane do destylacji Coder390) oraz `turboquant_kv_enabled: true` (8-bit, `skip_last: true`).
+- **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`:** Wyłączono `mtp_enabled: false` (plik sidecar `mtp.safetensors` ma kontrakt `qwen4-next`, co powodowało błąd `HTTP 400` przy zapisie ustawień w oMLX 0.7.2; model korzysta z 128 shardów N-gram) oraz włączono nową flagę **`qwen4_gdn_decode_wide_proj: true`** (scalony kernel dekodowania GDN dla projekcji 4-bit/gs32).
+- **`Qwen3.8-27B-Uncensored-MLX` i `Qwen3.8-27B-FP16_huzar_v1`:** Podpięto lokalny model pomocniczy **`dflash_draft_model: "Qwen3.8-27B-DFlash2"`** przy `dflash_enabled: true` oraz ujednolicono `turboquant_skip_last: true`.
+- **`Qwen3-235B-A22B-MLX-4bit` i `Laguna-S-2.1-MLX-8bit`:** Włączono kompresję `turboquant_kv_enabled: true` (8-bit, `skip_last: true`) dla `Qwen3-235B` oraz usunięto nieobsługiwany w xgrammar `reasoning_parser: "poolside_v1"` z `Laguna-S-2.1` (oMLX 0.7.2 automatycznie używa natywnego parsera `laguna`).
+- **Walidacja API:** Wszystkie 19 modeli zarejestrowanych w oMLX pomyślnie przechodzi walidację `PUT /admin/api/models/{id}/settings` ze statusem `200 OK`.
