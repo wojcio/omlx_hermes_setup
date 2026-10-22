@@ -33,6 +33,14 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+- **Diagnostyka i naprawa ładowania `Qwen3.8-Flash-Next-oQ5e-mtp` oraz audyt akceleracji Affine/MTP:**
+  * **Naprawa silnika ładowania:**
+    - Wykryto, że `Qwen3.8-Flash-Next-oQ5e-mtp` miał ustawiony `model_type_override: "llm"`, co powodowało próbę ładowania przez `mlx_lm` i błąd `ValueError: Model type qwen4_exp not supported`.
+    - Zmieniono `model_type_override` na `"vlm"` (silnik `mlx_vlm`) w `model_settings.json` oraz wariantach 1 i 2, a także ustawiono `reasoning_parser: "qwen_3_5"` i `thinking_budget_tokens: 32768`.
+  * **Weryfikacja akceleracji Affine i Lightning MTP:**
+    - W odróżnieniu od wersji `Speed` (gdzie wagi miksera HC były w nieskwantyzowanym BF16), wersja `oQ5e` ma wszystkie 296 wag Hyper-Connection w formacie **Affine 6-bit / group 64**. Dzięki temu `hc_fused` skompilował 100 dedykowanych ścieżek dekodowania na GPU.
+    - Wbudowane tensory `mtp.` aktywowały **Lightning MTP**, uzyskując znakomity współczynnik akceptacji draftów na poziomie **72.5%** (2.50 tok/cykl).
+    - Zweryfikowano działanie zapytaniem przez Hermes CLI (`hermes -m Qwen3.8-Flash-Next-oQ5e-mtp -z "..."`).
 - **Aktualizacja silnika do Splash 1.3.2-m1.2 z udoskonalonym podziałem Neural Engine / GPU:**
   * **Aktualizacja binariów:**
     - Zaktualizowano `splash-m1` z wersji `1.3.2-m1.1` do najnowszej wersji **`1.3.2-m1.2`** (`paperniuk/splash`) poprzez dedykowany instalator.
