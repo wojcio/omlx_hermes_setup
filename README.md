@@ -1,6 +1,6 @@
 # oMLX & Hermes Setup
 
-Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.7.2** oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context`), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.3.2-m1.2**, **Lightning MTP**, **DFlash2**, **Fused MoE & GDN**, **Affine `hc_fused`**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla lokalnych modeli językowych na Apple Silicon (M2 Ultra / MLX).
+Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.7.3.dev2** oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context`), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.3.2-m1.2**, **Lightning MTP**, **DFlash2**, **Fused MoE & GDN**, **Affine `hc_fused`**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla lokalnych modeli językowych na Apple Silicon (M2 Ultra / MLX).
 
 ---
 
@@ -10,6 +10,16 @@ Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSe
 
 👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
 👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
+
+---
+
+## 🚀 Nowości i optymalizacje w oMLX 0.7.3.dev2
+
+Konfiguracja jest w 100% zgodna z **oMLX `0.7.3.dev2`** (`mlx-vlm 0.7.10`) i automatycznie wykorzystuje wprowadzone usprawnienia silnikowe:
+- **Szybszy DFlash2 (`+16%` do `+33%` tok/s) dla modeli 27B:** Drafter `Qwen3.8-27B-DFlash2` (`bf16`) współpracujący z wariantami `Qwen3.8-27B-Uncensored-MLX` oraz `Qwen3.8-27B-FP16_huzar_v1` działa teraz w `fp16` z akumulacją rezydualną `fp32` (zamiast pełnego przebiegu w `fp32`).
+- **Zespolone kernele dekodowania dla MiniMax M3 (`+14%` do `+23%` decode):** Przyspieszone dekodowanie dla `MiniMax-M3-ConfigI-MLX` w przedziale 5k–64k tokenów z zachowaniem bitowej identyczności wyników oraz nieskwantyzowanego *patch mergera* w ścieżce wizyjnej.
+- **Ulepszenia Lightning MTP:** Przenoszenie stanu *batch park backoff* między zapytaniami dla modeli `Qwen3.8-Flash-Next-oQ5e-mtp` oraz `Qwen3.8-27B-Coder390-...-MTP-DFlash2`.
+- **Stabilność dla Hermesa, VLM i MCP:** Poprawne wydzielanie bloków `<think>` otwartych w prompcie na wszystkich endpointach (`/v1/chat/completions`, `/v1/messages`, `/v1/responses`), pełna obsługa `tool_choice: none`, kompaktowa reprezentacja obrazów zwracanych przez narzędzia MCP (zamiast surowego base64 w kontekście) oraz natychmiastowe zwalnianie RAM po anulowaniu ładowania modelu.
 
 ---
 
