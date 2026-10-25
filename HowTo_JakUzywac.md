@@ -219,7 +219,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 | 3 | **`Qwen3.8-Flash-Next-oQ5e-mtp`** | 🎯 Główny / Precyzja VLM | 256k | ~135 GB | **Tak** | Gdy zależy Ci na wyższej precyzji wag (`oQ5e` iMatrix), **100 skompilowanych ścieżkach Affine `hc_fused`** oraz **Lightning MTP (72.5% akceptacji)**. |
 | 4 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-`**<br>**`GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~31 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, natywne Lightning MTP `mtp-bf16`, 8-bit KV Cache). |
 | 5 | **`Qwen3-Coder-Next-MLX-9bit`** | 💻 Ciężki Coder | 256k | ~95 GB | Nie | Duże refaktoringi, generowanie długich plików kodu w jakości 9-bitowej (Fused MoE + 8-bit KV Cache). |
-| 6 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~155 GB | Nie | Najtrudniejsze problemy algorytmiczne, matematyczne i architektoniczne (Lightning MTP depth 3, 6-bit KV Cache). |
+| 6 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~159 GB | Nie | Najtrudniejsze problemy algorytmiczne i architektoniczne (embedded DSpark MTP depth 3, **31–34.6 tok/s** do 45k, **~21–24 tok/s** przy >210k). |
 | 7 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4 (Lightning MTP + MLA), gdy potrzebujesz mniejszego zużycia RAM. |
 | 8 | **`MiniMax-M3-ConfigI-MLX`** | 🌐 Multimodal MoE | 128k | ~156 GB | **Tak** | Potężny model 60-warstwowy z własnym stylem rozumowania (`<mm:think>`) i analizą obrazu. |
 | 9 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury. |
@@ -245,4 +245,9 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
    - **Wybierz Wariant 2 (`./switch-variant.sh 2`):** Gdy przez cały dzień pracujesz wyłącznie na głównym modelu `Qwen3.5-122B` i chcesz, aby streszczaniem długiego kontekstu zajmował się przypięty na stałe w RAM mały, ultraszybki model `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB, silnik Splash).
 
 3. **Praca z bardzo dużymi modelami (>150 GB RAM):**
-   - Podczas korzystania z `DeepSeek-V4-Flash-0731-MXFP4-MLX` (~155 GB) lub `MiniMax-M3-ConfigI-MLX` (~156 GB) zawsze używaj **Wariantu 1**, aby cała reszta ze 192 GB RAM była dostępna na bufor KV Cache przy długich rozmowach.
+   - Podczas korzystania z `DeepSeek-V4-Flash-0731-MXFP4-MLX` (~159 GB) lub `MiniMax-M3-ConfigI-MLX` (~156 GB) zawsze używaj **Wariantu 1**, aby cała reszta ze 192 GB RAM była dostępna na bufor KV Cache przy długich rozmowach.
+
+4. **Wpływ długości kontekstu na prędkość `DeepSeek-V4-Flash-0731-MXFP4-MLX`:**
+   - Na krótkim i średnim kontekście (`<45k` tokenów) model generuje z prędkością **31.0–34.6 tok/s** (czas kroku `backbone ~95 ms`, akceptacja wbudowanego draftera DSpark MTP na poziomie `91–96%`).
+   - Gdy sesja przekroczy **`210k–232k` tokenów**, prędkość spada do **21.0–23.7 tok/s** — jest to naturalne zachowanie wynikające z dwóch czynników: oMLX automatycznie wyłącza kompresję TurboQuant KV dla tej architektury z powodu użycia *attention sinks* (zachowując `fp16` KV cache przy `158.8 GB` zajętego RAM-u), przez co krok `backbone` wydłuża się do `~128 ms`, a przy długich wywołaniach narzędzi (`tool_calls`) akceptacja MTP spada do `80–84%`.
+   - Po automatycznej kompresji historii rozmowy (np. z `232k` do `~66k` tokenów) prędkość natychmiast wraca w okolice **30.0 tok/s**.

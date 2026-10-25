@@ -23,7 +23,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | 11 | [**Qwen3.8-Flash-Next-oQ5e-mtp**](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp)<br>*(Qwen 4 Exp VL)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Format oQ5e iMatrix (typ `vlm`, wizja), Lightning MTP (72.5% akceptacji, 2.50 tok/cykl), 100 ścieżek Affine `hc_fused`, KV 8-bit |
 | 12 | [**olmOCR-2-7B-1025-8bit**](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit)<br>*(Qwen 2.5 VL)* | **128k** / **8k**<br>*(Dense)* | `0.2` / `0.90` / `20` / `1.05` | Model VLM do zaawansowanego OCR dokumentów PDF, tabel, wzorów i układów wielokolumnowych |
 | 13 | [**Unlimited-OCR-8bit**](https://huggingface.co/mlx-community/Unlimited-OCR-8bit)<br>*(UnlimitedOCR MoE)* | **32k** / **8k**<br>*(SW: 128)* | `0.2` / `0.90` / `20` / `1.05` | Model VLM OCR bez limitu rozdzielczości obrazu (downsampling/tiling 2D), odczyt faktur i etykiet (`trust_remote_code`) |
-| 14 | [**DeepSeek-V4-Flash-0731-MXFP4-MLX**](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX)<br>*(DeepSeek V4 MoE)* | **256k** / **32k**<br>*(SW: 128)* | `0.6` / `0.95` / `40` / `1.00` | YaRN RoPE (factor 16), sliding window 128, TurboQuant KV 6-bit (`skip_last`), Lightning MTP depth 3, wagi MXFP4 (~155 GB) |
+| 14 | [**DeepSeek-V4-Flash-0731-MXFP4-MLX**](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX)<br>*(DeepSeek V4 MoE)* | **256k** / **32k**<br>*(SW: 128)* | `0.6` / `0.95` / `40` / `1.00` | YaRN RoPE (factor 16), SW 128, embedded DSpark MTP (depth 3), `fp16` KV (*attention sinks*), 31–34.6 tok/s (<45k) / ~21–24 tok/s (>210k), ~159 GB |
 | 15 | [**MiniMax-M3-ConfigI-MLX**](https://huggingface.co/thetom-ai/MiniMax-M3-ConfigI-MLX)<br>*(MiniMax M3 MoE VL)* | **128k** / **32k**<br>*(SW: 128)* | `1.0` / `0.95` / `40` / `1.00` | 60 warstw, 128 ekspertów (top-4), sparse attention, kwantyzacja ConfigI, parser `minimax_m3` (`<mm:think>`), ~156 GB |
 | 16 | [**Qwen3.8-27B-Coder390-...-MTP-DFlash2**](https://huggingface.co/nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2)<br>*(Qwen 3.5 Dense VL · BF16)* | **256k** / **32k**<br>*(Dense)* | `0.6` / `0.95` / `40` / `1.05` | Wagi BF16 (~30.6 GB), VLM, natywne Lightning MTP (`mtp-bf16`), KV 8-bit (`skip_last`), 34.6 tok/s, destylacja Opus 5.5 / GPT-6 / Grok 4.7 |
 | 17 | [**Qwen3.8-Flash-Next-MTPLX-Optimized-Speed**](https://huggingface.co/Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed)<br>*(Qwen 4 Exp VL)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | 512 ekspertów (top-10), 128 shardów N-gram (32 GB), `qwen4_gdn_decode_wide_proj` (Fused GDN), KV 8-bit, ~73.5 tok/s (~120.8 GB) |
@@ -109,6 +109,24 @@ WARNING run_agent: Context compression made no progress for 120.0s; continuing w
 2. **`context_total_ceiling_seconds: 1200`:** Łączny bezpieczny czas na całą procedurę kompresji to 20 minut.
 3. **Odblokowanie pełnego 256k okna:** Usunięto błąd, w którym Hermes odrzucał model kompresora poniżej progu 64k.
 4. **Wymuszenie lokalnego oMLX:** Skierowano `auxiliary.compression.provider: omlx` zamiast `auto`, co wyeliminowało błędy braku kredytów (402) i przekroczenia okna (400) w OpenRouterze.
+
+### 5.1. Obserwacja Produkcyjna: Skalowanie Prędkości `DeepSeek-V4-Flash-0731-MXFP4-MLX` w Funkcji Kontekstu
+
+Analiza telemetrii `server.log` (porównanie `oMLX 0.7.2` oraz `oMLX 0.7.3.dev2`) wykazała silną zależność prędkości generowania (`TG tok/s`) od bieżącej długości promptu w sesji:
+
+| Wersja oMLX | Długość kontekstu (`prompt`) | Czas kroku (`backbone / cykl`) | Akceptacja DSpark MTP (`tok/cykl`) | Prędkość generowania (`TG tok/s`) |
+| :--- | ---: | ---: | ---: | ---: |
+| `0.7.2` | **9 623 – 41 708** | `92.1 – 102.3 ms` | `3.30 – 3.65` (89–96%) | **31.0 – 34.6 tok/s** |
+| `0.7.2` | **63 578** | `101.2 ms` | `3.03` (85.2%) | **28.3 tok/s** |
+| `0.7.3.dev2` | **66 709** | **`95.0 ms`** | **`3.01` (92.5%)** | **30.0 tok/s** |
+| `0.7.3.dev2` | **161 154** | `115.0 ms` | `2.98` (84.3%) | **24.7 tok/s** |
+| `0.7.2` | **213 534 – 225 841** | `121.8 – 132.1 ms` | `2.58 – 2.76` (80–83%) | **20.9 – 21.7 tok/s** |
+| `0.7.3.dev2` | **226 775 – 232 273** | `125.2 – 127.6 ms` | `2.88 – 3.10` (81–88%) | **21.5 – 23.7 tok/s** |
+
+**Kluczowe wnioski techniczne z logów oMLX:**
+1. **Brak regresji po aktualizacji do `0.7.3.dev2`:** Przy porównywalnym kontekście (`~65k` oraz `~226k` tokenów) wersja `0.7.3.dev2` utrzymuje o `~1–1.5 tok/s` wyższą przepustowość niż `0.7.2`, a natychmiast po kompresji kontekstu z `232k` do `66k` prędkość wraca w okolice **30+ tok/s**.
+2. **Automatyczne wyłączenie TurboQuant KV przez *attention sinks*:** Pomimo ustawienia `turboquant_kv_enabled: true` w konfiguracji, podczas ładowania modelu scheduler oMLX loguje: `TurboQuant disabled: model uses attention sinks, which are not supported by TurboQuant's quantized attention kernels; keeping fp16 KV cache`. Przy wadze modelu `158.84 GB` w RAM i kontekście powyżej `225k` tokenów aktywuje się próg *Soft memory pressure* (`current=164.3GB, soft=164.1GB`), a koszt przeszukiwania bufora przez kernel `DSV4F/M2 v25 MMA indexer score` wydłuża krok `backbone` z `~95 ms` do `~128 ms` (+35%).
+3. **Dynamika akceptacji wbudowanego draftera `embedded DSpark` (3 stages, width 3):** Na krótkim kontekście drafter osiąga 91–96% akceptacji (`3.5 tok/cykl`), natomiast przy głębokim kontekście (>210k) i generowaniu rozbudowanych argumentów JSON dla narzędzi (`finish_reason=tool_calls`) akceptacja spada do 80–84% (`2.6–2.9 tok/cykl`), co w połączeniu z dłuższym krokiem `backbone` daje wynikowe **~21–24 tok/s**.
 
 ---
 

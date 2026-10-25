@@ -289,3 +289,28 @@ Model `Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` zgłaszał błąd ła
 - **`Qwen3.8-27B-Uncensored-MLX` i `Qwen3.8-27B-FP16_huzar_v1`:** Podpięto lokalny model pomocniczy **`dflash_draft_model: "Qwen3.8-27B-DFlash2"`** przy `dflash_enabled: true` oraz ujednolicono `turboquant_skip_last: true`.
 - **`Qwen3-235B-A22B-MLX-4bit` i `Laguna-S-2.1-MLX-8bit`:** Włączono kompresję `turboquant_kv_enabled: true` (8-bit, `skip_last: true`) dla `Qwen3-235B` oraz usunięto nieobsługiwany w xgrammar `reasoning_parser: "poolside_v1"` z `Laguna-S-2.1` (oMLX 0.7.2 automatycznie używa natywnego parsera `laguna`).
 - **Walidacja API:** Wszystkie 19 modeli zarejestrowanych w oMLX pomyślnie przechodzi walidację `PUT /admin/api/models/{id}/settings` ze statusem `200 OK`.
+
+---
+
+## 🚀 16. Aktualizacja do oMLX 0.7.3.dev2 oraz analiza skalowania prędkości `DeepSeek-V4-Flash-0731-MXFP4-MLX` w funkcji kontekstu (Październik 2026)
+
+### 1. Walidacja i nowości w `oMLX 0.7.3.dev2` (`mlx-vlm 0.7.10`):
+- Zweryfikowano wszystkie 19 modeli w `model_settings.json` za pomocą `omlx.model_settings.ModelSettings.from_dict()` z wbudowanego środowiska Python w `/Applications/oMLX.app` (`0` błędów, `0` nieznanych kluczy).
+- Potwierdzono automatyczne korzyści z nowej wersji: szybszy DFlash2 (`+16%` do `+33%` tok/s) dzięki uruchomieniu draftera `bf16` w `fp16` z akumulacją rezydualną `fp32` dla modeli 27B (`Qwen3.8-27B-Uncensored-MLX`, `Qwen3.8-27B-FP16_huzar_v1`), zespolone kernele dekodowania dla `MiniMax-M3-ConfigI-MLX` (`+14%` do `+23%` decode), udoskonalony *batch park backoff* w Lightning MTP oraz poprawki separacji `<think>`, obsługi `tool_choice: none` i miniatur obrazów z narzędzi MCP.
+
+### 2. Analiza telemetrii `server.log`: dlaczego `DeepSeek-V4-Flash-0731-MXFP4-MLX` zwalnia z ~32–34 TG do ~21–24 TG przy >210k kontekstu?
+Na podstawie 126 wpisów `Chat completion` oraz statystyk `MTP[...]` w `~/.omlx/logs/server.log` zestawiono wyniki przed aktualizacją (`oMLX 0.7.2`) i po aktualizacji (`oMLX 0.7.3.dev2` o godz. 13:01):
+
+| Godzina | Wersja oMLX | Kontekst (`prompt`) | Krok `backbone / cykl` | Akceptacja DSpark MTP (`tok/cykl`) | Prędkość (`TG tok/s`) |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| `03:02 – 03:06` | `0.7.2` | **9 623 – 41 708** | `92.1 – 102.3 ms` | `3.30 – 3.65` (89–96%) | **31.0 – 34.6 tok/s** |
+| `03:23:13` | `0.7.2` | **63 578** | `101.2 ms` | `3.03` (85.2%) | **28.3 tok/s** |
+| `07:39 – 07:48` | `0.7.2` | **213 534 – 225 841** | `121.8 – 132.1 ms` | `2.58 – 2.76` (80–83%) | **20.9 – 21.7 tok/s** |
+| `14:31:28` | `0.7.3.dev2` | **226 775** | `127.6 ms` | `2.88` (81.3%) | **21.5 tok/s** |
+| `14:35:06` | `0.7.3.dev2` | **232 273** | `125.2 ms` | `3.10` (88.1%) | **23.7 tok/s** |
+| `14:36:24` | `0.7.3.dev2` | **161 154** | `115.0 ms` | `2.98` (84.3%) | **24.7 tok/s** |
+| `14:39:58` | `0.7.3.dev2` | **66 709** | **`95.0 ms`** | **`3.01` (92.5%)** | **30.0 tok/s** |
+
+- **Wniosek 1 (brak regresji):** Przy identycznym rozmiarze kontekstu (`~65k` oraz `~226k` tokenów) `oMLX 0.7.3.dev2` jest o `~1–1.5 tok/s` szybszy od `0.7.2`. Gdy sesja została skompresowana z `232 273` do `66 709` tokenów, prędkość natychmiast wróciła do **`30.0 tok/s`**.
+- **Wniosek 2 (wyłączenie TurboQuant KV przez *attention sinks* i koszt pamięci):** Przy starcie modelu oMLX loguje `TurboQuant disabled: model uses attention sinks, which are not supported by TurboQuant's quantized attention kernels; keeping fp16 KV cache`. Sam model zajmuje `158.84 GB` RAM, więc powyżej `225k` tokenów osiągany jest próg *Soft memory pressure* (`current=164.3GB, soft=164.1GB`), a koszt przeszukiwania kontekstu przez kernel `DSV4F/M2 v25 MMA indexer score` wydłuża pojedynczy cykl `backbone` z `~95 ms` do `~128 ms` (+35%).
+- **Wniosek 3 (współczynnik akceptacji `embedded DSpark` MTP przy `tool_calls`):** Na krótkim kontekście 3-etapowy drafter DSpark trafia `91–96%` tokenów (`~3.5 tok/cykl`), natomiast przy `>210k` tokenów i generowaniu rozbudowanych wywołań narzędzi (`finish_reason=tool_calls`) akceptacja spada do `80–84%` (`2.6–2.9 tok/cykl`), co razem z dłuższym krokiem `backbone` daje `~21–24 tok/s`.
