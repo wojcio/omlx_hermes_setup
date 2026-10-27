@@ -473,7 +473,7 @@
       "enable_thinking": true,
       "external_engine": "splash",
       "model_type_override": "llm",
-      "is_pinned": false,
+      "is_pinned": true,
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,

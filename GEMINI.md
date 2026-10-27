@@ -33,6 +33,24 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+- **Wdrożenie oMLX 0.7.3rc1, Apple MLX 0.32.4 oraz Splash M1 1.4.0-m1 – Profilowanie Kompresora Wariantu 2 i Architektury Flash-Next (27 Października 2026):**
+  * **Aktualizacje binariów:**
+    - oMLX podbity do oficjalnego wydania **`0.7.3rc1`** (build `261027180332`) bazującego na **Apple MLX `0.32.4`**, `mlx_metal 0.32.4`, `mlx-lm 0.32.3.dev8` (`0d4d3d04`) oraz `mlx-vlm 0.7.10`.
+    - Zaktualizowano launcher `/opt/homebrew/bin/splash-m1` do najnowszej wersji **`1.4.0-m1`** (`paperniuk/splash`), wnoszącej buforowanie query w pamięci threadgroup oraz uaktualnione kernele Metal dla M1/M2.
+    - Zweryfikowano zgodność ze schematem `ModelSettings` (wszystkie 19 modeli: 0 błędów).
+  * **Changelog & Wpływ na konfigurację:**
+    - **TurboQuant KV & Sinks (PR #4856):** Zespolony kernel decode przyjmuje bufor `sinks: mx.array`, rozwiązując problem wyłączania TurboQuant na głębokim oknie (>200k) w `DeepSeek-V4-Flash-0731-MXFP4-MLX`.
+    - **Flash-Next Decode Speedup (PR #4880):** Optymalizacja pętli dekodowania architektury Qwen4/Flash-Next.
+    - **Metal Timeout Preemption (PR #4872):** Relaksacja limitu context store na procesorach M1/M2 Ultra zapobiega timeoutom `Metal 0000000e` przy długich prefillach (256k).
+    - **Hermes Agent Safety (PR #4869):** Kod błędu `incomplete_tool_call` zabezpiecza pętlę agenta przed uciętymi wywołaniami narzędzi.
+    - **Unlimited-OCR (PR #4822):** Usunięto powielanie tagów `<image>`.
+  * **Architektura Qwen3.8-Flash-Next (oMLX w 192 GB RAM vs Splash GGUF):**
+    - Potwierdzono, że Splash wymaga dla Flash-Next formatu GGUF (`_GGUF_ONLY_FAMILIES`) i stosuje kompromisowe strumieniowanie 30-gigabajtowej tablicy n-gramów PLE z dysku SSD (`--ple-memory 2G`), dedykowane dla maszyn $\le$64 GB RAM (~47 tok/s).
+    - Na Mac Studio z **192 GB RAM** modele natywne MLX safetensors (`oQ5e-mtp` oraz `Optimized-Speed`) mieszczą się w 100% w RAM i w oMLX z Lightning MTP osiągają aż **73.5 – 75+ tok/s**, deklasując warianty SSD.
+  * **Benchmark Wariantu 2 (Dedykowany Kompresor Splash 1.4.0-m1):**
+    - Przetestowano kompresję rzeczywistego kontekstu rozmowy (2 168 tokenów): generowanie podsumowań przyspieszyło z 42.7 tok/s do **63.99 tok/s** (+49.8%), TTFT wyniósł **0.31s**, akceptacja DFlash2 **3.92 tok/cykl**, a czas całej kompresji zamknął się w **10.50 s**.
+    - Model główny `Qwen3.5-122B` (~92 GB) + kompresor `Qwen 27B Splash` (~15.2 GB, `is_pinned: true`) = **~107 GB**, pozostawiając ~85 GB na bufory. Watchdog `omlx-single-model-guard` zachowuje oba modele.
+    - Udokumentowano zasadę: dla kolosów >150 GB (`DeepSeek-V4-Flash MXFP4`, `MiniMax-M3`) należy bezwzględnie używać **Wariantu 1** (Zero-Swap), aby nie przekroczyć sufitu pamięci oMLX (178.5 GB).
 - **Weryfikacja kompatybilności z oMLX 0.7.3.dev2 oraz profilowanie prędkości `DeepSeek-V4-Flash-0731-MXFP4-MLX` w funkcji kontekstu:**
   * Zweryfikowano pełną zgodność wszystkich 19 wpisów w [`model_settings.json`](model_settings.json) ze schematem `ModelSettings` w **oMLX `0.7.3.dev2`** (`0` błędów walidacji, `0` nieznanych kluczy).
   * Udokumentowano w [`README.md`](README.md), [`konfiguracja-modeli.md`](konfiguracja-modeli.md), [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md) oraz [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md) automatyczne korzyści z oMLX `0.7.3.dev2` (`mlx-vlm 0.7.10`): szybszy DFlash2 (`+16%` do `+33%` tok/s) dzięki przebiegowi draftera `bf16` w `fp16` z akumulacją rezydualną `fp32` dla modeli 27B (`Qwen3.8-27B-Uncensored-MLX`, `Qwen3.8-27B-FP16_huzar_v1`), zespolone kernele dekodowania dla `MiniMax-M3-ConfigI-MLX` (`+14%` do `+23%` decode), udoskonalony *batch park backoff* w Lightning MTP oraz poprawki parsowania `<think>`, obsługi `tool_choice: none` i obrazów MCP/VLM.

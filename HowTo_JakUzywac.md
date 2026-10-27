@@ -227,7 +227,7 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
 | 11 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
 | 12 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
 | 13 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
-| 14 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.3.2-m1.2** (Metal/ANE split `0.26` + DFlash2, ~43–70+ tok/s); przypięty kompresor Wariantu 2. |
+| 14 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.4.0-m1** (Threadgroup memory attention staging, Metal/ANE split `0.26` + DFlash2, do **64.0 tok/s**); przypięty kompresor Wariantu 2. |
 | 15 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) i Fused MoE do pracy narzędziowej. |
 | 16 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z natywnym parserem `laguna` w oMLX 0.7.2, Fused MoE i sliding window 512 do zadań inżynierskich. |
 | 17 | **`Qwen3-235B-A22B-MLX-4bit`** | 🏛️ Kolos 235B | 40k | ~130 GB | Nie | Największa liczba parametrów (235B, Fused MoE, 8-bit KV Cache) do sesji wymagających szerokiej erudycji. |
@@ -241,13 +241,33 @@ Poniższa tabela pozwala szybko porównać wszystkie 17 modeli pod kątem ich ro
    - Dzięki temu możesz swobodnie przełączać się między gigantycznymi modelami (np. z `MiniMax-M3` 156 GB na `DeepSeek-V4` 155 GB) bez ryzyka zapchania pamięci Unified Memory.
 
 2. **Kiedy wybrać Wariant 1, a kiedy Wariant 2?**
-   - **Wybierz Wariant 1 (`./switch-variant.sh 1` – Domyślny):** Gdy często zmieniasz modele w zależności od roli (np. rano używasz `Coder390` do kodu, w południe `olmOCR` do faktur, a po południu `Qwen3.8-Flash-Speed`). Kompresję długiej rozmowy wykona ten sam model, który masz już załadowany w pamięci (**Zero Swap**).
-   - **Wybierz Wariant 2 (`./switch-variant.sh 2`):** Gdy przez cały dzień pracujesz wyłącznie na głównym modelu `Qwen3.5-122B` i chcesz, aby streszczaniem długiego kontekstu zajmował się przypięty na stałe w RAM mały, ultraszybki model `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB, silnik Splash).
+   - **Wybierz Wariant 1 (`./switch-variant.sh 1` – Domyślny / Zero-Swap):**
+     * **Zasada:** Kompresję długiego kontekstu wykonuje ten sam model, który aktualnie prowadzi sesję (`provider: auto`).
+     * **Kiedy stosować:** Gdy często zmieniasz modele w zależności od roli lub gdy korzystasz z potężnych modeli (>150 GB RAM).
+     * **Zalety:** 100% zunifikowanej pamięci (192 GB) pozostaje do dyspozycji aktywnego modelu, brak narzutu na dodatkowy model w RAM.
+   - **Wybierz Wariant 2 (`./switch-variant.sh 2` – Dual-Model Resident):**
+     * **Zasada:** Model główny (np. `Qwen3.5-122B-A10B-MLX-9bit`) współistnieje w RAM z przypiętym na stałe małym, dedykowanym kompresorem `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15.2 GB, silnik **Splash 1.4.0-m1**).
+     * **Wydajność kompresora Splash:** Osiąga **63.99 tok/s** generowania podsumowań, minimalny TTFT **0.31 s**, akcelerację spekulatywną DFlash2 na poziomie **3.92 tok/cykl** oraz hybrydowy podział warstw FFN na Neural Engine (share `0.26`). Cały proces kompresji 2 168 tokenów kontekstu trwa zaledwie **10.5 s**.
+     * **Kiedy stosować:** Gdy prowadzisz długie, intensywne sesje na modelach o rozmiarze do ~130 GB RAM (np. `Qwen3.5-122B`, `Flash-Next`, `Coder390`, `Qwen 235B 4-bit`) i chcesz natychmiastowego, bezstratnego streszczania kontekstu bez odrywania modelu głównego.
 
-3. **Praca z bardzo dużymi modelami (>150 GB RAM):**
-   - Podczas korzystania z `DeepSeek-V4-Flash-0731-MXFP4-MLX` (~159 GB) lub `MiniMax-M3-ConfigI-MLX` (~156 GB) zawsze używaj **Wariantu 1**, aby cała reszta ze 192 GB RAM była dostępna na bufor KV Cache przy długich rozmowach.
+3. **Praca z bardzo dużymi modelami (>150 GB RAM) – Bezwzględny Wariant 1:**
+   - Podczas korzystania z modeli:
+     * `DeepSeek-V4-Flash-0731-MXFP4-MLX` (waga modelu: **158.84 GB**)
+     * `MiniMax-M3-ConfigI-MLX` (waga modelu: **156.0 GB**)
+   - **Zawsze przełącz na Wariant 1 (`./switch-variant.sh 1`)!**
+   - *Dlaczego?* W Wariancie 2 obecność rezydentnego kompresora Splash (~15.2 GB) podnosi łączną alokację do >174 GB, co przy dynamicznym suficie pamięci oMLX (~178.5 GB) wywołuje błąd `HTTP 507: Cannot load model: projected memory would exceed dynamic memory ceiling`. W Wariancie 1 demon Watchdoga dba o to, by w pamięci znajdował się wyłącznie jeden kolos, pozostawiając ~33 GB RAM na bufory KV Cache.
 
 4. **Wpływ długości kontekstu na prędkość `DeepSeek-V4-Flash-0731-MXFP4-MLX`:**
    - Na krótkim i średnim kontekście (`<45k` tokenów) model generuje z prędkością **31.0–34.6 tok/s** (czas kroku `backbone ~95 ms`, akceptacja wbudowanego draftera DSpark MTP na poziomie `91–96%`).
    - Gdy sesja przekroczy **`210k–232k` tokenów**, prędkość spada do **21.0–23.7 tok/s** — jest to naturalne zachowanie wynikające z dwóch czynników: oMLX automatycznie wyłącza kompresję TurboQuant KV dla tej architektury z powodu użycia *attention sinks* (zachowując `fp16` KV cache przy `158.8 GB` zajętego RAM-u), przez co krok `backbone` wydłuża się do `~128 ms`, a przy długich wywołaniach narzędzi (`tool_calls`) akceptacja MTP spada do `80–84%`.
    - Po automatycznej kompresji historii rozmowy (np. z `232k` do `~66k` tokenów) prędkość natychmiast wraca w okolice **30.0 tok/s**.
+
+5. **Qwen3.8-Flash-Next: oMLX (MLX w 192 GB RAM) vs Splash (GGUF ze strumieniowaniem SSD):**
+   - **W oMLX (nasza konfiguracja):**
+     * Posiadamy na dysku natywne wagi MLX safetensors: `Qwen3.8-Flash-Next-oQ5e-mtp` (~125 GB) oraz `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (~145 GB).
+     * Dzięki **192 GB Unified Memory** cały model — w tym pełna 30-gigabajtowa tablica n-gramów PLE oraz 512 ekspertów MoE — ładuje się w 100% do pamięci RAM.
+     * W oMLX z Lightning MTP i zespolonymi kernelami GDN (`qwen4_gdn_decode_wide_proj: true`) model ten osiąga zawrotną prędkość **73.5 – 75+ tok/s**!
+   - **W Splashu (`1.4.0-m1`):**
+     * Silnik Splash obsługuje `Qwen3.8-Flash-Next` **wyłącznie z formatu GGUF** (`_GGUF_ONLY_FAMILIES`). Checkpointy MLX safetensors są przez Splasha odrzucane (`error: Qwen3.8-Flash-Next loads from a GGUF only`).
+     * Splash został zaprojektowany z myślą o komputerach z mniejszą pamięcią (32 GB / 64 GB RAM), wykorzystując strumieniowanie PLE z dysku SSD (`--ple-memory 2G`) i uzyskując na M1 Max około **~47 tok/s**.
+     * **Rekomendacja:** Na Mac Studio 192 GB nie ma potrzeby godzić się na kompromisy strumieniowania z dysku. Używaj modeli Flash-Next bezpośrednio w **oMLX**, uzyskując pełną rezydentność w RAM i najwyższą możliwą prędkość generowania (**73.5 tok/s**).

@@ -18,7 +18,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | 6 | [**UI-Venus-1.5-30B-A3B-qx86-hi-mlx**](https://huggingface.co/nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx)<br>*(Qwen 3 VL MoE)* | **256k** / **16k**<br>*(Dense)* | `0.7` / `0.80` / `20` / `1.00` | Model multimodalny Vision / UI, typ `vlm`, TurboQuant KV 8-bit (`skip_last`) |
 | 7 | [**Laguna-S-2.1-MLX-8bit**](https://huggingface.co/Vontra/Laguna-S-2.1-MLX-8bit)<br>*(Laguna MoE)* | **256k** / **32k**<br>*(SW: 512)* | `0.7` / `0.95` / `20` / `1.05` | Sliding window 512, natywny parser `laguna` w oMLX 0.7.2, Fused MoE Gate/Up, TurboQuant KV 8-bit (`skip_last`) |
 | 8 | [**DeepSeek-V4-Flash-0731-AWQ**](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ)<br>*(DeepSeek V4 MoE)* | **256k** / **32k**<br>*(SW: 128)* | `0.6` / `0.95` / `40` / `1.00` | YaRN RoPE (factor 16), sliding window 128, Lightning MTP, MLA Latent Attention |
-| 9 | [**Qwen3.8-27B-Uncensored-MLX-SPLASH**](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX)<br>*(Qwen 3.5 Dense · Splash)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Silnik Splash 1.3.2-m1.2 (Metal/ANE FFN split `0.26` + DFlash2 draft), ~43–70+ tok/s, dedykowany kompresor Wariantu 2 |
+| 9 | [**Qwen3.8-27B-Uncensored-MLX-SPLASH**](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX)<br>*(Qwen 3.5 Dense · Splash)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Silnik Splash 1.4.0-m1 (Threadgroup memory register staging, Metal/ANE FFN split `0.26` + DFlash2 draft), do **64.0 tok/s**, dedykowany kompresor Wariantu 2 |
 | 10 | [**Qwen3-235B-A22B-MLX-4bit**](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit)<br>*(Qwen 3 MoE)* | **40k** / **8k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Natywne okno bazowe 40 960 tokenów, TurboQuant KV 8-bit (`skip_last`), Fused MoE Gate/Up |
 | 11 | [**Qwen3.8-Flash-Next-oQ5e-mtp**](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp)<br>*(Qwen 4 Exp VL)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Format oQ5e iMatrix (typ `vlm`, wizja), Lightning MTP (72.5% akceptacji, 2.50 tok/cykl), 100 ścieżek Affine `hc_fused`, KV 8-bit |
 | 12 | [**olmOCR-2-7B-1025-8bit**](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit)<br>*(Qwen 2.5 VL)* | **128k** / **8k**<br>*(Dense)* | `0.2` / `0.90` / `20` / `1.05` | Model VLM do zaawansowanego OCR dokumentów PDF, tabel, wzorów i układów wielokolumnowych |
@@ -44,7 +44,7 @@ Wszystkie modele znajdują się w lokalnym katalogu bazowym `~/.lmstudio/models/
 | 6 | `UI-Venus-1.5-30B-A3B-qx86-hi-mlx` | [nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx](https://huggingface.co/nightmedia/UI-Venus-1.5-30B-A3B-qx86-hi-mlx) | MLX qx86 Vision (~30 GB) |
 | 7 | `Laguna-S-2.1-MLX-8bit` | [Vontra/Laguna-S-2.1-MLX-8bit](https://huggingface.co/Vontra/Laguna-S-2.1-MLX-8bit) | MLX 8-bit MoE (~25 GB) |
 | 8 | `DeepSeek-V4-Flash-0731-AWQ` | [True2456/DeepSeek-V4-Flash-0731-AWQ](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ) | AWQ / MLX MoE (~100 GB) |
-| 9 | `Qwen3.8-27B-Uncensored-MLX-SPLASH` | [orcarouter/Qwen3.8-27B-Uncensored-MLX](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX) | Splash 1.3.2-m1.2 + DFlash2 (~15 GB) |
+| 9 | `Qwen3.8-27B-Uncensored-MLX-SPLASH` | [orcarouter/Qwen3.8-27B-Uncensored-MLX](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX) | Splash 1.4.0-m1 + DFlash2 (~15 GB) |
 | 10 | `Qwen3-235B-A22B-MLX-4bit` | [Qwen/Qwen3-235B-A22B-MLX-4bit](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit) | MLX 4-bit MoE (~130 GB) |
 | 11 | `Qwen3.8-Flash-Next-oQ5e-mtp` | [GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp](https://huggingface.co/GBP-DE/Qwen3.8-Flash-Next-oQ5e-mtp) | MLX oQ5e iMatrix MTP (~135 GB) |
 | 12 | `olmOCR-2-7B-1025-8bit` | [mlx-community/olmOCR-2-7B-1025-8bit](https://huggingface.co/mlx-community/olmOCR-2-7B-1025-8bit) | MLX 8-bit VLM (~8.8 GB) |
@@ -72,11 +72,12 @@ Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### ⚡ Wariant 2: Dual-Model Resident (Szybki Dedykowany Kompresor 27B)
 * **Model główny:** `Qwen3.5-122B-A10B-MLX-9bit` (256k)
-* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB, silnik Splash 1.3.2-m1.2)
-* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu napędzany ultraszybkim silnikiem Splash 1.3.2-m1.2 z podziałem GPU/ANE (`share 0.26`) i akceleracją spekulatywną DFlash2.
+* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB, silnik **Splash 1.4.0-m1**)
+* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu napędzany ultraszybkim silnikiem Splash 1.4.0-m1 z podziałem GPU/ANE (`share 0.26`), buforowaniem query w pamięci threadgroup oraz akceleracją spekulatywną DFlash2 (`3.92` tok/cykl).
 * **Integracja z Watchdogiem:** Model 27B Splash ma ustawioną flagę `"is_pinned": true` w `model_settings.json`, dzięki czemu demon Watchdoga nie wyładowuje go z pamięci obok modelu głównego.
-* **Pamięć RAM:** 128 GB (122B) + 15 GB (27B) + ~1.3 GB (DFlash2 draft) = **~144 GB** (swobodnie mieści się w 192 GB Unified Memory).
-* **Zalety:** Błyskawiczny prefill, generowanie ~50–70+ tok/s i zerowe obciążenie głównego modelu podczas kompresji.
+* **Pamięć RAM:** 128 GB (122B) + 15 GB (27B) + ~1.3 GB (DFlash2 draft) = **~144 GB** (swobodnie mieści się w 192 GB Unified Memory z ~48 GB zapasu).
+* **Zalety:** Błyskawiczny prefill, generowanie do **64.0 tok/s**, minimalny TTFT **0.31s** i zerowe obciążenie głównego modelu podczas kompresji.
+* **Ograniczenie:** Wariant 2 nie powinien być używany z gigantami >150 GB (`DeepSeek-V4-Flash MXFP4`, `MiniMax-M3`), dla których należy aktywować Wariant 1 (Zero-Swap).
 
 ---
 
