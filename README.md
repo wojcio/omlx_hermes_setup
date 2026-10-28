@@ -6,7 +6,7 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.7.3rc1** (Apple **MLX 0.32.4*
 
 ## 📖 Pełna dokumentacja i Przewodnik Użytkownika
 
-Szczegółowy opis wszystkich 17 modeli (w tym zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 256k/1M, `Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2` (VLM, natywna głowica Lightning MTP `mtp-bf16`), ultraszybkiego `Qwen3.8-27B-Uncensored-MLX-SPLASH` (silnik Splash 1.4.0-m1 z podziałem Metal/ANE `share 0.26` i DFlash2 draft, do **64.0 tok/s**), akcelerowanych modeli `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (`qwen4_gdn_decode_wide_proj`, 128 shardów N-gram, ~73.5 tok/s) i `Qwen3.8-Flash-Next-oQ5e-mtp` (VLM, 100 skompilowanych ścieżek Affine `hc_fused`, Lightning MTP 72.5% akceptacji), oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
+Szczegółowy opis wszystkich 18 modeli (w tym nowego autonomicznego agenta kodującego `flint-oQ8e` (MoE 39.8B, 256 ekspertów, top-6 = 2.5B akt./tok, ~39.4 GB RAM, natywne myślenie `<think>` i tool-calling do **74.1 tok/s**), zaawansowanych modeli MoE `DeepSeek-V4-Flash-0731-MXFP4-MLX` z oknem 256k/1M, `Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2` (VLM, natywna głowica Lightning MTP `mtp-bf16`), ultraszybkiego `Qwen3.8-27B-Uncensored-MLX-SPLASH` (silnik Splash 1.4.0-m1 z podziałem Metal/ANE `share 0.26` i DFlash2 draft, do **64.0 tok/s**), akcelerowanych modeli `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` (`qwen4_gdn_decode_wide_proj`, 128 shardów N-gram, ~73.5 tok/s) i `Qwen3.8-Flash-Next-oQ5e-mtp` (VLM, 100 skompilowanych ścieżek Affine `hc_fused`, Lightning MTP 72.5% akceptacji), oraz wyspecjalizowanych modeli Vision / OCR: `olmOCR-2-7B-1025-8bit`, `Unlimited-OCR-8bit`, `UI-Venus-1.5-30B`, `MiniMax-M3-ConfigI-MLX`), bezpośrednie linki do repozytoriów Hugging Face, tabelę parametrów oraz praktyczne scenariusze użycia znajdziesz w plikach:
 
 👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
 👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
@@ -33,7 +33,7 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 1. **Wariant 1 (Domyślny & Rekomendowany): `Zero-Swap Dynamic` (Kompresor = Model Sesji)**
    - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (lub dowolny inny wybrany model, np. `DeepSeek-V4-Flash-0731-MXFP4-MLX`, `Coder390-27B` czy `Qwen3.8-Flash-Next-Speed`)
    - Kompresor: **Dynamiczny** (`auxiliary.compression.provider: auto`, `model: ''`) — zawsze kompresuje ten model, z którym aktualnie prowadzona jest rozmowa.
-   - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency) dla wszystkich 17 modeli.*
+   - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency) dla wszystkich 18 modeli.*
 
 2. **Wariant 2: `Dual-Model Resident` (Dedykowany Szybki Kompresor 27B)**
    - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
@@ -71,7 +71,7 @@ Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany
 ## 📁 Zawartość repozytorium
 
 - **[`HowTo_JakUzywac.md`](HowTo_JakUzywac.md)** – Praktyczny przewodnik jak uruchamiać Hermesa oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych.
-- **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja techniczna 17 modeli i linki Hugging Face.
+- **[`konfiguracja-modeli.md`](konfiguracja-modeli.md)** – Kompletna dokumentacja techniczna 18 modeli i linki Hugging Face.
 - **[`config.yaml`](config.yaml)** – Aktywna konfiguracja agenta Hermes (domyślnie Wariant 1).
 - **[`config.variant1-single-model.yaml`](config.variant1-single-model.yaml)** – Konfiguracja Hermesa dla Wariantu 1 (kompresor dynamiczny).
 - **[`config.variant2-dual-model.yaml`](config.variant2-dual-model.yaml)** – Konfiguracja Hermesa dla Wariantu 2 (kompresor 27B).

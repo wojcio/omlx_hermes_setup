@@ -87,6 +87,10 @@ providers:
         context_length: 262144
         max_tokens: 32768
         supports_vision: true
+      flint-oQ8e:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
 fallback_providers: []
 toolsets:
   - hermes-cli

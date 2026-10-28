@@ -27,6 +27,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | 15 | [**MiniMax-M3-ConfigI-MLX**](https://huggingface.co/thetom-ai/MiniMax-M3-ConfigI-MLX)<br>*(MiniMax M3 MoE VL)* | **128k** / **32k**<br>*(SW: 128)* | `1.0` / `0.95` / `40` / `1.00` | 60 warstw, 128 ekspertów (top-4), sparse attention, kwantyzacja ConfigI, parser `minimax_m3` (`<mm:think>`), ~156 GB |
 | 16 | [**Qwen3.8-27B-Coder390-...-MTP-DFlash2**](https://huggingface.co/nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2)<br>*(Qwen 3.5 Dense VL · BF16)* | **256k** / **32k**<br>*(Dense)* | `0.6` / `0.95` / `40` / `1.05` | Wagi BF16 (~30.6 GB), VLM, natywne Lightning MTP (`mtp-bf16`), KV 8-bit (`skip_last`), 34.6 tok/s, destylacja Opus 5.5 / GPT-6 / Grok 4.7 |
 | 17 | [**Qwen3.8-Flash-Next-MTPLX-Optimized-Speed**](https://huggingface.co/Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed)<br>*(Qwen 4 Exp VL)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | 512 ekspertów (top-10), 128 shardów N-gram (32 GB), `qwen4_gdn_decode_wide_proj` (Fused GDN), KV 8-bit, ~73.5 tok/s (~120.8 GB) |
+| 18 | [**flint-oQ8e**](https://huggingface.co/mlx-community/flint-oQ8e)<br>*(Recursive Flint MoE)* | **256k** / **32k**<br>*(SW: 513)* | `0.6` / `0.95` / `20` / `1.05` | MoE 39.8B (256 eksp., top-6 = 2.5B akt./tok), oQ8e iMatrix, dedykowany kernel MoE decode patch (`omlx_flint_router_topk`), reasoning `<think>`, do **74.1 tok/s** (~39.4 GB) |
 
 ---
 
@@ -53,6 +54,7 @@ Wszystkie modele znajdują się w lokalnym katalogu bazowym `~/.lmstudio/models/
 | 15 | `MiniMax-M3-ConfigI-MLX` | [thetom-ai/MiniMax-M3-ConfigI-MLX](https://huggingface.co/thetom-ai/MiniMax-M3-ConfigI-MLX) | MLX ConfigI MoE VL (~156 GB) |
 | 16 | `Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-`<br>`GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2` | [nerkyor/Qwen3.8-27B-Coder390-...-MTP-DFlash2](https://huggingface.co/nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2) | MLX BF16 VLM (~30.6 GB) |
 | 17 | `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` | [Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed](https://huggingface.co/Youssofal/Qwen3.8-Flash-Next-MTPLX-Optimized-Speed) | MLX MTPLX Speed (~120.8 GB) |
+| 18 | `flint-oQ8e` | [mlx-community/flint-oQ8e](https://huggingface.co/mlx-community/flint-oQ8e) | MLX oQ8e MoE (~39.4 GB) |
 | *LoRA* | `salakash/Minimalism` *(Adapter)* | [salakash/Minimalism](https://huggingface.co/salakash/Minimalism) | LoRA Adapter (Qwen2.5-0.5B) |
 
 ---
@@ -62,7 +64,7 @@ Wszystkie modele znajdują się w lokalnym katalogu bazowym `~/.lmstudio/models/
 Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### 🏆 Wariant 1: Zero-Swap Dynamic (Domyślny & Rekomendowany: Kompresor = Model Sesji)
-* **Model główny:** Dowolny z 17 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
+* **Model główny:** Dowolny z 18 modeli (domyślnie `Qwen3.5-122B-A10B-MLX-9bit`)
 * **Kompresor (`auxiliary.compression`):** `provider: auto`, `model: ""`
 * **Zasada działania:** Hermes dynamicznie używa do kompresji tego samego modelu, który aktualnie prowadzi konwersację (Ornith, Qwen 122B, Coder itd.).
 * **Zalety:**

@@ -87,6 +87,10 @@ providers:
         context_length: 262144
         max_tokens: 32768
         supports_vision: true
+      flint-oQ8e:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
 fallback_providers: []
 toolsets:
   - hermes-cli
@@ -249,11 +253,11 @@ auxiliary:
     timeout: 120
     download_timeout: 30
   compression:
-    provider: omlx
-    model: Qwen3.8-27B-Uncensored-MLX-SPLASH
-    base_url: http://127.0.0.1:8000/v1
-    api_key: ${OMLX_API_KEY}
-    timeout: 180
+    provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
+    timeout: 360
   skills_hub:
     provider: auto
     model: ''

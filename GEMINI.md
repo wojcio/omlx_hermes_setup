@@ -10,11 +10,11 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla 17 modeli (okna do 1M, sampling, parsery, VLM/OCR) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla 18 modeli (okna do 1M, sampling, parsery, VLM/OCR) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
    - Praktyczny przewodnik obsługi CLI oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych (Use Cases) znajduje się w [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 17 modeli.
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 18 modeli.
    - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik Splash 1.3.2-m1.2) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
@@ -33,6 +33,22 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+- **Wdrożenie nowego modelu `flint-oQ8e` (Recursive Flint MoE 39.8B) – Lider Autonomicznego Kodowania i Tool-Use (28 Października 2026):**
+  * **Identyfikacja modelu i architektura:**
+    - Dodano do konfiguracji `flint-oQ8e` (`mlx-community/flint-oQ8e`) bazujący na architekturze `FlintForCausalLM` autorstwa Recursive Superintelligence (zespół Richarda Sochera).
+    - MoE o łącznej liczbie 39.8 miliarda parametrów z aktywacją **2.5 miliarda parametrów na token** (256 ekspertów, top-6 active + shared expert), 49 warstw hybrydowych (sliding window 513 oraz full attention), pełne okno kontekstu **262 144 tokenów (256k)**.
+    - Format oQ8e (kwantyzacja iMatrix 8-bit affine, waga na dysku i w RAM: ~39.4 GB).
+  * **Integracja z oMLX 0.7.3rc1:**
+    - Model automatycznie obsługiwany przez `VLMBatchedEngine` (`VLM_NATIVE_TEXT_MODEL_TYPES = {"flint"}`).
+    - Wykorzystuje dedykowany zespolony kernel dekodowania MoE oMLX: `apply_flint_decode_patch()` (`omlx_flint_router_topk` + weighted combine) oraz buforowanie rotacyjne KV (`RotatingKVCache`).
+    - Skonfigurowano optymalne parametry w `model_settings.json` (max_context: 256k, max_tokens: 32k, temp: 0.6, top_p: 0.95, top_k: 20, rep: 1.05, min_p: 0.01, pres: 0.0, TurboQuant KV 8-bit `skip_last`).
+  * **Wydajność i weryfikacja w Hermes Agent:**
+    - Przetestowano za pośrednictwem API oMLX oraz Hermes CLI (`hermes -m flint-oQ8e -z "..."`).
+    - Szybkość dekodowania wynosi imponujące **54.8 – 74.1 tok/s**, a prefill osiąga **607 tok/s** (TTFT: 0.26s).
+    - Zweryfikowano bezbłędne wykonywanie wieloetapowych wywołań narzędzi (tool calls) oraz poprawną separację bloków rozumowania `<think>` do pola `reasoning_content`.
+  * **Synchronizacja konfiguracji:**
+    - Zaktualizowano `config.variant1-single-model.yaml`, `config.variant2-dual-model.yaml`, `config.yaml`, `model_settings.json`, `~/.hermes/config.yaml` oraz `~/.omlx/model_settings.json`.
+    - Liczba modeli w konfiguracji Hermesa wzrosła do dokładnie **18**, a łączna liczba wpisów w `model_settings.json` wynosi **20** (18 modeli Hermesa + 2 lokalne modele Huzar).
 - **Wdrożenie oMLX 0.7.3rc1, Apple MLX 0.32.4 oraz Splash M1 1.4.0-m1 – Profilowanie Kompresora Wariantu 2 i Architektury Flash-Next (27 Października 2026):**
   * **Aktualizacje binariów:**
     - oMLX podbity do oficjalnego wydania **`0.7.3rc1`** (build `261027180332`) bazującego na **Apple MLX `0.32.4`**, `mlx_metal 0.32.4`, `mlx-lm 0.32.3.dev8` (`0d4d3d04`) oraz `mlx-vlm 0.7.10`.

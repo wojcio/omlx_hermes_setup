@@ -348,3 +348,38 @@ Przełączono system skryptem `./switch-variant.sh 2 --local` i zmierzono parame
 - **Czas pełnej kompresji kontekstu (250 tokenów podsumowania):** **`10.50 s`**.
 - **Współistnienie w 192 GB RAM:** Model główny `Qwen3.5-122B` (~92 GB) + kompresor `Qwen 27B Splash` (~15.2 GB, `is_pinned: true`) = **~107 GB**, pozostawiając ~85 GB wolnego RAM-u na dynamiczne bufory. Watchdog `omlx-single-model-guard` zachowuje oba modele.
 - **Rekomendacja dla modeli >150 GB:** Podczas sesji z `DeepSeek-V4-Flash MXFP4` (158.8 GB) lub `MiniMax-M3` (156 GB) należy bezwzględnie używać **Wariantu 1** (`./switch-variant.sh 1`), aby uniknąć przekroczenia dynamicznego limitu pamięci oMLX (178.5 GB).
+
+---
+
+## 🚀 18. Wdrożenie i pełna integracja nowego modelu `flint-oQ8e` (28 Października 2026)
+
+### 1. Geneza modelu i architektura Recursive Flint:
+- **Twórcy:** Recursive Superintelligence (zespół Richarda Sochera), model zbudowany przy użyciu systemu zautomatyzowanego badania AI *Eureka Machine*.
+- **Architektura (`FlintForCausalLM`):**
+  * Łączna liczba parametrów: **39.8 miliarda** (MoE).
+  * Aktywne parametry: **2.5 miliarda parametrów na token** (256 ekspertów, top-k 6 aktywnych ekspertów + shared expert).
+  * Warstwy: 49 warstw hybrydowych (sliding-window 513 oraz full attention).
+  * Okno kontekstu: **262 144 tokenów (256k)**.
+  * Zoptymalizowany pod autonomiczne agentowe kodowanie (SWE-bench Verified / Pro, Terminal-Bench 2.1) oraz wieloetapowe wywołania narzędzi.
+- **Wersja wag:** `mlx-community/flint-oQ8e` – kwantyzacja oQ / iMatrix 8-bit affine, zajmująca **39.44 GB** na dysku i w pamięci RAM.
+
+### 2. Integracja z silnikiem oMLX 0.7.3rc1:
+- **Klasa silnika:** Model obsługiwany przez `VLMBatchedEngine` (`VLM_NATIVE_TEXT_MODEL_TYPES = {"flint"}`).
+- **Zespolone kernele:** oMLX automatycznie aplikuje dedykowany patch dekodowania `apply_flint_decode_patch()` (`omlx_flint_router_topk` + weighted MoE combine) oraz rotacyjny bufor `RotatingKVCache` z blokami wyrównanymi do okna 513 tokenów.
+- **Kalibracja ustawień w `model_settings.json`:**
+  * `max_context_window`: 262144
+  * `max_tokens`: 32768
+  * `temperature`: 0.6, `top_p`: 0.95, `top_k`: 20, `repetition_penalty`: 1.05, `min_p`: 0.01, `presence_penalty`: 0.0
+  * `enable_thinking`: true (`forced_ct_kwargs`: `["enable_thinking"]`, `chat_template_kwargs`: `{"enable_thinking": true}`)
+  * `turboquant_kv_enabled`: true, `turboquant_kv_bits`: 8.0, `turboquant_skip_last`: true
+  * `model_type_override`: "vlm"
+
+### 3. Pomiary wydajności i weryfikacja:
+- **Szybkość generowania:** **`54.81 – 74.1 tok/s`** przy aktywnym rozumowaniu `<think>` (generowanie 220 tokenów w 15.49 s przy prompt kontekście 13 293 tokenów = 74.1 tok/s).
+- **Czas prefillu (TTFT):** **`0.26 s`** przy szybkości ewaluacji promptu na poziomie **`607 tok/s`**.
+- **Weryfikacja agentowa Hermes:** Pomyślnie wykonano zapytania z wywołaniami narzędzi (`tool_calls`), pobieraniem danych z terminala CLI (`date`) oraz generowaniem tekstu w języku polskim.
+
+### 4. Aktualizacja katalogu modeli:
+- Liczba modeli w konfiguracji Hermesa wzrosła z 17 do **18**.
+- Łączna liczba wpisów w `model_settings.json` wynosi **20** (18 modeli Hermesa + 2 lokalne modele Huzar).
+
