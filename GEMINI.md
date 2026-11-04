@@ -15,7 +15,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
    - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 18 modeli.
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik Splash 1.3.2-m1.2) jako dedykowany szybki kompresor.
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik Splash 1.5.0-m1) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
@@ -32,7 +32,16 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Wszelkie modyfikacje plików konfiguracyjnych wykonuj w tym katalogu, a następnie synchronizuj do `~/.hermes/config.yaml` oraz `~/.omlx/` za pomocą `./switch-variant.sh`.
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
-## 🔄 Ostatnie Zmiany i Stan Projektu (Październik 2026)
+## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Wdrożenie oMLX 0.7.4.dev1 (build 3628), Splash M1 1.5.0-m1 oraz optymalizacja `activation_fp16_enabled` dla Qwen3.8-Flash-Next (4 Listopada 2026):**
+  * **Aktualizacja binariów i walidacja schematu:**
+    - Zweryfikowano `oMLX 0.7.4.dev1` (build `3628`, `MLX 0.32.4`, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`) – wszystkie 20 modeli w `model_settings.json` przechodzi walidację 86-polowego schematu `ModelSettings` z `0` błędami i `0` nieznanymi kluczami.
+    - Zaktualizowano `/opt/homebrew/bin/splash-m1` z wersji `1.4.0-m1` do **`1.5.0-m1`** (`paperniuk/splash`), wnoszącej upstreamowe wydania `1.4.1`/`1.5.0`, optymalizację `Prefill Tail` i ANE (#32, -30–70 ms TTFT), skalowaną z 60 rdzeniami GPU atencję długiego kontekstu (#33, +3.5% przy 64k i +7.4% przy 128k), poprawki `Host Steps` (#38), `Column Tile for MoE` (#29) i skwantyzowane routery MoE (#599).
+    - Skalibrowano Neural Engine FFN split w Splash 1.5.0-m1 (`share 0.26` dla $\ge 529$ wierszy, 53.1 ms GPU+ANE vs 70.1 ms sam GPU) i zweryfikowano `Qwen3.8-27B-Uncensored-MLX-SPLASH` w oMLX oraz Hermes CLI (**60.5 tok/s**, `3.5 tok/cykl`, deduplikacja bloków cache).
+  * **Diagnoza i naprawa kernela `attn_fused` (PR #4901) na M2 Ultra dzięki `activation_fp16_enabled: true`:**
+    - Wykryto, że nowy dwuprzebiegowy kernel `omlx_qwen4_attn_sdpa2_gate` (`plan=2` w `attn_fused.py`, PR #4901) w emulowanym na M2 Ultra trybie `bfloat16` przekracza limit rejestrów/wątków grupy (`ValueError: Thread group size (1024) is greater than the maximum allowed threads per threadgroup (896)`) i wyłącza cały moduł `attn_fused`.
+    - Włączenie nowej opcji **`"activation_fp16_enabled": true`** dla `Qwen3.8-Flash-Next-oQ5e-mtp` oraz `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` konwertuje liście `bfloat16 -> float16` (2 471 tensorów), aktywuje natywne ścieżki FP16 (PR #5028), pozwala skompilować oba plany `attn_fused` (`plan=1` i `plan=2`) bez błędów i przyspiesza generowanie w fazie czystego rozumowania z `39.62 tok/s` do **`62.56 tok/s`** (+58%, TTFT `0.48s`) oraz do **~97 tok/s** na kodzie.
+    - Przeprowadzono audyt kompatybilności `activation_fp16_enabled` dla pozostałych architektur: potwierdzono, że `deepseek_v4` (`wsdpa_attention.py`) i gęste `qwen3_5` (`qwen35_packed_linear.py`) wymagają `bfloat16`, dlatego flagę włączono selektywnie tylko dla modeli `qwen4_exp` (`Qwen3.8-Flash-Next-*`).
 - **Wdrożenie nowego modelu `flint-oQ8e` (Recursive Flint MoE 39.8B) – Lider Autonomicznego Kodowania i Tool-Use (28 Października 2026):**
   * **Identyfikacja modelu i architektura:**
     - Dodano do konfiguracji `flint-oQ8e` (`mlx-community/flint-oQ8e`) bazujący na architekturze `FlintForCausalLM` autorstwa Recursive Superintelligence (zespół Richarda Sochera).

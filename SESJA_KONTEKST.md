@@ -383,3 +383,30 @@ Przełączono system skryptem `./switch-variant.sh 2 --local` i zmierzono parame
 - Liczba modeli w konfiguracji Hermesa wzrosła z 17 do **18**.
 - Łączna liczba wpisów w `model_settings.json` wynosi **20** (18 modeli Hermesa + 2 lokalne modele Huzar).
 
+---
+
+## 🚀 19. Wdrożenie oMLX 0.7.4.dev1 (build 3628), Splash M1 1.5.0-m1 oraz optymalizacja `activation_fp16_enabled` dla Qwen3.8-Flash-Next (4 Listopada 2026)
+
+### 1. Aktualizacja środowiska wykonawczego:
+- **oMLX `0.7.4.dev1` (build `3628`):**
+  * Silnik bazowy: **Apple MLX `0.32.4`**, `mlx-lm 0.32.3.dev8+g0d4d3d04f`, **`mlx-vlm 0.7.11`**.
+  * Schemat `ModelSettings` rozrósł się do 86 pól (m.in. `a8_prefill_enabled`, `a8_prefill_min_tokens`, `deepseek_v41_ced_prefill_enabled`, `prefill_helper_node_id`, `activation_fp16_enabled`, `dflash_draft_quant_*`). Wszystkie 20 modeli w `model_settings.json` przechodzi walidację z `0` błędami i `0` nieznanymi kluczami.
+- **Splash M1 `1.5.0-m1` (`paperniuk/splash`):**
+  * Zaktualizowano `/opt/homebrew/bin/splash-m1` z `1.4.0-m1` do **`1.5.0-m1`**.
+  * Najważniejsze zmiany dla M2 Ultra (60 rdzeni GPU, 32 rdzenie ANE):
+    - *Prefill Tail & ANE (#32):* Ostatni blok prefillu nie jest przycinany poniżej minimum Neural Engine (-30 do -70 ms TTFT).
+    - *Long-Context Prefill Attention (#33):* Skalowanie podziału uwagi podczas prefillu z liczbą rdzeni GPU (+3.5% przy 64k, +7.4% przy 128k–256k).
+    - *Host Steps (#38) & Column Tile for MoE (#29):* Usunięcie aktywnego wirowania wątków hosta na M1/M2 oraz rejestr GEMV dla małych kafelków MoE.
+    - *Quantized MoE Router (#599):* Redukcja odczytów routera MoE z 84 MB do 22 MB/cykl.
+  * Ponowna kalibracja Neural Engine FFN split na M2 Ultra ustawiła udział ANE na **`share 0.26`** (dla bloków $\ge 529$ wierszy: **53.1 ms** GPU+ANE vs 70.1 ms sam GPU). W teście `Qwen3.8-27B-Uncensored-MLX-SPLASH` osiągnięto **60.5 tok/s** (`3.5 tok/cykl`) z aktywną deduplikacją bloków KV.
+
+### 2. Diagnoza i naprawa nowego kernela `attn_fused` (PR #4901) w `Qwen3.8-Flash-Next` na M2 Ultra:
+- W `oMLX 0.7.4.dev1` wprowadzono zespolone kernele uwagi `attn_fused.py` (PR #4901: `omlx_qwen4_attn_prep_qk`, `omlx_qwen4_attn_sdpa1_gate`, `omlx_qwen4_attn_sdpa2_gate`) oraz wsparcie FP16 w `hc_fused` i `gdn_prework` (PR #5028) i 8-bit `out_proj` w GDN (PR #4988).
+- **Wykryty problem na M2 Ultra w `bfloat16`:** Ponieważ M2 Ultra emuluje `bfloat16` programowo, kernel `omlx_qwen4_attn_sdpa2_gate` (`plan=2`, `threadgroup=(1024, 1, 1)`) przekraczał limit rejestrów na wątek i rzucał wyjątek `ValueError: Thread group size (1024) is greater than the maximum allowed threads per threadgroup (896)`, co ustawiało `_DISABLED = True` i wyłączało cały moduł `attn_fused` (w tym `prep_qk` i `plan=1`).
+- **Rozwiązanie (`"activation_fp16_enabled": true`):**
+  * Włączenie `"activation_fp16_enabled": true` dla `Qwen3.8-Flash-Next-oQ5e-mtp` oraz `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` konwertuje po załadowaniu 2 471 liści `bfloat16 -> float16` (`activation dtype: bfloat16 -> float16 (2471 tensors)`).
+  * W natywnym `float16` na M2 Ultra zużycie rejestrów shadera spada i **oba plany `attn_fused` (`plan=1` oraz `plan=2`) kompilują się i wykonują bezbłędnie (`SUCCESS!`)**.
+  * Prędkość generowania `Qwen3.8-Flash-Next-oQ5e-mtp` na czystym przebiegu rozumowania (1024 tokeny) wzrosła z **`39.62 tok/s`** (`bfloat16`) do **`62.56 tok/s`** (`float16`, **+58%**, TTFT `0.48s`), a na generowaniu kodu osiąga do **`~97 tok/s`** (`6.00 tok/cykl`, `backbone=61.5ms`).
+  * Dla modeli `DeepSeek-V4-Flash` oraz gęstych `Qwen3.8-27B` pozostawiono `activation_fp16_enabled: false`, gdyż ich dedykowane kernele (`wsdpa_attention.py`, `qwen35_packed_linear.py`) wymagają `bfloat16`.
+
+

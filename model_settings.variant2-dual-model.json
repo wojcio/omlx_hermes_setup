@@ -425,7 +425,8 @@
       "is_default": false,
       "is_hidden": false,
       "is_favorite": true,
-      "trust_remote_code": true
+      "trust_remote_code": true,
+      "activation_fp16_enabled": true
     },
     "Qwen3.8-Flash-Next-MTPLX-Optimized-Speed": {
       "max_context_window": 262144,
@@ -455,7 +456,8 @@
       "is_hidden": false,
       "is_favorite": true,
       "trust_remote_code": true,
-      "qwen4_gdn_decode_wide_proj": true
+      "qwen4_gdn_decode_wide_proj": true,
+      "activation_fp16_enabled": true
     },
     "Qwen3.8-27B-Uncensored-MLX-SPLASH": {
       "max_context_window": 262144,
