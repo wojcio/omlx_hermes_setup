@@ -33,6 +33,9 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Uzupełnienie trwałego zapisu `"activation_fp16_enabled": true` dla `Qwen3.8-Flash-Next-oQ5e-mtp` oraz wyróżnienie Qwen 3.8 Flash w OpenCode (6 Listopada 2026):**
+  * Dodano brakujący klucz `"activation_fp16_enabled": true` bezpośrednio do wpisu `Qwen3.8-Flash-Next-oQ5e-mtp` we wszystkich wariantach [`model_settings.json`](model_settings.json), [`model_settings.variant1-single-model.json`](model_settings.variant1-single-model.json), [`model_settings.variant2-dual-model.json`](model_settings.variant2-dual-model.json) oraz `~/.omlx/model_settings.json`, gwarantując zachowanie akceleracji FP16 (`attn_fused` plan=1/plan=2, ~62.6–97 tok/s) po każdym uruchomieniu `switch-variant.sh`.
+  * Zaktualizowano konfigurację OpenCode (`/Users/wojcio/Desktop/Devel/opencode_omlx` oraz `~/.config/opencode`): przesunięto oba modele `Qwen3.8-Flash-Next` na szczyt listy, dodano etykiety z aliasem `(Qwen 3.8 Flash · ...)` ułatwiające wyszukiwanie w `/models` oraz usunięto wycofane w OpenCode 2.2.5 pole `"attachment": true`.
 - **Wdrożenie oMLX 0.7.4.dev1 (build 3628), Splash M1 1.5.0-m1 oraz optymalizacja `activation_fp16_enabled` dla Qwen3.8-Flash-Next (4 Listopada 2026):**
   * **Aktualizacja binariów i walidacja schematu:**
     - Zweryfikowano `oMLX 0.7.4.dev1` (build `3628`, `MLX 0.32.4`, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`) – wszystkie 20 modeli w `model_settings.json` przechodzi walidację 86-polowego schematu `ModelSettings` z `0` błędami i `0` nieznanymi kluczami.
