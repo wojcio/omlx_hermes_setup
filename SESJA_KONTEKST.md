@@ -63,6 +63,8 @@
 | **`model_profiles.json`** | Profile oMLX (`work`, `turbo`, `setup`) z pełnym 256k oknem i TurboQuant KV 8-bit (`~/.omlx/model_profiles.json`). |
 | **`settings.json`** | Globalne parametry serwera oMLX i sampling domyślny (`~/.omlx/settings.json`). |
 | **`switch-variant.sh`** | Skrypt CLI do przełączania wariantów (`./switch-variant.sh 1` lub `2`). |
+| **`move_from_SSD_to_HDD.sh`** | Skrypt CLI audytu użycia i bezpiecznej migracji nieużywanych modeli z SSD na zewnętrzny HDD Seagate. |
+| **`move_from_SSD_to_HDD.py`** | Silnik pythonowy audytu (analiza logów oMLX, SQLite Hermesa, transfer rsync/chunked, symlinki, API reload). |
 | **`konfiguracja-modeli.md`** | Pełna dokumentacja techniczna 15 modeli, tabel parametrów i wariantów. |
 | **`README.md`** | Główne wprowadzenie do repozytorium GitHub. |
 | **`SESJA_KONTEKST.md`** | Ten plik – zachowanie pełnego kontekstu wiedzy i decyzji sesji. |
@@ -442,5 +444,36 @@ Przełączono system skryptem `./switch-variant.sh 2 --local` i zmierzono parame
 
 ### 4. Synchronizacja ekosystemu (Hermes + oMLX + OpenCode):
 - Zaktualizowano wszystkie pliki w repozytorium Hermesa/oMLX (**25 modeli w Hermesie**, **27 modeli w oMLX**) oraz w repozytorium OpenCode (`/Users/wojcio/Desktop/Devel/opencode_omlx` i `~/.config/opencode`, **27 modeli**).
+
+---
+
+## 📦 21. Inteligentne Zarządzanie Przestrzenią SSD/HDD – Skrypt `move_from_SSD_to_HDD.sh` (12 Listopada 2026)
+
+### 1. Geneza i Wymagania:
+- Z uwagi na ciągły rozwój biblioteki modeli LLM na Mac Studio (27 modeli, ponad 1.6 TB wag), wewnętrzny dysk SSD (`/Users/wojcio/.lmstudio/models`) wymagał zautomatyzowanego mechanizmu zwalniania miejsca.
+- Użytkownik zlecił stworzenie skryptu `move_from_SSD_to_HDD.sh`, który będzie:
+  1. Sprawdzał kiedy realnie dany model był ostatnio uruchamiany / używany.
+  2. Proponował modele nieużywane od określonego czasu (domyślnie >14 dni) jako kandydatów do przeniesienia na zewnętrzny talerzowy dysk USB-C (`/Volumes/Seagate_Expansion_Drive/LLM`).
+  3. Chronił przed przeniesieniem modele kluczowe: model domyślny (`is_default`) oraz przypięty kompresor (`is_pinned`).
+  4. Realizował bezpieczną migrację (wykrycie istniejącej kopii na HDD, weryfikację transferu, utworzenie zerokosztowego symlinka na SSD, dodanie znacznika `[HDD]` w konfiguracjach modeli oMLX i OpenCode oraz wywołanie `POST /admin/api/reload`).
+
+### 2. Architektura Agregacji Użycia Modeli (`move_from_SSD_to_HDD.py`):
+Skrypt łączy dane z czterech niezależnych źródeł, zapewniając 100% precyzję:
+1. **Rotowane logi serwera oMLX (`~/.omlx/logs/server.log*`):** Parsuje zdarzenia `Loading model: <path>`, `Loaded model: <path>` oraz `Chat completion: model='<id>'`. Daje to milisekundową dokładność dla aktywności z ostatnich dni.
+2. **Baza danych SQLite Hermes Agenta (`~/.hermes/state.db`):** Odpytuje tabele `sessions` oraz `session_model_usage` o znaczniki czasu `started_at`, `last_activity_at` i `last_seen` powiązane z nazwami modeli.
+3. **Pamięć podręczna API oMLX (`GET /admin/api/models`):** Odczytuje pole `last_access` dla modeli obecnie utrzymywanych w pamięci serwera.
+4. **Metadane plików dyskowych (Fallback):** W przypadku modeli pobranych przed okresem rotacji logów, skrypt sprawdza `st_mtime` / `st_atime` plików `config.json` oraz wag `.safetensors`.
+
+### 3. Weryfikacja Działania i Wyniki Audytu:
+- Narzędzie przetestowano w trybie audytu: `./move_from_SSD_to_HDD.sh --check`.
+- **Wykrycie stanu:**
+  * Szybki dysk SSD: 649.7 GiB wolnego miejsca.
+  * Zewnętrzny HDD: Podłączony (1682.4 GiB wolnego).
+  * Zidentyfikowano 24 modele na SSD oraz 5 modeli już zarchiwizowanych jako linki na HDD.
+  * Model domyślny `Qwen3.8-Flash-Next-oQ5e-mtp` został poprawnie oznaczony jako chroniony `🔒 Domyślny model (Chroniony)`.
+  * Modele aktywne (np. pobrane dziś `GLM-5.3-Flash-oQ4e/oQ2e`, `Qwen 3.8 oQ6e`, `Gemma 4`, `Nanbeige`, `Bonsai`) otrzymały status `🟢 Aktywny (<7d)`.
+  * Dla progu 14 dni skrypt wskazał 14 kandydatów o łącznym rozmiarze **840.1 GiB** (m.in. `Step-3.5-Flash-4bit` 103.2 GB, `DeepSeek-V4-Flash-AWQ` 100.8 GB, `MiniMax-M3` 155.6 GB, `Laguna-S-2.1` 116.3 GB, `Ornith-35B` 65.4 GB).
+  * Wiele z tych modeli posiada już identyczne kopie na HDD, co pozwala na natychmiastowe utworzenie symlinków bez konieczności ponownego transferu przez USB-C.
+
 
 

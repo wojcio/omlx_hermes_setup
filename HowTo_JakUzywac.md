@@ -55,6 +55,23 @@ W katalogu konfiguracyjnym (`~/Desktop/Devel/omlx_hermes_config`) znajduje się 
 ./switch-variant.sh 1 --remote
 ```
 
+### Audyt Użycia i Oszczędzanie Miejsca na SSD (`move_from_SSD_to_HDD.sh`)
+Narzędzie bada historię użycia modeli w logach oMLX oraz bazie Hermesa, proponując bezpieczne przeniesienie nieużywanych modeli z SSD na zewnętrzny dysk USB-C:
+
+```bash
+# Szybki podgląd kandydatów (dry-run, domyślnie >14 dni bezczynności)
+./move_from_SSD_to_HDD.sh --check
+
+# Sprawdzenie kandydatów nieużywanych od ponad 30 dni
+./move_from_SSD_to_HDD.sh --days 30 --check
+
+# Interaktywne menu wyboru i bezpieczna migracja (z symlinkowaniem i odświeżeniem oMLX)
+./move_from_SSD_to_HDD.sh
+
+# Bezpośrednie przeniesienie konkretnego modelu
+./move_from_SSD_to_HDD.sh -t "Step-3.5-Flash"
+```
+
 ---
 
 ## 2. Dobór Modeli pod Kątem Ról (Use Cases)
@@ -283,3 +300,9 @@ Poniższa tabela pozwala szybko porównać wszystkie 25 modeli pod kątem ich ro
      * Silnik Splash obsługuje `Qwen3.8-Flash-Next` **wyłącznie z formatu GGUF** (`_GGUF_ONLY_FAMILIES`). Checkpointy MLX safetensors są przez Splasha odrzucane (`error: Qwen3.8-Flash-Next loads from a GGUF only`).
      * Splash został zaprojektowany z myślą o komputerach z mniejszą pamięcią (32 GB / 64 GB RAM), wykorzystując strumieniowanie PLE z dysku SSD (`--ple-memory 2G`) i uzyskując na M1 Max około **~47 tok/s**.
      * **Rekomendacja:** Na Mac Studio 192 GB nie ma potrzeby godzić się na kompromisy strumieniowania z dysku. Używaj modeli Flash-Next bezpośrednio w **oMLX**, uzyskując pełną rezydentność w RAM i najwyższą możliwą prędkość generowania (**73.5 tok/s**).
+
+6. **Hierarchiczne Zarządzanie Magazynem Modeli (Szybki SSD vs Zewnętrzny Seagate HDD):**
+   - Na wewnętrznym dysku SSD przechowujemy modele używane na co dzień oraz te, które wymagają najwyższej przepustowości I/O przy ładowaniu do RAM.
+   - Gdy miejsce na SSD spada, uruchom `./move_from_SSD_to_HDD.sh --check`.
+   - Skrypt przeanalizuje czasy ostatnich wywołań w logach oMLX i bazie SQLite Hermesa, po czym umożliwi bezpieczne przeniesienie wybranych modeli na `/Volumes/Seagate_Expansion_Drive/LLM`.
+   - W miejscu oryginalnych plików tworzone są dowiązania symboliczne (`symlink`), a w oMLX i OpenCode model otrzymuje etykietę `[HDD]`. W ten sposób model pozostaje w 100% sprawny i dostępny w menu, nie zajmując ani megabajta na wewnętrznym SSD!

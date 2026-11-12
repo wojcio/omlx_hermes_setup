@@ -59,6 +59,25 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 ./switch-variant.sh 1 --local
 ```
 
+### 📦 Zarządzanie Przestrzenią Dyskową: `move_from_SSD_to_HDD.sh`
+
+Gdy szybki dysk SSD zapełnia się nowymi modelami, skrypt `./move_from_SSD_to_HDD.sh` pozwala na inteligentne wykrycie i przeniesienie nieużywanych modeli na zewnętrzny dysk USB-C (`/Volumes/Seagate_Expansion_Drive/LLM`):
+
+```bash
+# Podgląd modeli kwalifikujących się do przeniesienia (dry-run, próg 14 dni):
+./move_from_SSD_to_HDD.sh --check
+
+# Wyszukanie modeli nieużywanych od 30 dni:
+./move_from_SSD_to_HDD.sh --days 30 --check
+
+# Interaktywne przenoszenie wybranych modeli z automatycznym tworzeniem dowiązań i aktualizacją oMLX:
+./move_from_SSD_to_HDD.sh
+```
+
+- **Agregacja aktywności:** Bada logi serwera `server.log*`, bazę sesji SQLite Hermesa `state.db` oraz metadane plików.
+- **Ochrona krytycznych modeli:** Automatycznie blokuje przypadkowe przeniesienie modelu domyślnego (`is_default`) oraz przypiętego kompresora (`is_pinned`).
+- **Zerokosztowe dowiązania:** Tworzy symlinki na SSD, dodaje oznaczenie `[HDD]` w konfiguracji modeli i przeładowuje rejestr oMLX przez API.
+
 ### 🌐 Automatyczna Detekcja oMLX (Lokalny vs Zdalny Serwer)
 
 Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany na bieżącej maszynie:
@@ -84,3 +103,5 @@ Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany
 - **[`model_profiles.json`](model_profiles.json)** – Dedykowane profile wykonawcze (`work`, `turbo`, `setup`).
 - **[`settings.json`](settings.json)** – Globalne parametry serwera oMLX oraz domyślny sampling.
 - **[`switch-variant.sh`](switch-variant.sh)** – Skrypt bash do automatycznego przełączania wariantów.
+- **[`move_from_SSD_to_HDD.sh`](move_from_SSD_to_HDD.sh)** – Skrypt audytu użycia i bezpiecznej migracji nieużywanych modeli z SSD na zewnętrzny HDD Seagate.
+- **[`move_from_SSD_to_HDD.py`](move_from_SSD_to_HDD.py)** – Silnik analityczno-migracyjny skryptu (agregacja logów oMLX, SQLite Hermesa, obsługa transferu i symlinków).

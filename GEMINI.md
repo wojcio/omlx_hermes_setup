@@ -28,11 +28,24 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Rozumowanie: Odblokowany budżet myślenia (`thinking_budget_tokens: 32768`, `thinking_budget_enabled: false`).
    - Bezpieczeństwo i trwałość: `hard_stop_enabled: true`, `checkpoints.enabled: true`, `command_allowlist: []`, `lifetime_seconds: 1800`, `allow_lazy_installs: false`.
 
-5. **Synchronizacja i Git:**
+5. **Zarządzanie Pamięcią Masową (SSD vs HDD) i Skrypt `move_from_SSD_to_HDD.sh`:**
+   - Na dysku SSD (`~/.lmstudio/models`) utrzymywane są modele najczęściej używane i o najwyższej wydajności, a rzadziej używane lub starsze wersje przenoszone są na zewnętrzny dysk USB-C (`/Volumes/Seagate_Expansion_Drive/LLM`).
+   - Narzędzie [`./move_from_SSD_to_HDD.sh`](move_from_SSD_to_HDD.sh) automatycznie audytuje historię uruchomień modeli z wielu źródeł (rotowane logi oMLX `server.log*`, baza SQLite Hermes Agenta `state.db`, statystyki plików).
+   - Skrypt proponuje kandydatów do zwolnienia miejsca na SSD (chroniąc modele `is_default` i `is_pinned`), bezpiecznie kopiuje/weryfikuje pliki na HDD, tworzy dowiązania symboliczne, automatycznie aktualizuje opisy o znacznik `[HDD]` w `model_settings*.json` i OpenCode oraz przeładowuje oMLX przez API.
+
+6. **Synchronizacja i Git:**
    - Wszelkie modyfikacje plików konfiguracyjnych wykonuj w tym katalogu, a następnie synchronizuj do `~/.hermes/config.yaml` oraz `~/.omlx/` za pomocą `./switch-variant.sh`.
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Narzędzie audytu użycia i bezpiecznej migracji modeli `move_from_SSD_to_HDD.sh` (12 Listopada 2026):**
+  * **Wielopoziomowa agregacja historii użycia:**
+    - Skrypt bada rotowane logi `~/.omlx/logs/server.log*` (milisekundowe znaczniki `Loading model:` i `Chat completion:`), bazę SQLite `~/.hermes/state.db` (tabele `sessions` i `session_model_usage`), a w ostateczności czasy modyfikacji plików `config.json` i wag `.safetensors`.
+  * **Ochrona modeli krytycznych i kategoryzacja kandydatów:**
+    - Chroni domyślny model (`is_default: true` -> `Qwen3.8-Flash-Next-oQ5e-mtp`) oraz przypięty kompresor Wariantu 2 (`is_pinned: true`).
+    - Kategoryzuje modele na: mocnych kandydatów (>30 dni bezczynności, >20 GB), standardowych kandydatów (>14 dni), mało używanych (>7 dni) oraz aktywnych (<7 dni).
+  * **Automatyzacja migracji i spójność ekosystemu:**
+    - Wykrywa istniejące już kopie na HDD (unika ponownego kopiowania przez USB-C), kopiuje z wskaźnikiem postępu i weryfikacją sumaryczną, tworzy dowiązania symboliczne w `~/.lmstudio/models/<org>/<model>`, automatycznie oznacza modele jako `[HDD]` w konfiguracjach oMLX i OpenCode oraz wysyła żądanie `POST /admin/api/reload` do oMLX.
 - **Wdrożenie 7 nowych modeli MLX/MTP (Gemma 4, GLM 5.3 Flash 320B, Qwen 3.8 oQ6e, Bonsai-2, Nanbeige 4.3), podniesienie sufitu pamięci do 186 GB oraz archiwizacja `[HDD]` (12 Listopada 2026):**
   * **Odblokowanie 186 GB RAM dla GPU Metal i pełna rezydentność `GLM-5.3-Flash-oQ4e-mtp` (173.86 GB):**
     - Po ustawieniu `iogpu.wired_limit_mb=186777`, w `settings.json` skonfigurowano `"prefill_memory_guard": false`, `"memory_guard_tier": "custom"` oraz `"memory_guard_custom_ceiling_gb": 186.0`, co pozwoliło załadować 320-miliardowy model `GLM-5.3-Flash-oQ4e-mtp` w 100% do RAM bez SSD expert offloadu.
