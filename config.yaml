@@ -1,5 +1,5 @@
 model:
-  default: Qwen3.5-122B-A10B-MLX-9bit
+  default: Qwen3.8-Flash-Next-oQ5e-mtp
   provider: omlx
   context_window: 262144
   context_length: 262144
@@ -11,7 +11,7 @@ providers:
     base_url: http://127.0.0.1:8000/v1
     api_key: ${OMLX_API_KEY}
     api_mode: chat_completions
-    default_model: Qwen3.5-122B-A10B-MLX-9bit
+    default_model: Qwen3.8-Flash-Next-oQ5e-mtp
     models:
       Qwen3.5-122B-A10B-MLX-9bit:
         context_window: 262144
@@ -90,6 +90,40 @@ providers:
       flint-oQ8e:
         context_window: 262144
         context_length: 262144
+        max_tokens: 32768
+      Qwen3.8-Flash-Next-oQ6e-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      GLM-5.3-Flash-oQ4e-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      GLM-5.3-Flash-oQ2e-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      gemma-4-12B-it-oQ8e-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      gemma-4-31B-it-oQ6e-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      Nanbeige4.3-33B-MLX-6bit:
+        context_window: 524288
+        context_length: 524288
         max_tokens: 32768
 fallback_providers: []
 toolsets:

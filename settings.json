@@ -18,7 +18,11 @@
     "burst_decode_mode": "balanced",
     "preserve_mid_system_cache": true,
     "distributed_inference_enabled": false,
-    "max_audio_upload_size": "100MB"
+    "max_audio_upload_size": "100MB",
+    "max_image_upload_size": "50MB",
+    "max_request_body_size": "512MB",
+    "max_image_side_length": 2048,
+    "gpu_keep_warm_interval": 0.5
   },
   "model": {
     "model_dirs": [
@@ -29,9 +33,9 @@
     "hide_helper_models": false
   },
   "memory": {
-    "prefill_memory_guard": true,
-    "memory_guard_tier": "aggressive",
-    "memory_guard_custom_ceiling_gb": 0.0,
+    "prefill_memory_guard": false,
+    "memory_guard_tier": "custom",
+    "memory_guard_custom_ceiling_gb": 186.0,
     "soft_threshold": 0.85,
     "hard_threshold": 0.95,
     "prefill_safe_zone_ratio": 0.8,
@@ -62,6 +66,7 @@
     "api_key": "sk-omlx-0Thr9X0jHr1U2T2ReS17j6Vi",
     "secret_key": "4103ea518e89a4b00157c333dc6faf7bb7a1d002b615107e4ca699dde70d0085",
     "skip_api_key_verification": false,
+    "allow_unauthenticated_inference": false,
     "sub_keys": []
   },
   "mcp": {
@@ -98,15 +103,18 @@
     "mode": "cloud",
     "opus_model": null,
     "sonnet_model": null,
-    "haiku_model": null
+    "haiku_model": null,
+    "desktop_enabled": false
   },
   "integrations": {
     "codex_model": null,
     "opencode_model": null,
     "openclaw_model": null,
-    "hermes_model": "Qwen3.5-122B-A10B-MLX-9bit",
+    "hermes_model": "Qwen3.8-Flash-Next-oQ5e-mtp",
     "pi_model": null,
+    "vibe_model": null,
     "copilot_model": null,
+    "dsh_model": null,
     "openclaw_tools_profile": "coding",
     "markitdown_enabled": true,
     "markitdown_expose_model": false,
@@ -120,10 +128,20 @@
     "web_search_max_results": 3,
     "web_search_content_mode": "snippet",
     "web_search_content_truncate": true,
-    "web_search_content_max_chars": 20000
+    "web_search_content_max_chars": 20000,
+    "splash_path": null,
+    "splash_kv_format": "int8",
+    "splash_max_memory_gb": null,
+    "splash_ssd_cache_gb": null,
+    "splash_ane_prefill": true
   },
   "ui": {
-    "language": "en"
+    "language": "en",
+    "dashboard_layout": null,
+    "custom_theme": null
+  },
+  "usage": {
+    "usage_history": true
   },
   "idle_timeout": {
     "idle_timeout_seconds": 120

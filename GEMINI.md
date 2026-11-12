@@ -10,12 +10,12 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla 18 modeli (okna do 1M, sampling, parsery, VLM/OCR) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla **25 modeli w Hermesie (27 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
    - Praktyczny przewodnik obsługi CLI oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych (Use Cases) znajduje się w [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 18 modeli.
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.5-122B` jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik Splash 1.5.0-m1) jako dedykowany szybki kompresor.
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 25 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `GLM-5.3-Flash-oQ2e-mtp`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik Splash 1.6.0-m1) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
@@ -33,6 +33,20 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Wdrożenie 7 nowych modeli MLX/MTP (Gemma 4, GLM 5.3 Flash 320B, Qwen 3.8 oQ6e, Bonsai-2, Nanbeige 4.3), podniesienie sufitu pamięci do 186 GB oraz archiwizacja `[HDD]` (12 Listopada 2026):**
+  * **Odblokowanie 186 GB RAM dla GPU Metal i pełna rezydentność `GLM-5.3-Flash-oQ4e-mtp` (173.86 GB):**
+    - Po ustawieniu `iogpu.wired_limit_mb=186777`, w `settings.json` skonfigurowano `"prefill_memory_guard": false`, `"memory_guard_tier": "custom"` oraz `"memory_guard_custom_ceiling_gb": 186.0`, co pozwoliło załadować 320-miliardowy model `GLM-5.3-Flash-oQ4e-mtp` w 100% do RAM bez SSD expert offloadu.
+  * **Archiwizacja 3 starszych modeli Qwen na dysk USB-C (`/Volumes/Seagate_Expansion_Drive/LLM`) z oznaczeniem `[HDD]`:**
+    - Przeniesiono / podlinkowano `Qwen3-235B-A22B-MLX-4bit` (116G), `Qwen3-Coder-Next-MLX-9bit` (83G) oraz `Qwen3.5-122B-A10B-MLX-9bit` (128G) na zewnętrzny dysk Seagate HDD, odzyskując **328 GiB** na wewnętrznym SSD (łącznie z czyszczeniem cache HF odzyskano ~497 GiB; po pobraniu 7 nowych modeli pozostało **650.2 GiB** wolnego miejsca na SSD).
+    - Zachowano wszystkie 3 modele w oMLX oraz OpenCode z widocznym oznaczeniem **`[HDD]`**, a domyślny model Hermesa i oMLX przełączono na rezydentny na SSD `Qwen3.8-Flash-Next-oQ5e-mtp`.
+  * **Dodanie i profilowanie 7 nowych modeli w Hermes Agent (łącznie 25 modeli), oMLX (27 modeli) i OpenCode (27 modeli):**
+    1. `Qwen3.8-Flash-Next-oQ6e-mtp` (`Jundot/`, 6-bit iMatrix VLM, 141.1 GB RAM): `activation_fp16_enabled: true`, Lightning MTP (69.7%, `2.59 tok/cykl`), **60.6–63.9 tok/s**, TTFT **0.58s**. (Wariant `WLSRefit-MTP` usunięto po benchmarku jako wolniejszy: 62.1 tok/s vs 67.5–73.0 tok/s dla `oQ5e-mtp`).
+    2. `GLM-5.3-Flash-oQ4e-mtp` (`Jundot/`, 320B MoE / 18B akt., `glm5_next`, VLM, 173.9 GB RAM): Fused KDA prework, Lightning MTP (82.5%, `3.00 tok/cykl`), **TTFT 0.17s** (`bf16`), **25.9–29.9 tok/s**.
+    3. `GLM-5.3-Flash-oQ2e-mtp` (`Jundot/`, 320B MoE / 18B akt., 2-bit eksperci + 4-bit router/shared/MTP, VLM, **102.9 GB RAM**): oszczędza **71 GB RAM** względem `oQ4e`, ładuje się w ~16s i generuje **32.1–37.6 tok/s** przy zachowaniu czystego kodu i rozumowania.
+    4. `gemma-4-12B-it-oQ8e-mtp` (`Jundot/`, `gemma4_unified` Any-to-Any VLM/Audio, 13.0 GB RAM): `activation_fp16_enabled: true`, Lightning MTP (80.3–92.4%, depth `d8`), **51.4–68.4 tok/s**, TTFT **0.60s**.
+    5. `gemma-4-31B-it-oQ6e-mtp` (`Jundot/`, Dense 31B VLM, 26.3 GB RAM): `activation_fp16_enabled: true` (+42% speedup), `gemma4_verify_kernel`, Lightning MTP (88.4%, `4.38 tok/cykl`), **32.4–34.0 tok/s**, TTFT **0.93s**.
+    6. `Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed` (`Youssofal/`, 2-bit Hadamard 27B VLM, **8.23 GB RAM**): **31.4 tok/s**, TTFT **0.77s**.
+    7. `Nanbeige4.3-33B-MLX-6bit` (`PocketAiHub/`, Dense 33B, 25.2 GB RAM): okno kontekstu **524 288 tokenów (512k)**, **19.6 tok/s**, TTFT **0.93s**.
 - **Aktualizacja silnika do Splash M1 1.6.0-m1, uzupełnienie `"activation_fp16_enabled": true` dla `Qwen3.8-Flash-Next-oQ5e-mtp` oraz wyróżnienie Qwen 3.8 Flash w OpenCode (6–7 Listopada 2026):**
   * **Aktualizacja do `Splash 1.6.0-m1` (`/opt/homebrew/bin/splash-m1`):**
     - Zaktualizowano silnik z `1.5.0-m1` do **`1.6.0-m1`** (`paperniuk/splash`), wnoszącego zarządcę pamięci `One memory ledger`, selektywne utrzymywanie rezydentnego KV cache tylko dla czytanych bloków (`Idle KV` #644), zespolony przebieg `MoE gate + up` (#45), `staged hyper-connection norm` (#46), próg prefillu ANE od 128 wierszy (#49), automatyczny restart silnika oraz odporność `--model-dir` na pliki `.DS_Store` (#42).

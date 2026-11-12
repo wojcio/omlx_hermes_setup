@@ -409,4 +409,38 @@ Przełączono system skryptem `./switch-variant.sh 2 --local` i zmierzono parame
   * Prędkość generowania `Qwen3.8-Flash-Next-oQ5e-mtp` na czystym przebiegu rozumowania (1024 tokeny) wzrosła z **`39.62 tok/s`** (`bfloat16`) do **`62.56 tok/s`** (`float16`, **+58%**, TTFT `0.48s`), a na generowaniu kodu osiąga do **`~97 tok/s`** (`6.00 tok/cykl`, `backbone=61.5ms`).
   * Dla modeli `DeepSeek-V4-Flash` oraz gęstych `Qwen3.8-27B` pozostawiono `activation_fp16_enabled: false`, gdyż ich dedykowane kernele (`wsdpa_attention.py`, `qwen35_packed_linear.py`) wymagają `bfloat16`.
 
+---
+
+## 🚀 20. Wdrożenie 7 Nowych Modeli MLX/MTP (Gemma 4, GLM 5.3 Flash 320B, Qwen 3.8 oQ6e, Bonsai-2, Nanbeige 4.3), Sufit Pamięci 186 GB i Archiwizacja `[HDD]` (12 Listopada 2026)
+
+### 1. Audyt środowiska i sufitu pamięci Metal GPU (186 GB):
+- Zweryfikowano wersje: `oMLX 0.7.4.dev1`, `MLX 0.32.4`, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11` oraz `Splash M1 1.6.0-m1` (`/opt/homebrew/bin/splash-m1`, automatycznie wybierany przez oMLX na M2 Ultra zamiast `splash 1.6.1` przeznaczonego dla M3/M4 GPU family 9).
+- Po podniesieniu przez użytkownika limitu pamięci drutowanej GPU w macOS (`sysctl iogpu.wired_limit_mb=186777`), w `settings.json` skonfigurowano:
+  * `"prefill_memory_guard": false`
+  * `"memory_guard_tier": "custom"`
+  * `"memory_guard_custom_ceiling_gb": 186.0`
+- Pozwoliło to załadować w 100% do pamięci RAM (bez SSD expert offloadu) gigantyczny model **`GLM-5.3-Flash-oQ4e-mtp`** (**173.86 GB** w RAM).
+
+### 2. Archiwizacja 3 starszych modeli Qwen na dysk USB-C (`[HDD]`) i odzyskanie ~500 GiB na SSD:
+- Oczyszczono osierocony cache `/Users/wojcio/.cache/huggingface/hub/models--*` (**+169 GiB**).
+- Zastąpiono katalogi 3 starszych modeli na wewnętrznym SSD dowiązaniami symbolicznymi (`symlink`) do identycznych kopii na zewnętrznym dysku `/Volumes/Seagate_Expansion_Drive/LLM` (**+328 GiB** na SSD):
+  1. `Qwen/Qwen3-235B-A22B-MLX-4bit` (`[HDD] Qwen3-235B-A22B-MLX-4bit`, 116 GiB)
+  2. `inferencerlabs/Qwen3-Coder-Next-MLX-9bit` (`[HDD] Qwen3-Coder-Next-MLX-9bit`, 83 GiB)
+  3. `inferencerlabs/Qwen3.5-122B-A10B-MLX-9bit` (`[HDD] Qwen3.5-122B-A10B-MLX-9bit`, 128 GiB)
+- Przestawiono domyślny model w Hermesie (`config*.yaml`) oraz oMLX (`model_settings*.json`, `settings.json`) na rezydentny na szybkim SSD **`Qwen3.8-Flash-Next-oQ5e-mtp`**.
+
+### 3. Pobieranie z Watchdogiem i Benchmark 7 Nowych Modeli:
+- Zbudowano skrypt pobierający z watchdogiem aktywności (`INACTIVITY_TIMEOUT_SEC = 180`, automatyczne przełączanie `HF_XET_HIGH_PERFORMANCE=0` -> `HF_HUB_DISABLE_XET=1` w razie zawieszenia gniazda XET).
+- Przetestowano 8 pobranych modeli, odrzucając i usuwając z dysku wolniejszy duplikat `GBP-DE/Qwen3.8-Flash-Next-oQ5e-WLSRefit-MTP` (62.1 tok/s vs 67.5–73.0 tok/s w `oQ5e-mtp`) i pozostawiając **7 nowych modeli**:
+  1. **`Jundot/Qwen3.8-Flash-Next-oQ6e-mtp` (`141.08 GB RAM`):** 6-bit iMatrix (oMLX 0.7.3), VLM, `activation_fp16_enabled: true`, Lightning MTP (60.9–69.7%, `2.59 tok/cykl`), **60.62 – 63.92 tok/s**, TTFT **0.58s**.
+  2. **`Jundot/GLM-5.3-Flash-oQ4e-mtp` (`173.86 GB RAM`):** 320B MoE (18B akt./tok, `glm5_next`, okno natywne 1M / skonfigurowane 256k), VLM, Fused KDA prework, Lightning MTP (82.5%, `3.00 tok/cykl`), **TTFT 0.17s** (w `bf16`), **25.85 – 29.89 tok/s**.
+  3. **`Jundot/GLM-5.3-Flash-oQ2e-mtp` (`102.87 GB RAM`):** 320B MoE w hybrydowym 2-bit oQ2e (4-bit router/shared/embeddings/MTP) — zajmuje o **71 GB mniej RAM** niż `oQ4e`, ładuje się w ~16s, osiąga **32.05 – 37.63 tok/s** (o ~24% szybciej niż `oQ4e`) przy zachowaniu bardzo wysokiej jakości kodu i rozumowania.
+  4. **`Jundot/gemma-4-12B-it-oQ8e-mtp` (`13.01 GB RAM`):** Any-to-Any (`gemma4_unified`: tekst/obraz/audio, 256k), 8-bit, `activation_fp16_enabled: true`, Lightning MTP (80.3–92.4%, depth do `d8`), **51.38 – 68.38 tok/s**, TTFT **0.60s**.
+  5. **`Jundot/gemma-4-31B-it-oQ6e-mtp` (`26.25 GB RAM`):** Dense 31B VLM (`gemma4`, 256k), 6-bit, `activation_fp16_enabled: true` (+42% speedup), `gemma4_verify_kernel`, Lightning MTP (88.4%, `4.38 tok/cykl`), **32.41 – 34.03 tok/s**, TTFT **0.93s**.
+  6. **`Youssofal/Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed` (`8.23 GB RAM`):** 2-bit Hadamard 27B VLM (`prism_hadamard_qwen35`, 256k), automatycznie zwalnia 420 MB nieużywanych biasów t5, **31.41 tok/s**, TTFT **0.77s**.
+  7. **`PocketAiHub/Nanbeige4.3-33B-MLX-6bit` (`25.23 GB RAM`):** Dense 33B (`llama`) z gigantycznym oknem **524 288 tokenów (512k)**, TurboQuant KV 8-bit (`skip_last`), **19.42 – 19.58 tok/s**, TTFT **0.93s**.
+
+### 4. Synchronizacja ekosystemu (Hermes + oMLX + OpenCode):
+- Zaktualizowano wszystkie pliki w repozytorium Hermesa/oMLX (**25 modeli w Hermesie**, **27 modeli w oMLX**) oraz w repozytorium OpenCode (`/Users/wojcio/Desktop/Devel/opencode_omlx` i `~/.config/opencode`, **27 modeli**).
+
 
