@@ -1,17 +1,17 @@
 # oMLX & Hermes Setup
 
-Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.7.4.dev1** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.6.0-m1**, **Lightning MTP**, **DFlash2**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **25 modeli w Hermesie (27 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
+Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.0rc1** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.6.1-m1**, **Lightning MTP**, **DFlash2**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **24 modeli w Hermesie (26 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
 
 ---
 
 ## 📖 Pełna dokumentacja i Przewodnik Użytkownika
 
-Szczegółowy opis wszystkich **25 modeli w Hermesie (27 w oMLX)** — w tym nowych rodzin:
-- **`Qwen3.8-Flash-Next-oQ5e-mtp`** (~119.9 GB, **67.5–97 tok/s**) oraz **`Qwen3.8-Flash-Next-oQ6e-mtp`** (6-bit, ~141.1 GB, **60.6–63.9 tok/s**) i **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** (**~73.5 tok/s**),
-- **`GLM-5.3-Flash-oQ4e-mtp`** (320B MoE / 18B akt., 173.9 GB w 100% w RAM, TTFT **0.17s**, **25.9–29.9 tok/s**) oraz **`GLM-5.3-Flash-oQ2e-mtp`** (320B MoE w hybrydowym 2-bit/4-bit, tylko **102.9 GB RAM**, okno **512k**, `temp 1.0`, **32.1–37.6 tok/s**),
+Szczegółowy opis wszystkich **24 modeli w Hermesie (26 w oMLX)** — w tym nowych rodzin:
+- **`Qwen3.8-Flash-Next-oQ5e-mtp`** (~119.9 GB, **67.5–97 tok/s**) oraz **`Qwen3.8-Flash-Next-oQ6e-mtp`** (6-bit, ~141.1 GB, **60.6–66.8 tok/s**) i **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** (**~73.5 tok/s**),
+- **`GLM-5.3-Flash-oQ4e-mtp`** (320B MoE / 18B akt., 173.9 GB w 100% w RAM, TTFT **0.17s**, **25.5–32.8 tok/s**),
 - **`gemma-4-12B-it-oQ8e-mtp`** (Any-to-Any VLM/Audio, 13.0 GB, **51.4–68.4 tok/s**) oraz **`gemma-4-31B-it-oQ6e-mtp`** (Dense 31B VLM, 26.3 GB, `gemma4_verify_kernel`, **32.4–34.0 tok/s**),
 - **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** (2-bit Hadamard 27B VLM, tylko **8.23 GB RAM**, **31.4 tok/s**) oraz **`Nanbeige4.3-33B-MLX-6bit`** (Dense 33B, okno **512k tokenów**, **19.6 tok/s**),
-- autonomicznego agenta kodującego **`flint-oQ8e`** (MoE 39.8B, 2.5B akt./tok, do **74.1 tok/s**), **`DeepSeek-V4-Flash-0731-MXFP4-MLX`**, **`Qwen3.8-27B-Coder390-...-MTP-DFlash2`**, **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** (Splash 1.6.0-m1, do **64.0 tok/s**) oraz modeli zarchiwizowanych na zewnętrznym dysku USB-C z oznaczeniem **`[HDD]`** (`Qwen3.5-122B`, `Qwen3-Coder-Next`, `Qwen3-235B`) — znajdziesz w plikach:
+- autonomicznego agenta kodującego **`flint-oQ8e`** (MoE 39.8B, 2.5B akt./tok, do **74.1 tok/s**), **`DeepSeek-V4-Flash-0731-MXFP4-MLX`**, **`Qwen3.8-27B-Coder390-...-MTP-DFlash2`**, **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** (**Splash 1.6.1-m1**, **69.2 tok/s** średnio / do **91.2 tok/s** w OpenCode) oraz modeli zarchiwizowanych na zewnętrznym dysku USB-C z oznaczeniem **`[HDD]`** (`Qwen3.5-122B`, `Qwen3-Coder-Next`, `Qwen3-235B`, `Step-3.5-Flash`, `Qwen3.8-27B-FP16_huzar_v1` / `-SPLASH`) — znajdziesz w plikach:
 
 👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
 👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
@@ -39,9 +39,9 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
    - *Brak opóźnień związanych z przełączaniem modeli w pamięci RAM (0s swap latency) dla wszystkich 18 modeli.*
 
 2. **Wariant 2: `Dual-Model Resident` (Dedykowany Szybki Kompresor 27B)**
-   - Model główny: `Qwen3.5-122B-A10B-MLX-9bit` (256k)
-   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik Splash 1.5.0-m1)
-   - *Ultraszybki (60.5–64.0 tok/s), dedykowany model Splash z podziałem GPU/ANE (share 0.26), optymalizacją Prefill Tail/Attention i akceleracją DFlash2 (3.5–3.92 tok/cykl) do podsumowań kontekstu współistniejący z modelem głównym.*
+   - Model główny: `Qwen3.8-Flash-Next-oQ5e-mtp` (256k) lub `Qwen3.5-122B-A10B-MLX-9bit`
+   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.6.1-m1**)
+   - *Ultraszybki (średnio **69.2 tok/s** i do **91.2 tok/s** w OpenCode), dedykowany model Splash z podziałem GPU/ANE (share 0.26), off-loop kompilacją Metal (fix `paperniuk/splash#62`) i akceleracją DFlash2 (3.6–5.8 tok/cykl) do podsumowań kontekstu współistniejący z modelem głównym.*
 
 ### 🔄 Szybkie przełączanie wariantów:
 
@@ -105,3 +105,4 @@ Skrypt `./switch-variant.sh` automatycznie sprawdza, czy oMLX jest zainstalowany
 - **[`switch-variant.sh`](switch-variant.sh)** – Skrypt bash do automatycznego przełączania wariantów.
 - **[`move_from_SSD_to_HDD.sh`](move_from_SSD_to_HDD.sh)** – Skrypt audytu użycia i bezpiecznej migracji nieużywanych modeli z SSD na zewnętrzny HDD Seagate.
 - **[`move_from_SSD_to_HDD.py`](move_from_SSD_to_HDD.py)** – Silnik analityczno-migracyjny skryptu (agregacja logów oMLX, SQLite Hermesa, obsługa transferu i symlinków).
+- **[`omlx_bench.sh`](omlx_bench.sh)** – Automatyczny benchmark wszystkich lokalnych modeli OpenCode/oMLX bez prefiksu `[HDD]` na wspólnym zadaniu repozytorium (zbiera czasy, tury, wywołania narzędzi, `tok/s`, MTP i zrzuca tabelę `SUMMARY.md`).

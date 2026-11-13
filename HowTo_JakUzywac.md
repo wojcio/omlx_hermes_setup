@@ -1,6 +1,6 @@
 # Przewodnik Użytkownika: Jak i Do Czego Używać Hermesa z Modelami oMLX
 
-Praktyczna instrukcja obsługi agenta **Hermes** współpracującego z lokalnym serwerem **oMLX** na platformie Apple Silicon (Mac Studio 192 GB Unified Memory, limit GPU Metal podniesiony do **186 GB**). Dokument zawiera ściągawkę z najważniejszych komend CLI oraz dobór optymalnych modeli z bazy **25 skonfigurowanych modeli** w Hermesie (**27 modeli** w oMLX) pod kątem konkretnych ról zawodowych i codziennych scenariuszy użycia.
+Praktyczna instrukcja obsługi agenta **Hermes** współpracującego z lokalnym serwerem **oMLX** na platformie Apple Silicon (Mac Studio 192 GB Unified Memory, limit GPU Metal podniesiony do **186 GB**). Dokument zawiera ściągawkę z najważniejszych komend CLI oraz dobór optymalnych modeli z bazy **24 skonfigurowanych modeli** w Hermesie (**26 modeli** w oMLX) pod kątem konkretnych ról zawodowych i codziennych scenariuszy użycia.
 
 ---
 
@@ -13,8 +13,8 @@ Domyślnie Hermes startuje z modelem głównym `Qwen3.8-Flash-Next-oQ5e-mtp` (~6
 # Start z domyślnym modelem głównym (Qwen3.8-Flash-Next-oQ5e-mtp)
 hermes
 
-# Start z flagowym gigantem 320B MoE w hybrydowym 2-bit/4-bit (102.9 GB RAM, 32.1–37.6 tok/s, VLM + MTP)
-hermes -m GLM-5.3-Flash-oQ2e-mtp
+# Start z flagowym gigantem 320B MoE w 4-bit (173.9 GB RAM, VLM + MTP)
+hermes -m GLM-5.3-Flash-oQ4e-mtp
 
 # Start z ultra-szybkim modelem kodistycznym Coder390 (27B VLM, ~34.6 tok/s, MTP)
 hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2
@@ -22,7 +22,7 @@ hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-
 # Start z najszybszym modelem ogólnym (~73.5 tok/s z tablicą ngramów)
 hermes -m Qwen3.8-Flash-Next-MTPLX-Optimized-Speed
 
-# Błyskawiczne polecenie z linii komend napędzane silnikiem Splash 1.6.0-m1 (~50–64 tok/s)
+# Błyskawiczne polecenie z linii komend napędzane silnikiem Splash 1.6.1-m1 (~69.2 śr. / do 91.2 tok/s)
 hermes -m Qwen3.8-27B-Uncensored-MLX-SPLASH -z "Przedstaw w 3 punktach podsumowanie kluczowych zalet silnika Splash w oMLX."
 ```
 
@@ -36,7 +36,7 @@ W otwartej sesji czatu Hermesa możesz w każdej chwili przełączyć model bez 
   ```bash
   hermes -m DeepSeek-V4-Flash-0731-MXFP4-MLX --reasoning high
   ```
-  > 💡 **Wskazówka dla `GLM-5.3-Flash` (`oQ2e` / `oQ4e`):** jego szablon `chat_template.jinja` rozpoznaje wyłącznie poziomy `low` i `high` — każda inna wartość (w tym domyślne w Hermesie `medium`) przełącza model w tryb **`Max`**, w którym potrafi generować 6k–12k+ tokenów samego `<think>`. Gdy zależy Ci na zwięźlejszym rozumowaniu, użyj jawnie `--reasoning high` lub `--reasoning low`.
+  > 💡 **Wskazówka dla `GLM-5.3-Flash-oQ4e-mtp`:** jego szablon `chat_template.jinja` rozpoznaje wyłącznie poziomy `low` i `high` — każda inna wartość (w tym domyślne w Hermesie `medium`) przełącza model w tryb **`Max`**, w którym potrafi generować 6k–12k+ tokenów samego `<think>`. Gdy zależy Ci na zwięźlejszym rozumowaniu, użyj jawnie `--reasoning high` lub `--reasoning low`.
 * **Praca na bezpiecznej kopii repozytorium (`--worktree`):** Idealne przy dużych refaktoringach:
   ```bash
   hermes -m Qwen3-Coder-Next-MLX-9bit --worktree
@@ -199,7 +199,7 @@ Do codziennych pytań, burzy mózgów, planowania podróży, tłumaczeń, stresz
 | :--- | :--- | :--- |
 | **Błyskawiczny czat na każdy temat (0 czekania)** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Odpowiada niemal natychmiast (~73.5 tok/s). Posiada ogromną wiedzę (512 ekspertów) i potrafi także analizować wrzucone zdjęcia. |
 | **Najwyższa jakość odpowiedzi, złożone pytania i analizy** | **`Qwen3.5-122B-A10B-MLX-9bit`** *(lub `Qwen3.8-Flash-Next-oQ5e-mtp`)* | Nasz domyślny złoty środek (9-bitowa precyzja) lub wariant `oQ5e` od GBP-DE. Bardzo dojrzałe, wyważone i szczegółowe odpowiedzi. |
-| **Pytania i pisma po polsku, styl i redagowanie** | **`Qwen3.5-122B-A10B-MLX-9bit`** | Znakomita erudycja i styl językowy (9-bitowa precyzja, 256k okno). W samym oMLX dostępny jest również wyspecjalizowany model `Qwen3.8-27B-FP16_huzar_v1-SPLASH`. |
+| **Pytania i pisma po polsku, styl i redagowanie** | **`Qwen3.5-122B-A10B-MLX-9bit`** | Znakomita erudycja i styl językowy (9-bitowa precyzja, 256k okno). W samym oMLX dostępny jest również zarchiwizowany jako `[HDD]` model `Qwen3.8-27B-FP16_huzar_v1-SPLASH` (oraz na SSD `Qwen3.8-27B-FP16_huzar_v1`). |
 
 **Przykładowe użycie:**
 ```bash
@@ -230,9 +230,9 @@ hermes -m Qwen3.5-122B-A10B-MLX-9bit -z "Napisz uprzejme, ale stanowcze wezwanie
 
 ---
 
-## 3. Wielka Ściąga: Katalog Wszystkich 25 Modeli w Hermesie (27 w oMLX)
+## 3. Wielka Ściąga: Katalog Wszystkich 24 Modeli w Hermesie (26 w oMLX)
 
-Poniższa tabela pozwala szybko porównać wszystkie 25 modeli pod kątem ich rozmiaru w pamięci RAM, okna kontekstu oraz głównego przeznaczenia:
+Poniższa tabela pozwala szybko porównać wszystkie 24 modele pod kątem ich rozmiaru w pamięci RAM, okna kontekstu oraz głównego przeznaczenia:
 
 | # | Nazwa Modelu (`hermes -m ...`) | Kategoria | Okno | Rozmiar RAM | Vision (VLM) | Kiedy wybierać? |
 | :-: | :--- | :--- | :---: | :---: | :---: | :--- |
@@ -240,27 +240,26 @@ Poniższa tabela pozwala szybko porównać wszystkie 25 modeli pod kątem ich ro
 | 2 | **`Qwen3.8-Flash-Next-oQ6e-mtp`** | 🎯 Wyższa Precyzja 6-bit VLM | 256k | ~141.1 GB | **Tak** | Gdy zależy Ci na wyższej, 6-bitowej precyzji wag `Qwen3.8-Flash-Next` z Lightning MTP (**60.6–63.9 tok/s**, TTFT 0.58s). |
 | 3 | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | ⚡ Ultra-Fast Agent | 256k | ~120.8 GB | **Tak** | Gdy liczy się **maksymalna prędkość (~73.5 tok/s, Fused GDN Decode + 128 shardów N-gram)** w długich sesjach agentowych i obsługa obrazów. |
 | 4 | **`GLM-5.3-Flash-oQ4e-mtp`** | 🏛️ Kolos 320B MoE (4-bit) | 256k | ~173.9 GB | **Tak** | Flagowy 320B MoE (18B akt./tok) w 100% w RAM (limit 186 GB), Fused KDA prework, **TTFT 0.17s**, Lightning MTP (82.5% akceptacji, **25.9–29.9 tok/s**). |
-| 5 | **`GLM-5.3-Flash-oQ2e-mtp`** | 🚀 Kolos 320B MoE (2-bit Fast) | 512k | ~102.9 GB | **Tak** | **Kolos 320B MoE (512k):** 2-bit eksperci + 4-bit router/shared/MTP, `temp 1.0` — oszczędza **71 GB RAM** względem `oQ4e` i generuje aż **32.1–37.6 tok/s**! |
-| 6 | **`gemma-4-12B-it-oQ8e-mtp`** | ⚡ Any-to-Any (VLM + Audio) | 256k | ~13.0 GB | **Tak (+Audio)** | Lekki, błyskawiczny model Google Gemma 4 (`gemma4_unified`, 8-bit, FP16 recast, Lightning MTP do `d8`, **51.4–68.4 tok/s**). |
-| 7 | **`gemma-4-31B-it-oQ6e-mtp`** | 🧠 Dense 31B VLM (Gemma 4) | 256k | ~26.3 GB | **Tak** | Gęsty model 31B VLM z dedykowanym kernelem `gemma4_verify_kernel`, FP16 recast (+42% speedup) i akceptacją MTP **88.4% (`4.38 tok/cykl`, 32.4–34.0 tok/s)**. |
-| 8 | **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** | 🪶 Ultralekki 27B Hadamard | 256k | **~8.23 GB** | **Tak** | Kwantyzacja 2-bit Hadamard (`prism_hadamard_qwen35`): pełny model 27B VLM zajmujący zaledwie **8.23 GB RAM** i generujący **31.4 tok/s**. |
-| 9 | **`Nanbeige4.3-33B-MLX-6bit`** | 📚 Gęsty 33B / Okno **512k** | **512k** | ~25.2 GB | Nie | Gęsty model 33B do zadań agentowych i analizy gigantycznych repozytoriów z oknem aż **524 288 tokenów (512k)** (**19.6 tok/s**). |
-| 10 | **`flint-oQ8e`** | 🤖 Autonomous Agent MoE | 256k | ~39.4 GB | Nie | **Lider agentic coding** (SWE-bench, Terminal-Bench), MoE 40B (256 eksp., 2.5B akt./tok), oQ8e iMatrix, dedykowany kernel decode, do **74.1 tok/s**. |
-| 11 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-`**<br>**`GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~30.6 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, natywne Lightning MTP `mtp-bf16`, 8-bit KV Cache). |
-| 12 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.6.0-m1** (One memory ledger, Idle KV, Metal/ANE split `0.26` + DFlash2, do **64.0 tok/s**); przypięty kompresor Wariantu 2. |
-| 13 | **`Qwen3.8-27B-Uncensored-MLX`** | 🔓 Szybki Uncensored (MLX) | 256k | ~15 GB | Nie | Bardzo lekki model bez cenzury z natywnym dekodowaniem spekulatywnym **DFlash2 (`Qwen3.8-27B-DFlash2`)** i 8-bit KV Cache. |
-| 14 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~159 GB | Nie | Najtrudniejsze problemy algorytmiczne i architektoniczne (embedded DSpark MTP depth 3, **31–34.6 tok/s** do 45k, **~21–24 tok/s** przy >210k). |
-| 15 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4 (Lightning MTP + MLA), gdy potrzebujesz mniejszego zużycia RAM. |
-| 16 | **`MiniMax-M3-ConfigI-MLX`** | 🌐 Multimodal MoE | 128k | ~156 GB | **Tak** | Potężny model 60-warstwowy z własnym stylem rozumowania (`<mm:think>`) i analizą obrazu. |
-| 17 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury. |
-| 18 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) i Fused MoE do pracy narzędziowej. |
-| 19 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z natywnym parserem `laguna` w oMLX 0.7.2+, Fused MoE i sliding window 512 do zadań inżynierskich. |
-| 20 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
-| 21 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
-| 22 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
-| 23 | **`Qwen3.5-122B-A10B-MLX-9bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (MoE 122B) | 256k | ~128 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM` (zastąpiony przez serię `Qwen3.8-Flash-Next`). |
-| 24 | **`Qwen3-Coder-Next-MLX-9bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Coder 9-bit) | 256k | ~83 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM`. |
-| 25 | **`Qwen3-235B-A22B-MLX-4bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Kolos 235B) | 40k | ~116 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM`. |
+| 5 | **`gemma-4-12B-it-oQ8e-mtp`** | ⚡ Any-to-Any (VLM + Audio) | 256k | ~13.0 GB | **Tak (+Audio)** | Lekki, błyskawiczny model Google Gemma 4 (`gemma4_unified`, 8-bit, FP16 recast, Lightning MTP do `d8`, **51.4–68.4 tok/s**). |
+| 6 | **`gemma-4-31B-it-oQ6e-mtp`** | 🧠 Dense 31B VLM (Gemma 4) | 256k | ~26.3 GB | **Tak** | Gęsty model 31B VLM z dedykowanym kernelem `gemma4_verify_kernel`, FP16 recast (+42% speedup) i akceptacją MTP **88.4% (`4.38 tok/cykl`, 32.4–34.0 tok/s)**. |
+| 7 | **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** | 🪶 Ultralekki 27B Hadamard | 256k | **~8.23 GB** | **Tak** | Kwantyzacja 2-bit Hadamard (`prism_hadamard_qwen35`): pełny model 27B VLM zajmujący zaledwie **8.23 GB RAM** i generujący **31.4 tok/s**. |
+| 8 | **`Nanbeige4.3-33B-MLX-6bit`** | 📚 Gęsty 33B / Okno **512k** | **512k** | ~25.2 GB | Nie | Gęsty model 33B do zadań agentowych i analizy gigantycznych repozytoriów z oknem aż **524 288 tokenów (512k)** (**19.6 tok/s**). |
+| 9 | **`flint-oQ8e`** | 🤖 Autonomous Agent MoE | 256k | ~39.4 GB | Nie | **Lider agentic coding** (SWE-bench, Terminal-Bench), MoE 40B (256 eksp., 2.5B akt./tok), oQ8e iMatrix, dedykowany kernel decode, do **74.1 tok/s**. |
+| 10 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-`**<br>**`GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~30.6 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, natywne Lightning MTP `mtp-bf16`, 8-bit KV Cache). |
+| 11 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.6.1-m1** (One memory ledger, Idle KV, Metal/ANE split `0.26` + DFlash2, **69.2 tok/s śr. / 91.2 tok/s szczyt**); przypięty kompresor Wariantu 2. |
+| 12 | **`Qwen3.8-27B-Uncensored-MLX`** | 🔓 Szybki Uncensored (MLX) | 256k | ~15 GB | Nie | Bardzo lekki model bez cenzury z natywnym dekodowaniem spekulatywnym **DFlash2 (`Qwen3.8-27B-DFlash2`)** i 8-bit KV Cache. |
+| 13 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~159 GB | Nie | Najtrudniejsze problemy algorytmiczne i architektoniczne (embedded DSpark MTP depth 3, **31–34.6 tok/s** do 45k, **~21–24 tok/s** przy >210k). |
+| 14 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4 (Lightning MTP + MLA), gdy potrzebujesz mniejszego zużycia RAM. |
+| 15 | **`MiniMax-M3-ConfigI-MLX`** | 🌐 Multimodal MoE | 128k | ~156 GB | **Tak** | Potężny model 60-warstwowy z własnym stylem rozumowania (`<mm:think>`) i analizą obrazu *(znany błąd >4k tok na M2 Ultra: `jundot/omlx#5233`)*. |
+| 16 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury. |
+| 17 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) i Fused MoE do pracy narzędziowej. |
+| 18 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z natywnym parserem `laguna` w oMLX 0.7.2+, Fused MoE i sliding window 512 do zadań inżynierskich. |
+| 19 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
+| 20 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
+| 21 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
+| 22 | **`Qwen3.5-122B-A10B-MLX-9bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (MoE 122B) | 256k | ~128 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM` (zastąpiony przez serię `Qwen3.8-Flash-Next`). |
+| 23 | **`Qwen3-Coder-Next-MLX-9bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Coder 9-bit) | 256k | ~83 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM`. |
+| 24 | **`Qwen3-235B-A22B-MLX-4bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Kolos 235B) | 40k | ~116 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM`. |
 
 ---
 

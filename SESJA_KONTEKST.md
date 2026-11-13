@@ -496,4 +496,25 @@ Skrypt łączy dane z czterech niezależnych źródeł, zapewniając 100% precyz
 * **`GLM-5.3-Flash-oQ4e-mtp`** pozostawiono przy **`262 144` (256k)** i **`temperature: 0.7`** (estymacja `182.28 GB` blisko sufitu `186 GB`).
 * Zsynchronizowano konfigurację przez `./switch-variant.sh 1 --local`, przeładowano serwer (`POST /admin/api/reload` $\rightarrow$ `200 OK`) i wypchnięto zmiany do obu repozytoriów (`omlx_hermes_setup` oraz `open_code_config`).
 
+---
+
+## 🧪 23. Benchmark `omlx_bench.sh`, Splash `1.6.1-m1`, Zgłoszenie `MiniMax-M3` (`#5233`) i Usunięcie `GLM-5.3-Flash-oQ2e-mtp` (13 Listopada 2026)
+
+### 1. Nocny pojedynek `GLM-5.3-Flash-oQ2e-mtp` vs `oQ4e-mtp` w OpenCode i powstanie `omlx_bench.sh`:
+* Na tym samym zadaniu OpenCode (`describe the repo in this directory `):
+  * **`GLM-5.3-Flash-oQ2e-mtp`** (`variant: medium` $\rightarrow$ `Max`) zapętlił się na **69+ turach** (`186 405` tokenów kontekstu, wielokrotne czytanie tych samych plików) i został przerwany po ~25 minutach ([`/Users/wojcio/Desktop/zagladamy_do_muzgu_GLM-5.3-Flash-oQ2e-mtp.md`](file:///Users/wojcio/Desktop/zagladamy_do_muzgu_GLM-5.3-Flash-oQ2e-mtp.md)).
+  * **`GLM-5.3-Flash-oQ4e-mtp`** (`variant: high`) ukończył zadanie czysto w **3 tury** (~92s pracy po załadowaniu `173.76 GB` RAM, `14 503` tok kontekstu, `25.5–32.8 tok/s`, `75–87.5%` MTP, wyładowany po TTL) ([`/Users/wojcio/Desktop/zagladamy_do_muzgu_GLM-5.3-Flash-oQ4e-mtp.md`](file:///Users/wojcio/Desktop/zagladamy_do_muzgu_GLM-5.3-Flash-oQ4e-mtp.md)).
+* Utworzono skrypt [`omlx_bench.sh`](omlx_bench.sh) testujący w OpenCode wszystkie lokalne modele oMLX bez `[HDD]` z kontrolą zasobów i automatycznym wyładowaniem RAM pomiędzy modelami (`bench_results/` dodano do `.gitignore`).
+
+### 2. Przebieg 17 modeli i diagnoza 3 błędów:
+* W przebiegu `bench_results/20261113_091231` **12 modeli** zaliczyło **PASS** (m.in. `Qwen3.8-Flash-Next-oQ6e-mtp` **`66.8 tok/s`**, `flint-oQ8e` `53.7 tok/s` przy 10 turach/27 toolach, `Ornith-1.5-35B` `52.6 tok/s`, `Qwen3.8-Flash-Next-oQ5e-mtp` `46.2 tok/s`, `DeepSeek-V4-Flash-0731-MXFP4-MLX` `32.9 tok/s` i `89.7%` MTP, `Ternary-Bonsai-2-27B` `8.01 GB` RAM), a 2 osiągnęły limit `480s` (`Nanbeige4.3-33B-MLX-6bit`, natywny `Qwen3.8-27B-Uncensored-MLX`).
+* **3 modele ze statusem `FAIL`:**
+  1. **`MiniMax-M3-ConfigI-MLX`:** Krótki prompt (`198` tok.) przeszedł (`28.19 tok/s`), ale powyżej `4096` tokenów w `language.py` (`_MSA_SPARSE_DECODE_DEFAULT_MAX_DENSITY = 0.5`) uruchamia `_msa_prefill_attention` $\rightarrow$ `msa_sparse_attention_b1`, gdzie `_MSA_CSR_K1_STEEL_MMA` narzuca `threadgroup=(512, 1, 1)` ponad limit `384` dla Apple M2 Ultra (`applegpu_g14d`). Zgłoszono ze skryptem reprodukującym w **[`jundot/omlx#5233`](https://github.com/jundot/omlx/issues/5233)**.
+  2. **`Qwen3.8-27B-Uncensored-MLX-SPLASH`:** W `Splash 1.6.0-m1` blokował heartbeat `/status` ponad 30s przez synchroniczną kompilację pipeline'ów Metal (`paperniuk/splash#62`). Po aktualizacji `/opt/homebrew/bin/splash-m1` do **`Splash 1.6.1-m1`** ponowny test w `omlx_bench.sh` (`bench_results/20261113_112348`) zakończył się wynikiem **PASS w `197.2s`** (4 tury, średnio **`69.2 tok/s`**, szczytowo **`91.2 tok/s`** w turze 2).
+  3. **`Qwen3.8-27B-FP16_huzar_v1-SPLASH`:** Model źródłowy leży na HDD i posiada tensory nieskwantyzowane w `F16` zamiast `BF16` wymaganego przez `mlx-affine` Splasha (`source tensor type or shape does not match`). Dodano prefiks **`[HDD]`** w `model_settings*.json` i `opencode.json*`.
+
+### 3. Usunięcie `GLM-5.3-Flash-oQ2e-mtp`:
+* Z uwagi na świetne wyniki rodziny `Qwen3.8-Flash-Next` (`oQ5e`/`oQ6e`) oraz skłonność 2-bitowego `oQ2e` do zapętleń i gubienia warunków logicznych, model **`GLM-5.3-Flash-oQ2e-mtp`** został całkowicie usunięty z dysku SSD (**+103 GiB** wolnego miejsca) oraz ze wszystkich plików konfiguracyjnych oMLX (`26` modeli), Hermesa (`24` modele) i OpenCode (`26` modeli).
+
+
 
