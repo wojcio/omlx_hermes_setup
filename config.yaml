@@ -478,6 +478,20 @@ skills:
   inline_shell_timeout: 10
   guard_agent_created: false
   creation_nudge_interval: 15
+  disabled:
+  - audiocraft-audio-generation
+  - godmode
+  - heartmula
+  - hermes-s6-container-supervision
+  - linear
+  - minecraft-modpack-server
+  - obliteratus
+  - pixel-art
+  - plan
+  - pokemon-player
+  - polymarket
+  - segment-anything-model
+  - yuanbao
 curator:
   enabled: true
   interval_hours: 168
