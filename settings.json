@@ -22,7 +22,8 @@
     "max_image_upload_size": "50MB",
     "max_request_body_size": "512MB",
     "max_image_side_length": 2048,
-    "gpu_keep_warm_interval": 0.5
+    "gpu_keep_warm_interval": 0.5,
+    "gpu_keep_warm_idle_window": 300.0
   },
   "model": {
     "model_dirs": [
@@ -46,6 +47,7 @@
     "embedding_batch_size": 32,
     "chunked_prefill": false,
     "prefill_priority": "context",
+    "concurrent_priority": "balanced",
     "decode_fairness": true
   },
   "cache": {

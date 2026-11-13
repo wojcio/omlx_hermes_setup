@@ -38,6 +38,15 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Aktualizacja konfiguracji pod oMLX `0.8.0rc1` (build 3731, 13 Listopada 2026):**
+  * **Migracja schematu `model_settings*.json` do `SETTINGS_VERSION = 2` oraz aktualizacja `model_profiles.json`:**
+    - Przemigrowano [`model_settings.json`](model_settings.json), [`model_settings.variant1-single-model.json`](model_settings.variant1-single-model.json) oraz [`model_settings.variant2-dual-model.json`](model_settings.variant2-dual-model.json) przez `ModelSettingsManager` z oMLX `0.8.0rc1` (`version: 1` $\rightarrow$ `2`, jawne wartości domyślne m.in. `turboquant_kv_scheme: "turboquant"`, znormalizowane `turboquant_kv_bits` jako `float`, zachowana wyłączna różnica `is_pinned` w Wariancie 2).
+    - Zsynchronizowano zmigrowany przez `0.8.0rc1` plik [`model_profiles.json`](model_profiles.json) (`qwen35_oq_a8_enabled` $\rightarrow$ `a8_prefill_enabled`, `turboquant_kv_scheme: "turboquant"`).
+  * **Nowe globalne parametry serwera i schedulera w [`settings.json`](settings.json):**
+    - Dodano `scheduler.concurrent_priority: "balanced"` (adaptacyjne dzielenie GPU między nowym prefillem a trwającym dekodowaniem) oraz `server.gpu_keep_warm_idle_window: 300.0` (podtrzymanie wybudzonego GPU po ostatnim żądaniu).
+  * **Weryfikacja sprzętowa M2 Ultra (`applegpu_g14d`, 192 GB) i reload API:**
+    - Potwierdzono `is_nax_available() == False` (`a8_prefill_enabled` pozostaje wyłączone, brak sprzętowych jednostek NAX z M5+) oraz pozostawiono `"turboquant"` zamiast `"affine4"`/`"affine8"` (kernele TensorOps wymagają M5+; na M2 Ultra `Affine4`/`Affine8` używa ścieżki portable z dekwantyzacją).
+    - Zsynchronizowano konfigurację przez `./switch-variant.sh 1` i przeładowano serwer (`POST /admin/api/reload` $\rightarrow$ `200 OK`, `Loaded settings for 27 models`, `0` ostrzeżeń w `server.log`).
 - **Narzędzie audytu użycia i bezpiecznej migracji modeli `move_from_SSD_to_HDD.sh` (12 Listopada 2026):**
   * **Wielopoziomowa agregacja historii użycia:**
     - Skrypt bada rotowane logi `~/.omlx/logs/server.log*` (milisekundowe znaczniki `Loading model:` i `Chat completion:`), bazę SQLite `~/.hermes/state.db` (tabele `sessions` i `session_model_usage`), a w ostateczności czasy modyfikacji plików `config.json` i wag `.safetensors`.
