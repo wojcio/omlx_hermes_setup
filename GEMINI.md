@@ -38,6 +38,8 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Dostosowanie `GLM-5.3-Flash-oQ2e-mtp` (512k + `temperature: 1.0`) po testach A/B z `oQ4e-mtp` (13 Listopada 2026):**
+  * Podniesiono okno kontekstu `GLM-5.3-Flash-oQ2e-mtp` z `262144` (256k) do **`524288` (512k)** oraz skorygowano `temperature` z `0.7` do **`1.0`** (zgodnie z natywnym `generation_config.json`) w [`model_settings.variant1-single-model.json`](model_settings.variant1-single-model.json), [`model_settings.variant2-dual-model.json`](model_settings.variant2-dual-model.json), [`config.variant1-single-model.yaml`](config.variant1-single-model.yaml) i [`config.variant2-dual-model.yaml`](config.variant2-dual-model.yaml). `GLM-5.3-Flash-oQ4e-mtp` pozostawiono przy `262144` (256k) / `temperature: 0.7` ze względu na limit RAM (`173.7 GB` w RAM pod sufitem `186 GB`).
 - **Trwały `LaunchDaemon` dla `iogpu.wired_limit_mb=186777` i powiadomienia macOS (13 Listopada 2026):**
   * **Architektura dwuczęściowa (`LaunchDaemon` + `LaunchAgent`):**
     - [`launchd/com.wojcio.iogpu-wired-limit.plist`](launchd/com.wojcio.iogpu-wired-limit.plist): systemowy `LaunchDaemon` (`/Library/LaunchDaemons/com.wojcio.iogpu-wired-limit.plist`) ustawiający przy starcie systemu `/usr/sbin/sysctl -w iogpu.wired_limit_mb=186777` (95% ze 192 GiB RAM = 182.4 GiB; zostawia ~9.6 GiB bufora dla kernela macOS i WindowServera).
