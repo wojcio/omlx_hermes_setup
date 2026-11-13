@@ -38,6 +38,11 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Trwały `LaunchDaemon` dla `iogpu.wired_limit_mb=186777` i powiadomienia macOS (13 Listopada 2026):**
+  * **Architektura dwuczęściowa (`LaunchDaemon` + `LaunchAgent`):**
+    - [`launchd/com.wojcio.iogpu-wired-limit.plist`](launchd/com.wojcio.iogpu-wired-limit.plist): systemowy `LaunchDaemon` (`/Library/LaunchDaemons/com.wojcio.iogpu-wired-limit.plist`) ustawiający przy starcie systemu `/usr/sbin/sysctl -w iogpu.wired_limit_mb=186777` (95% ze 192 GiB RAM = 182.4 GiB; zostawia ~9.6 GiB bufora dla kernela macOS i WindowServera).
+    - [`launchd/com.wojcio.iogpu-wired-limit-notify.plist`](launchd/com.wojcio.iogpu-wired-limit-notify.plist) + [`launchd/iogpu-wired-limit-notify.sh`](launchd/iogpu-wired-limit-notify.sh): `LaunchAgent` sesji graficznej (`Aqua`) weryfikujący po zalogowaniu `sysctl -n iogpu.wired_limit_mb` i wyświetlający bąbelek powiadomienia macOS (`osascript`) z wpisem do `~/.omlx/logs/wired-limit-notify.log`.
+    - [`./install-wired-limit-daemon.sh`](install-wired-limit-daemon.sh): skrypt instalujący oba komponenty (`sudo ./install-wired-limit-daemon.sh` dla `LaunchDaemon` w `/Library/LaunchDaemons/`).
 - **Aktualizacja konfiguracji pod oMLX `0.8.0rc1` (build 3731, 13 Listopada 2026):**
   * **Migracja schematu `model_settings*.json` do `SETTINGS_VERSION = 2` oraz aktualizacja `model_profiles.json`:**
     - Przemigrowano [`model_settings.json`](model_settings.json), [`model_settings.variant1-single-model.json`](model_settings.variant1-single-model.json) oraz [`model_settings.variant2-dual-model.json`](model_settings.variant2-dual-model.json) przez `ModelSettingsManager` z oMLX `0.8.0rc1` (`version: 1` $\rightarrow$ `2`, jawne wartości domyślne m.in. `turboquant_kv_scheme: "turboquant"`, znormalizowane `turboquant_kv_bits` jako `float`, zachowana wyłączna różnica `is_pinned` w Wariancie 2).

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.wojcio.iogpu-wired-limit-notify</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>__TARGET_HOME__/.omlx/bin/iogpu-wired-limit-notify.sh</string>
+        <string>186777</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+    <key>StandardOutPath</key>
+    <string>__TARGET_HOME__/.omlx/logs/wired-limit-notify.out</string>
+    <key>StandardErrorPath</key>
+    <string>__TARGET_HOME__/.omlx/logs/wired-limit-notify.err</string>
+</dict>
+</plist>
