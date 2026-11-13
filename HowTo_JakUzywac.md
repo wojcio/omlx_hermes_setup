@@ -36,6 +36,7 @@ W otwartej sesji czatu Hermesa możesz w każdej chwili przełączyć model bez 
   ```bash
   hermes -m DeepSeek-V4-Flash-0731-MXFP4-MLX --reasoning high
   ```
+  > 💡 **Wskazówka dla `GLM-5.3-Flash` (`oQ2e` / `oQ4e`):** jego szablon `chat_template.jinja` rozpoznaje wyłącznie poziomy `low` i `high` — każda inna wartość (w tym domyślne w Hermesie `medium`) przełącza model w tryb **`Max`**, w którym potrafi generować 6k–12k+ tokenów samego `<think>`. Gdy zależy Ci na zwięźlejszym rozumowaniu, użyj jawnie `--reasoning high` lub `--reasoning low`.
 * **Praca na bezpiecznej kopii repozytorium (`--worktree`):** Idealne przy dużych refaktoringach:
   ```bash
   hermes -m Qwen3-Coder-Next-MLX-9bit --worktree

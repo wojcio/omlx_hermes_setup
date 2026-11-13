@@ -8,7 +8,7 @@ Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.7.4.dev1** (Apple **MLX 0.32.
 
 Szczegółowy opis wszystkich **25 modeli w Hermesie (27 w oMLX)** — w tym nowych rodzin:
 - **`Qwen3.8-Flash-Next-oQ5e-mtp`** (~119.9 GB, **67.5–97 tok/s**) oraz **`Qwen3.8-Flash-Next-oQ6e-mtp`** (6-bit, ~141.1 GB, **60.6–63.9 tok/s**) i **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** (**~73.5 tok/s**),
-- **`GLM-5.3-Flash-oQ4e-mtp`** (320B MoE / 18B akt., 173.9 GB w 100% w RAM, TTFT **0.17s**, **25.9–29.9 tok/s**) oraz **`GLM-5.3-Flash-oQ2e-mtp`** (320B MoE w hybrydowym 2-bit/4-bit, tylko **102.9 GB RAM**, **32.1–37.6 tok/s**),
+- **`GLM-5.3-Flash-oQ4e-mtp`** (320B MoE / 18B akt., 173.9 GB w 100% w RAM, TTFT **0.17s**, **25.9–29.9 tok/s**) oraz **`GLM-5.3-Flash-oQ2e-mtp`** (320B MoE w hybrydowym 2-bit/4-bit, tylko **102.9 GB RAM**, okno **512k**, `temp 1.0`, **32.1–37.6 tok/s**),
 - **`gemma-4-12B-it-oQ8e-mtp`** (Any-to-Any VLM/Audio, 13.0 GB, **51.4–68.4 tok/s**) oraz **`gemma-4-31B-it-oQ6e-mtp`** (Dense 31B VLM, 26.3 GB, `gemma4_verify_kernel`, **32.4–34.0 tok/s**),
 - **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** (2-bit Hadamard 27B VLM, tylko **8.23 GB RAM**, **31.4 tok/s**) oraz **`Nanbeige4.3-33B-MLX-6bit`** (Dense 33B, okno **512k tokenów**, **19.6 tok/s**),
 - autonomicznego agenta kodującego **`flint-oQ8e`** (MoE 39.8B, 2.5B akt./tok, do **74.1 tok/s**), **`DeepSeek-V4-Flash-0731-MXFP4-MLX`**, **`Qwen3.8-27B-Coder390-...-MTP-DFlash2`**, **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** (Splash 1.6.0-m1, do **64.0 tok/s**) oraz modeli zarchiwizowanych na zewnętrznym dysku USB-C z oznaczeniem **`[HDD]`** (`Qwen3.5-122B`, `Qwen3-Coder-Next`, `Qwen3-235B`) — znajdziesz w plikach:

@@ -160,6 +160,20 @@ Wyniki pomiarów przeprowadzonych na Mac Studio M2 Ultra (192 GB Unified Memory,
 | **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** | `prism_hadamard_qwen35` (VLM) | **`8.23 GB`** | `0.77s` | **31.41 tok/s** | 2-bit Hadamard, automatyczne zwolnienie 420 MB biasów t5, KV 8-bit |
 | **`Nanbeige4.3-33B-MLX-6bit`** | `llama` (Dense 33B, **512k**) | `25.23 GB` | `0.93s` | **19.42 – 19.58 tok/s** | Okno kontekstu **524 288 tokenów (512k)**, KV 8-bit (`skip_last`) |
 
+### 5.3. Porównanie A/B `GLM-5.3-Flash-oQ2e-mtp` vs `GLM-5.3-Flash-oQ4e-mtp` (13 Listopada 2026)
+
+Bezpośrednie testy porównawcze na Mac Studio M2 Ultra (192 GB RAM, czyste wywołania API oMLX w trybie domyślnym `Max` z pełnym czyszczeniem RAM między modelami):
+
+* **Architektura kwantów (`README.md` / `oq_imatrix_report.json`):** W obu checkpointach warstwy krytyczne (`8.976B` wag Affine 8-bit, `0.607B` BF16, `0.086B` FP32, Vision Encoder `1.050 GiB`, głowica MTP `4.013 GiB`) oraz kalibracja imatrix (`oqe_code_multilingual`, 100% pokrycia `38 688` ekspertów) są identyczne. Różni się wyłącznie `304.406B` wag routowanych ekspertów MoE (Affine 2-bit `2.746 bpw` w `oQ2e` vs Affine 4-bit `4.641 bpw` z nowszym „Better Low-Bit oQ” `#4776` w `oQ4e`).
+* **Pamięć i szybkość:**
+  * `oQ2e-mtp`: `102.87 GB` w RAM (`107.86 GB` estymacja), cold-load **18.87 s**, generacja **30.4–35.1 tok/s**.
+  * `oQ4e-mtp`: `173.73 GB` w RAM (`182.28 GB` estymacja pod limitem `186 GB`), cold-load **177.07 s**, generacja **25.0–30.0 tok/s**, wyraźnie głębsze trafienia MTP (`d3 = 968/1285` vs `414/546` w zadaniu kombinatorycznym).
+* **Jakość rozumowania i wnioski konfiguracyjne:**
+  * **Tool-calling na czystym prompcie:** oba modele zdały w ~5.4–5.6 s (`oQ4e` w 37 tok, `oQ2e` w 67 tok).
+  * **Wielowarunkowa logika / bug-hunt / kombinatoryka:** `oQ4e` rozwiązał zagadkę z 5 warunkami bezbłędnie (wyłapując dodatkowo dwuznaczność sformułowania) oraz użył zwięzłego dowodu bijekcją, podczas gdy `oQ2e` pogubił warunek w zagadce logicznej i częściej wpadał w rozwlekłe wyliczanie ręczne lub pętle powtórzeń w długim `<think>`.
+  * **Korekta ustawień:** dla **`GLM-5.3-Flash-oQ2e-mtp`** podniesiono okno do **`524 288` (512k)** (lekki hybrydowy KV cache: 34× linear attention + 11× MLA zużywa tylko ~11 MB / 1k tok) i ustawiono **`temperature: 1.0`** zgodnie z natywnym `generation_config.json`, aby ograniczyć pętle powtórzeń. **`GLM-5.3-Flash-oQ4e-mtp`** pozostawiono przy **`262 144` (256k)** i **`temperature: 0.7`** ze względu na niewielki zapas RAM pod sufitem `186 GB`.
+  * **Pułapka `chat_template.jinja`:** szablon modelu rozpoznaje wyłącznie `low` i `high` — każde inne ustawienie (w tym `effort: medium` z Hermesa) aktywuje tryb **`Max`**.
+
 ---
 
 ## 6. Zestawienie Plików Konfiguracyjnych

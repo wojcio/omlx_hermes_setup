@@ -475,5 +475,25 @@ Skrypt łączy dane z czterech niezależnych źródeł, zapewniając 100% precyz
   * Dla progu 14 dni skrypt wskazał 14 kandydatów o łącznym rozmiarze **840.1 GiB** (m.in. `Step-3.5-Flash-4bit` 103.2 GB, `DeepSeek-V4-Flash-AWQ` 100.8 GB, `MiniMax-M3` 155.6 GB, `Laguna-S-2.1` 116.3 GB, `Ornith-35B` 65.4 GB).
   * Wiele z tych modeli posiada już identyczne kopie na HDD, co pozwala na natychmiastowe utworzenie symlinków bez konieczności ponownego transferu przez USB-C.
 
+---
+
+## 🧪 22. Porównanie A/B `GLM-5.3-Flash-oQ2e-mtp` vs `oQ4e-mtp`, Analiza Pętli w Sesji Hermesa oraz Tuning 512k / `temp 1.0` (13 Listopada 2026)
+
+### 1. Diagnoza sesji Hermesa `20261019_085129_ca310c` (`GLM-5.3-Flash-oQ2e-mtp`):
+* Analiza bazy `~/.hermes/state.db`, `agent.log` / `desktop.log` oraz `~/.omlx/logs/server.log` wykazała, że po przełączeniu w locie starej sesji z `2026-10-19` na `GLM-5.3-Flash-oQ2e-mtp` i wysłaniu zapytania bez narzędziowej akcji na starcie (`16 585` tok prefillu), model wygenerował `8 665` tokenów w samym kanale `reasoning` i wpadł w pętlę powtórzeń (`copy=5989/6083 in 869` cykli MTP), co detektor Hermesa (`chat_completion_helpers.py`) uciął komunikatem `runaway repetition loop`.
+* Wykryto dodatkowy mechanizm w `chat_template.jinja` GLM-5.3-Flash: szablon rozpoznaje wyłącznie `reasoning_effort` w `['low', 'high']`, a wszystko inne (w tym domyślne w Hermesie `effort: medium`) wpada w `else 'max'` (**`Reasoning Effort: Max`**), gwałtownie wydłużając fazę `<think>`.
+
+### 2. Kontrolowany test A/B `oQ2e-mtp` vs `oQ4e-mtp` na lokalnym oMLX:
+* Oba modele przetestowano kolejno (z pełnym `unload` między przebiegami) na 4 identycznych zadaniach (`1_tool_call_repo`, 5-warunkowa zagadka logiczna, bug-hunt `asyncio`, kombinatoryka `114`):
+  * **Tool-calling:** oba przeszły czysto w ~5.4–5.6 s (`oQ4e`: 37 tok, `oQ2e`: 67 tok).
+  * **Ładowanie i przepustowość:** `oQ2e` (`102.87 GB`, cold-load **18.87 s**, **30.4–35.1 tok/s**) vs `oQ4e` (`173.73 GB`, cold-load **177.07 s**, **25.0–30.0 tok/s**, wyższa głębokość akceptacji MTP `d3=968/1285` vs `414/546`).
+  * **Jakość rozumowania w `<think>`:** w zagadce logicznej `oQ4e` znalazł poprawne rozwiązanie i zauważył dwuznaczność sformułowania, a w kombinatoryce zastosował dowód bijekcją cykliczną (`114`), podczas gdy `oQ2e` zgubił warunek w zagadce logicznej (`"no solutions"`) i grzązł w ręcznym wyliczaniu przypadków.
+
+### 3. Dostosowanie konfiguracji (`omlx_hermes_config` + `opencode_omlx`):
+* Z uwagi na zapas RAM (`102.9 GB`) oraz lekki hybrydowy KV cache (`34` warstwy linear attention + `11` warstw MLA: ok. `+0.18 GB` dla `16.6k` tokenów), dla **`GLM-5.3-Flash-oQ2e-mtp`**:
+  * podniesiono okno kontekstu do **`524 288` (512k)** w `model_settings*.json`, `config*.yaml`, `opencode.json*` i dokumentacji `.md`,
+  * zmieniono `temperature` z `0.7` na **`1.0`** (zgodnie z natywnym `generation_config.json`), aby ograniczyć zapętlanie przy 2-bitowym `<think>`.
+* **`GLM-5.3-Flash-oQ4e-mtp`** pozostawiono przy **`262 144` (256k)** i **`temperature: 0.7`** (estymacja `182.28 GB` blisko sufitu `186 GB`).
+* Zsynchronizowano konfigurację przez `./switch-variant.sh 1 --local`, przeładowano serwer (`POST /admin/api/reload` $\rightarrow$ `200 OK`) i wypchnięto zmiany do obu repozytoriów (`omlx_hermes_setup` oraz `open_code_config`).
 
 
