@@ -850,7 +850,10 @@
       "is_hidden": false,
       "is_favorite": true,
       "trust_remote_code": true,
-      "embedding_audio_enabled": false
+      "embedding_audio_enabled": false,
+      "display_name": "[HDD] MiniMax-M3-ConfigI-MLX",
+      "model_alias": "[HDD] MiniMax-M3-ConfigI-MLX",
+      "description": "Archiwum na zewnętrznym dysku USB-C HDD (/Volumes/Seagate_Expansion_Drive/LLM)"
     },
     "Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2": {
       "max_context_window": 262144,
