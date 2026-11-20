@@ -1,6 +1,6 @@
 # oMLX & Hermes Setup
 
-Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.0rc1** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.6.1-m1**, **Lightning MTP**, **DFlash2**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **24 modeli w Hermesie (26 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
+Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.0** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.6.1-m1.1**, **Lightning MTP**, **DFlash2**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **24 modeli w Hermesie (26 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
 
 ---
 
@@ -11,7 +11,7 @@ Szczegółowy opis wszystkich **24 modeli w Hermesie (26 w oMLX)** — w tym now
 - **`GLM-5.3-Flash-oQ4e-mtp`** (320B MoE / 18B akt., 173.9 GB w 100% w RAM, TTFT **0.17s**, **25.5–32.8 tok/s**),
 - **`gemma-4-12B-it-oQ8e-mtp`** (Any-to-Any VLM/Audio, 13.0 GB, **51.4–68.4 tok/s**) oraz **`gemma-4-31B-it-oQ6e-mtp`** (Dense 31B VLM, 26.3 GB, `gemma4_verify_kernel`, **32.4–34.0 tok/s**),
 - **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** (2-bit Hadamard 27B VLM, tylko **8.23 GB RAM**, **31.4 tok/s**) oraz **`Nanbeige4.3-33B-MLX-6bit`** (Dense 33B, okno **512k tokenów**, **19.6 tok/s**),
-- autonomicznego agenta kodującego **`flint-oQ8e`** (MoE 39.8B, 2.5B akt./tok, do **74.1 tok/s**), **`DeepSeek-V4-Flash-0731-MXFP4-MLX`**, **`Qwen3.8-27B-Coder390-...-MTP-DFlash2`**, **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** (**Splash 1.6.1-m1**, **69.2 tok/s** średnio / do **91.2 tok/s** w OpenCode) oraz modeli zarchiwizowanych na zewnętrznym dysku USB-C z oznaczeniem **`[HDD]`** (`Qwen3.5-122B`, `Qwen3-Coder-Next`, `Qwen3-235B`, `Step-3.5-Flash`, `Qwen3.8-27B-FP16_huzar_v1` / `-SPLASH`) — znajdziesz w plikach:
+- autonomicznego agenta kodującego **`flint-oQ8e`** (MoE 39.8B, 2.5B akt./tok, do **74.1 tok/s**), **`DeepSeek-V4-Flash-0731-MXFP4-MLX`**, **`Qwen3.8-27B-Coder390-...-MTP-DFlash2`**, **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** (**Splash 1.6.1-m1.1**, **69.2 tok/s** średnio / do **91.2 tok/s** w OpenCode) oraz modeli zarchiwizowanych na zewnętrznym dysku USB-C z oznaczeniem **`[HDD]`** (`Qwen3.5-122B`, `Qwen3-Coder-Next`, `Qwen3-235B`, `Step-3.5-Flash`, `Qwen3.8-27B-FP16_huzar_v1` / `-SPLASH`) — znajdziesz w plikach:
 
 👉 **[Przewodnik Użytkownika & Use Cases dla 7 Ról (HowTo_JakUzywac.md)](HowTo_JakUzywac.md)**  
 👉 **[Konfiguracja Techniczna Modeli & Hugging Face (konfiguracja-modeli.md)](konfiguracja-modeli.md)**
@@ -40,7 +40,7 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 
 2. **Wariant 2: `Dual-Model Resident` (Dedykowany Szybki Kompresor 27B)**
    - Model główny: `Qwen3.8-Flash-Next-oQ5e-mtp` (256k) lub `Qwen3.5-122B-A10B-MLX-9bit`
-   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.6.1-m1**)
+   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.6.1-m1.1**)
    - *Ultraszybki (średnio **69.2 tok/s** i do **91.2 tok/s** w OpenCode), dedykowany model Splash z podziałem GPU/ANE (share 0.26), off-loop kompilacją Metal (fix `paperniuk/splash#62`) i akceleracją DFlash2 (3.6–5.8 tok/cykl) do podsumowań kontekstu współistniejący z modelem głównym.*
 
 ### 🔄 Szybkie przełączanie wariantów:

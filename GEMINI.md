@@ -15,7 +15,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
    - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 24 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.6.1-m1**) jako dedykowany szybki kompresor.
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.6.1-m1.1**) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
@@ -38,6 +38,11 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Aktualizacja do oMLX `0.8.0` (build `3789`) & Splash `1.6.1-m1.1` oraz weryfikacja poprawki `MiniMax-M3` (`#5233`, 20 Listopada 2026):**
+  * **Splash `1.6.1-m1.1`:** Zaktualizowano `/opt/homebrew/bin/splash-m1` z `1.6.1-m1` do **`1.6.1-m1.1`** (poprawka streamowania ekspertów MoE `#63`/`#65` oraz opcjonalny dwuchunkowy prefill GPU+ANE dla 27B `#64`).
+  * **oMLX `0.8.0` & [`settings.json`](settings.json):** Zweryfikowano 100% zgodność `model_settings.json` (`SETTINGS_VERSION = 2`, 86 pól, 26 modeli) i `model_profiles.json` oraz dopisano nowe pole `integrations.splash_activations: "bf16"` (`#5337`) do [`settings.json`](settings.json) + zsynchronizowano przez `./switch-variant.sh 1`.
+  * **Weryfikacja naprawy `MiniMax-M3-ConfigI-MLX` (`jundot/omlx#5233` / PR `#5239`):** Re-test w [`omlx_bench.sh`](omlx_bench.sh) (`bench_results/20261120_194439`) zakończony wynikiem **PASS** (`max_prompt=16376`, `25.1 tok/s` decode, `155.6 GB` RAM, `0` błędów Metal; log potwierdza przełączenie na `masked sparse path`, zimny prefill 15.4k = `211.7s`, tura 2 z cache 14.3k = `20.5s`; w OpenCode model zakończył po krótkiej odpowiedzi 80 zn.).
+  * Zaktualizowano wersje `oMLX 0.8.0` / `Splash 1.6.1-m1.1` w dokumentacji (`README.md`, `konfiguracja-modeli.md`, `HowTo_JakUzywac.md`, `opencode_omlx`) oraz skillu [`mlx-inference-optimization`](~/.hermes/skills/mlops/mlx-inference-optimization/SKILL.md) (`v2.1`).
 - **Audyt, aktualizacja i porządki w skillach Hermesa (`~/.hermes/skills` + `skills.disabled` w `config*.yaml`, 13 Listopada 2026):**
   * **Przywrócenie i aktualizacje:** Przywrócono wbudowany skill `hermes-agent` do wersji fabrycznej (`3.3.0`, `hermes skills reset hermes-agent --restore --yes`) oraz zaktualizowano wszystkie 3 przestarzałe skille z Huba (`baoyu-article-illustrator`, `baoyu-comic`, `sketch` — `0 update(s) available`).
   * **Odinstalowanie zablokowanych skilli Huba:** Usunięto 4 skille odrzucane przez audyt (`gif-search`, `weights-and-biases`, `llama-cpp`, `huggingface-hub`) — wszystkie pozostałe `11` skilli z Huba ma status `SAFE` / `ALLOWED` i `up_to_date`.

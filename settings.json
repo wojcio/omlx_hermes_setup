@@ -135,7 +135,8 @@
     "splash_kv_format": "int8",
     "splash_max_memory_gb": null,
     "splash_ssd_cache_gb": null,
-    "splash_ane_prefill": true
+    "splash_ane_prefill": true,
+    "splash_activations": "bf16"
   },
   "ui": {
     "language": "en",

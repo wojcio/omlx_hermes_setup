@@ -22,7 +22,7 @@ hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-
 # Start z najszybszym modelem ogólnym (~73.5 tok/s z tablicą ngramów)
 hermes -m Qwen3.8-Flash-Next-MTPLX-Optimized-Speed
 
-# Błyskawiczne polecenie z linii komend napędzane silnikiem Splash 1.6.1-m1 (~69.2 śr. / do 91.2 tok/s)
+# Błyskawiczne polecenie z linii komend napędzane silnikiem Splash 1.6.1-m1.1 (~69.2 śr. / do 91.2 tok/s)
 hermes -m Qwen3.8-27B-Uncensored-MLX-SPLASH -z "Przedstaw w 3 punktach podsumowanie kluczowych zalet silnika Splash w oMLX."
 ```
 
@@ -246,11 +246,11 @@ Poniższa tabela pozwala szybko porównać wszystkie 24 modele pod kątem ich ro
 | 8 | **`Nanbeige4.3-33B-MLX-6bit`** | 📚 Gęsty 33B / Okno **512k** | **512k** | ~25.2 GB | Nie | Gęsty model 33B do zadań agentowych i analizy gigantycznych repozytoriów z oknem aż **524 288 tokenów (512k)** (**19.6 tok/s**). |
 | 9 | **`flint-oQ8e`** | 🤖 Autonomous Agent MoE | 256k | ~39.4 GB | Nie | **Lider agentic coding** (SWE-bench, Terminal-Bench), MoE 40B (256 eksp., 2.5B akt./tok), oQ8e iMatrix, dedykowany kernel decode, do **74.1 tok/s**. |
 | 10 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-`**<br>**`GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~30.6 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, natywne Lightning MTP `mtp-bf16`, 8-bit KV Cache). |
-| 11 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.6.1-m1** (One memory ledger, Idle KV, Metal/ANE split `0.26` + DFlash2, **69.2 tok/s śr. / 91.2 tok/s szczyt**); przypięty kompresor Wariantu 2. |
+| 11 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.6.1-m1.1** (One memory ledger, Idle KV, Metal/ANE split `0.26` + DFlash2, **69.2 tok/s śr. / 91.2 tok/s szczyt**); przypięty kompresor Wariantu 2. |
 | 12 | **`Qwen3.8-27B-Uncensored-MLX`** | 🔓 Szybki Uncensored (MLX) | 256k | ~15 GB | Nie | Bardzo lekki model bez cenzury z natywnym dekodowaniem spekulatywnym **DFlash2 (`Qwen3.8-27B-DFlash2`)** i 8-bit KV Cache. |
 | 13 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~159 GB | Nie | Najtrudniejsze problemy algorytmiczne i architektoniczne (embedded DSpark MTP depth 3, **31–34.6 tok/s** do 45k, **~21–24 tok/s** przy >210k). |
 | 14 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4 (Lightning MTP + MLA), gdy potrzebujesz mniejszego zużycia RAM. |
-| 15 | **`MiniMax-M3-ConfigI-MLX`** | 🌐 Multimodal MoE | 128k | ~156 GB | **Tak** | Potężny model 60-warstwowy z własnym stylem rozumowania (`<mm:think>`) i analizą obrazu *(znany błąd >4k tok na M2 Ultra: `jundot/omlx#5233`)*. |
+| 15 | **`MiniMax-M3-ConfigI-MLX`** | 🌐 Multimodal MoE | 128k | ~156 GB | **Tak** | Potężny model 60-warstwowy z własnym stylem rozumowania (`<mm:think>`) i analizą obrazu *(w oMLX 0.8.0 naprawiono `#5233`: działa >4k tok przez masked sparse fallback, `25.1 tok/s`)*. |
 | 16 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury. |
 | 17 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) i Fused MoE do pracy narzędziowej. |
 | 18 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z natywnym parserem `laguna` w oMLX 0.7.2+, Fused MoE i sliding window 512 do zadań inżynierskich. |
