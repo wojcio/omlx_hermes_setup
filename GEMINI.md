@@ -10,12 +10,12 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla **24 modeli w Hermesie (26 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla **26 modeli w Hermesie (28 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
    - Praktyczny przewodnik obsługi CLI oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych (Use Cases) znajduje się w [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 24 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.6.1-m1.1**) jako dedykowany szybki kompresor.
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 26 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.0-m1**) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
@@ -38,6 +38,12 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Aktualizacja do oMLX `0.8.2` (build `3849`) & Splash `1.7.0-m1` oraz wdrożenie `Hy4-flash-oQ4h-mtp` i `Inkling-2-Mini-oQ4e-mtp` (21 Listopada 2026):**
+  * **Splash `1.7.0-m1`:** Zaktualizowano `/opt/homebrew/bin/splash-m1` do **`1.7.0-m1`** (automatyczna kalibracja dwuchunkowego prefillu GPU+ANE `#66`, szybszy 4-bit MLX decode `#69`/`#70`, INT8 cached states ~3× mniejsze, upstream `1.7.0`).
+  * **oMLX `0.8.2` (build `3849`):** Zweryfikowano 100% zgodność `model_settings.json` (`SETTINGS_VERSION = 2`, `87` pól z obsługą LoRA `#5449`), `settings.json` i `model_profiles.json` (`0` błędnych kluczy).
+  * **Nowe modele (`26` w Hermesie / `28` w oMLX i OpenCode) + benchmark [`omlx_bench.sh`](omlx_bench.sh) (`bench_results/20261121_222633`):**
+    - **`Jundot/Hy4-flash-oQ4h-mtp`** (`123.6 GB` RAM, VLM, 512 eksp. top-16, nowy format `oQh`, Lightning MTP `81.9%` / `2.91 tok/cykl`, okno `256k` z natywnego `1M`): **`35.0 tok/s`** śr. (do **`42.9 tok/s`**) aż przy `75.6k` promptu (`0` błędów Metal); w OpenCode złapał `TIMEOUT` `480.1s` z powodu bardzo głębokiej eksploracji (`11` tur / `22` wywołania narzędzi, skok kontekstu do `70.1k`).
+    - **`mlx-community/Inkling-2-Mini-oQ4e-mtp`** (`17.5 GB` RAM, VLM, 128 eksp. top-8, pętla `3×`, bundled DSpark `block=8 depth=7`, `76.0%` / `2.69 tok/cykl`, okno `256k` z natywnego `1M`): **PASS w `170.9s`** (`7` tur, `7` narzędzi bez powtórzeń, `max_prompt=34 211`, **`38.2 tok/s`** śr. / do **`49.4 tok/s`**, bardzo szczegółowy opis **`4778 zn.`**).
 - **Aktualizacja do oMLX `0.8.0` (build `3789`) & Splash `1.6.1-m1.1` oraz weryfikacja poprawki `MiniMax-M3` (`#5233`, 20 Listopada 2026):**
   * **Splash `1.6.1-m1.1`:** Zaktualizowano `/opt/homebrew/bin/splash-m1` z `1.6.1-m1` do **`1.6.1-m1.1`** (poprawka streamowania ekspertów MoE `#63`/`#65` oraz opcjonalny dwuchunkowy prefill GPU+ANE dla 27B `#64`).
   * **oMLX `0.8.0` & [`settings.json`](settings.json):** Zweryfikowano 100% zgodność `model_settings.json` (`SETTINGS_VERSION = 2`, 86 pól, 26 modeli) i `model_profiles.json` oraz dopisano nowe pole `integrations.splash_activations: "bf16"` (`#5337`) do [`settings.json`](settings.json) + zsynchronizowano przez `./switch-variant.sh 1`.

@@ -101,6 +101,16 @@ providers:
         context_length: 262144
         max_tokens: 32768
         supports_vision: true
+      Hy4-flash-oQ4h-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
+      Inkling-2-Mini-oQ4e-mtp:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
       gemma-4-12B-it-oQ8e-mtp:
         context_window: 262144
         context_length: 262144
