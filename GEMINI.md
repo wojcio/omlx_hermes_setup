@@ -10,11 +10,11 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla **26 modeli w Hermesie (28 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla **27 modeli w Hermesie (29 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
    - Praktyczny przewodnik obsługi CLI oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych (Use Cases) znajduje się w [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 26 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 27 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
    - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.0-m1**) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
@@ -38,6 +38,11 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Wdrożenie `Inkling-Small-mxfp4` i pełny benchmark wszystkich 19 modeli SSD (`19/19 PASS`, 23 Listopada 2026):**
+  * **Nowy model `mlx-community/Inkling-Small-mxfp4` (`27` modeli w Hermesie / `29` w oMLX i OpenCode):** Skonfigurowano Thinking Machines Inkling 1 Small (`130.6 GB` RAM, VLM, 42 warstwy, 256 eksp. top-6, okno `256k` z natywnego `1M`, `temp 1.0`, `top_p 0.95`) w `model_settings*.json`, `config*.yaml` oraz `opencode.json*`, zsynchronizowano `./switch-variant.sh 1` i przeładowano oMLX.
+  * **Pełny benchmark [`omlx_bench.sh`](omlx_bench.sh) (`bench_results/20261123_002131`, `oMLX 0.8.2` + `Splash 1.7.0-m1` + `OpenCode v2.3.2`, `--variant high --timeout 600`):** **19/19 PASS**, `0` błędów, `0` timeoutów i `0` powtórzonych wywołań narzędzi (`rep=0`) na całej stawce aktywnych modeli SSD!
+    - Liderzy szybkości decode: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (**`72.9 tok/s`** na `Splash 1.7.0-m1`), `Qwen3.8-Flash-Next-oQ6e-mtp` (**`64.2 tok/s`**, `129.1s`), `Qwen3.8-Flash-Next-oQ5e-mtp` (**`61.0 tok/s`**, `122.5s`), `flint-oQ8e` (**`60.6 tok/s`**, `92.4s`, `4157 zn.`), `Ornith-1.5-35B` (**`52.0 tok/s`**, `70.9s`).
+    - Nowe modele: `Inkling-Small-mxfp4` (**PASS `124.4s`**, **`40.2 tok/s`**, `130.6 GB`, `1355 zn.`), `Hy4-flash-oQ4h-mtp` (**PASS `185.4s`**, `32.6 tok/s`, MTP `78.5%`, **`3741 zn.`**), `Inkling-2-Mini-oQ4e-mtp` (**PASS `160.8s`**, `32.2 tok/s`, `15.7 GB`, **`3693 zn.`**).
 - **Aktualizacja do oMLX `0.8.2` (build `3849`) & Splash `1.7.0-m1` oraz wdrożenie `Hy4-flash-oQ4h-mtp` i `Inkling-2-Mini-oQ4e-mtp` (21 Listopada 2026):**
   * **Splash `1.7.0-m1`:** Zaktualizowano `/opt/homebrew/bin/splash-m1` do **`1.7.0-m1`** (automatyczna kalibracja dwuchunkowego prefillu GPU+ANE `#66`, szybszy 4-bit MLX decode `#69`/`#70`, INT8 cached states ~3× mniejsze, upstream `1.7.0`).
   * **oMLX `0.8.2` (build `3849`):** Zweryfikowano 100% zgodność `model_settings.json` (`SETTINGS_VERSION = 2`, `87` pól z obsługą LoRA `#5449`), `settings.json` i `model_profiles.json` (`0` błędnych kluczy).

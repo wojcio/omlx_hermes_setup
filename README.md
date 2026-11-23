@@ -1,6 +1,6 @@
 # oMLX & Hermes Setup
 
-Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.2** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.7.0-m1**, **Lightning MTP**, **DSpark**, **DFlash2**, **oQh Rotated Codes**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **26 modeli w Hermesie (28 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
+Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.2** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.7.0-m1**, **Lightning MTP**, **DSpark**, **DFlash2**, **oQh Rotated Codes**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **27 modeli w Hermesie (29 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
 
 ---
 

@@ -111,6 +111,11 @@ providers:
         context_length: 262144
         max_tokens: 32768
         supports_vision: true
+      Inkling-Small-mxfp4:
+        context_window: 262144
+        context_length: 262144
+        max_tokens: 32768
+        supports_vision: true
       gemma-4-12B-it-oQ8e-mtp:
         context_window: 262144
         context_length: 262144

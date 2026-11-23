@@ -1,6 +1,6 @@
 # Przewodnik Użytkownika: Jak i Do Czego Używać Hermesa z Modelami oMLX
 
-Praktyczna instrukcja obsługi agenta **Hermes** współpracującego z lokalnym serwerem **oMLX** na platformie Apple Silicon (Mac Studio 192 GB Unified Memory, limit GPU Metal podniesiony do **186 GB**). Dokument zawiera ściągawkę z najważniejszych komend CLI oraz dobór optymalnych modeli z bazy **26 skonfigurowanych modeli** w Hermesie (**28 modeli** w oMLX) pod kątem konkretnych ról zawodowych i codziennych scenariuszy użycia.
+Praktyczna instrukcja obsługi agenta **Hermes** współpracującego z lokalnym serwerem **oMLX** na platformie Apple Silicon (Mac Studio 192 GB Unified Memory, limit GPU Metal podniesiony do **186 GB**). Dokument zawiera ściągawkę z najważniejszych komend CLI oraz dobór optymalnych modeli z bazy **27 skonfigurowanych modeli** w Hermesie (**29 modeli** w oMLX) pod kątem konkretnych ról zawodowych i codziennych scenariuszy użycia.
 
 ---
 
@@ -230,9 +230,9 @@ hermes -m Qwen3.5-122B-A10B-MLX-9bit -z "Napisz uprzejme, ale stanowcze wezwanie
 
 ---
 
-## 3. Wielka Ściąga: Katalog Wszystkich 26 Modeli w Hermesie (28 w oMLX)
+## 3. Wielka Ściąga: Katalog Wszystkich 27 Modeli w Hermesie (29 w oMLX)
 
-Poniższa tabela pozwala szybko porównać wszystkie 26 modeli pod kątem ich rozmiaru w pamięci RAM, okna kontekstu oraz głównego przeznaczenia:
+Poniższa tabela pozwala szybko porównać wszystkie 27 modeli pod kątem ich rozmiaru w pamięci RAM, okna kontekstu oraz głównego przeznaczenia:
 
 | # | Nazwa Modelu (`hermes -m ...`) | Kategoria | Okno | Rozmiar RAM | Vision (VLM) | Kiedy wybierać? |
 | :-: | :--- | :--- | :---: | :---: | :---: | :--- |
@@ -241,7 +241,8 @@ Poniższa tabela pozwala szybko porównać wszystkie 26 modeli pod kątem ich ro
 | 3 | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | ⚡ Ultra-Fast Agent | 256k | ~120.8 GB | **Tak** | Gdy liczy się **maksymalna prędkość (~73.5 tok/s, Fused GDN Decode + 128 shardów N-gram)** w długich sesjach agentowych i obsługa obrazów. |
 | 4 | **`GLM-5.3-Flash-oQ4e-mtp`** | 🏛️ Kolos 320B MoE (4-bit) | 256k | ~173.9 GB | **Tak** | Flagowy 320B MoE (18B akt./tok) w 100% w RAM (limit 186 GB), Fused KDA prework, **TTFT 0.17s**, Lightning MTP (82.5% akceptacji, **25.9–29.9 tok/s**). |
 | 4a | **`Hy4-flash-oQ4h-mtp`** | 🐉 Tencent Hy4-flash (`oQ4h`) | 256k | ~123.6 GB | **Tak** | 512 eksp. (top-16), nowy format `oQh` z oMLX `0.8.2`, Lightning MTP (**81.9%**), **35.0 tok/s śr.** (do **42.9 tok/s**). |
-| 4b | **`Inkling-2-Mini-oQ4e-mtp`** | ⚡ Lekki Agent VLM (DSpark) | 256k | ~17.5 GB | **Tak** | Zaskakująco dokładny lekki VLM MoE (pętla `3×`, DSpark `76.0%`, **38.2–49.4 tok/s**; PASS `4778 zn.` w OpenCode). |
+| 4b | **`Inkling-2-Mini-oQ4e-mtp`** | ⚡ Lekki Agent VLM (DSpark) | 256k | ~17.5 GB | **Tak** | Zaskakująco dokładny lekki VLM MoE (pętla `3×`, DSpark `67.8–76.0%`, **32.2–49.4 tok/s**; PASS `3693–4778 zn.` w OpenCode). |
+| 4c | **`Inkling-Small-mxfp4`** | 🧠 Inkling 1 Small (MXFP4) | 256k | ~130.6 GB | **Tak** | Thinking Machines Inkling 1 Small (256 eksp. top-6, VLM, **40.2 tok/s**, PASS `124.4s` w OpenCode). |
 | 5 | **`gemma-4-12B-it-oQ8e-mtp`** | ⚡ Any-to-Any (VLM + Audio) | 256k | ~13.0 GB | **Tak (+Audio)** | Lekki, błyskawiczny model Google Gemma 4 (`gemma4_unified`, 8-bit, FP16 recast, Lightning MTP do `d8`, **51.4–68.4 tok/s**). |
 | 6 | **`gemma-4-31B-it-oQ6e-mtp`** | 🧠 Dense 31B VLM (Gemma 4) | 256k | ~26.3 GB | **Tak** | Gęsty model 31B VLM z dedykowanym kernelem `gemma4_verify_kernel`, FP16 recast (+42% speedup) i akceptacją MTP **88.4% (`4.38 tok/cykl`, 32.4–34.0 tok/s)**. |
 | 7 | **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** | 🪶 Ultralekki 27B Hadamard | 256k | **~8.23 GB** | **Tak** | Kwantyzacja 2-bit Hadamard (`prism_hadamard_qwen35`): pełny model 27B VLM zajmujący zaledwie **8.23 GB RAM** i generujący **31.4 tok/s**. |
