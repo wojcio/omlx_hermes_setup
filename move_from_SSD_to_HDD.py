@@ -30,7 +30,24 @@ HDD_BASE_DIR = Path("/Volumes/Seagate_Expansion_Drive/LLM")
 OMLX_LOGS_DIR = Path.home() / ".omlx" / "logs"
 HERMES_DB_PATH = Path.home() / ".hermes" / "state.db"
 OMLX_API_URL = "http://127.0.0.1:8000"
-OMLX_API_KEY = "sk-omlx-0Thr9X0jHr1U2T2ReS17j6Vi"
+
+
+def _load_omlx_api_key() -> str:
+    env_key = os.environ.get("OMLX_API_KEY", "").strip()
+    if env_key and not env_key.startswith("YOUR_"):
+        return env_key
+    settings_path = Path.home() / ".omlx" / "settings.json"
+    if settings_path.exists():
+        try:
+            key = json.loads(settings_path.read_text()).get("auth", {}).get("api_key", "")
+            if key and not str(key).startswith("YOUR_"):
+                return str(key)
+        except Exception:
+            pass
+    return ""
+
+
+OMLX_API_KEY = _load_omlx_api_key()
 
 # Pliki konfiguracyjne do aktualizacji
 CONFIG_FILES = [

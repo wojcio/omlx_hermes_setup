@@ -38,6 +38,9 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Usunięcie sekretów z publicznych repozytoriów i rotacja klucza oMLX (23 Listopada 2026):**
+  * **Czyszczenie repozytorium:** Odpięto `.env` z gita (`git rm --cached .env`) i dodano `.env` do [`.gitignore`](.gitignore); zastąpiono jawne klucze placeholderami w [`.env.example`](.env.example) i [`settings.json`](settings.json); zmodyfikowano [`switch-variant.sh`](switch-variant.sh) (zachowuje lokalne `auth.api_key`/`auth.secret_key` z `~/.omlx/settings.json` przy synchronizacji) oraz [`move_from_SSD_to_HDD.py`](move_from_SSD_to_HDD.py) (dynamiczne czytanie klucza z env/`~/.omlx/settings.json`).
+  * **Rotacja i weryfikacja:** Wygenerowano nowy `api_key` i `secret_key` w lokalnych plikach (`~/.omlx/settings.json`, `~/.hermes/.env`, `.env`, `~/.config/opencode/opencode.json*`), zrestartowano `oMLX.app` i potwierdzono `HTTP 200` dla nowego klucza oraz `HTTP 401` dla starego (`0` wycieków w plikach śledzonych przez git w obu repozytoriach).
 - **Aktualizacja do oMLX `0.8.3` (build `3879`) & Splash `1.7.0-m1.1`, migracja schematu `v3` oraz re-test `Hy4-flash` i `Inkling-2-Mini` (23 Listopada 2026):**
   * **Splash `1.7.0-m1.1`:** Zainstalowano krytyczny hotfix `#75` w `/opt/homebrew/bin/splash-m1` (naprawia błędne odpowiedzi na krótkich promptach 33–64 tokenów i po odtworzeniu prefix-cache).
   * **Migracja schematu oMLX `0.8.3`:** Przemigrowano `model_settings*.json` do **`SETTINGS_VERSION = 3`** (`88` pól, `29` modeli) oraz zsynchronizowano `model_profiles.json` (`version: 2`, usunięcie sztywnego `mtp_adaptive_max_depth: 3`), zsynchronizowano `./switch-variant.sh 1` i przeładowano oMLX.

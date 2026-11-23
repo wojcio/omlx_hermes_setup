@@ -65,8 +65,8 @@
     "initial_cache_blocks": 256
   },
   "auth": {
-    "api_key": "sk-omlx-0Thr9X0jHr1U2T2ReS17j6Vi",
-    "secret_key": "4103ea518e89a4b00157c333dc6faf7bb7a1d002b615107e4ca699dde70d0085",
+    "api_key": "YOUR_OMLX_API_KEY",
+    "secret_key": "YOUR_OMLX_SECRET_KEY",
     "skip_api_key_verification": false,
     "allow_unauthenticated_inference": false,
     "sub_keys": []

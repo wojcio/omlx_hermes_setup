@@ -23,7 +23,7 @@ fi
 
 OMLX_IP="${OMLX_IP:-100.123.37.101}"
 OMLX_PORT="${OMLX_PORT:-8000}"
-OMLX_API_KEY="${OMLX_API_KEY:-sk-omlx-0Thr9X0jHr1U2T2ReS17j6Vi}"
+OMLX_API_KEY="${OMLX_API_KEY:-}"
 
 # ==============================================================================
 # 2. Parsowanie argumentów wywołania
@@ -125,7 +125,26 @@ if [ "$IS_LOCAL" -eq 1 ]; then
     mkdir -p "$OMLX_DIR"
     cp "$DIR/model_settings.json" "$OMLX_DIR/model_settings.json"
     cp "$DIR/model_profiles.json" "$OMLX_DIR/model_profiles.json"
-    cp "$DIR/settings.json" "$OMLX_DIR/settings.json"
+    # Synchronizuj settings.json zachowujac lokalne auth.api_key / auth.secret_key (nie trzymamy sekretow w repo)
+    python3 - "$DIR/settings.json" "$OMLX_DIR/settings.json" "${OMLX_API_KEY:-}" <<'PY'
+import json, pathlib, sys
+src_p, dst_p, env_key = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]), sys.argv[3]
+src = json.loads(src_p.read_text())
+dst_auth = {}
+if dst_p.exists():
+    try:
+        dst_auth = json.loads(dst_p.read_text()).get("auth", {}) or {}
+    except Exception:
+        dst_auth = {}
+src_auth = src.setdefault("auth", {})
+if dst_auth.get("api_key") and not str(dst_auth["api_key"]).startswith("YOUR_"):
+    src_auth["api_key"] = dst_auth["api_key"]
+elif env_key and not env_key.startswith("YOUR_"):
+    src_auth["api_key"] = env_key
+if dst_auth.get("secret_key") and not str(dst_auth["secret_key"]).startswith("YOUR_"):
+    src_auth["secret_key"] = dst_auth["secret_key"]
+dst_p.write_text(json.dumps(src, indent=2, ensure_ascii=False) + "\n")
+PY
 
     echo "✅ Wariant $VARIANT zostal aktywowany w trybie LOKALNYM (127.0.0.1:8000)!"
 else
