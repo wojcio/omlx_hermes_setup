@@ -15,7 +15,7 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
    - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 27 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.0-m1**) jako dedykowany szybki kompresor.
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.0-m1.1**) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
@@ -38,6 +38,12 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Aktualizacja do oMLX `0.8.3` (build `3879`) & Splash `1.7.0-m1.1`, migracja schematu `v3` oraz re-test `Hy4-flash` i `Inkling-2-Mini` (23 Listopada 2026):**
+  * **Splash `1.7.0-m1.1`:** Zainstalowano krytyczny hotfix `#75` w `/opt/homebrew/bin/splash-m1` (naprawia błędne odpowiedzi na krótkich promptach 33–64 tokenów i po odtworzeniu prefix-cache).
+  * **Migracja schematu oMLX `0.8.3`:** Przemigrowano `model_settings*.json` do **`SETTINGS_VERSION = 3`** (`88` pól, `29` modeli) oraz zsynchronizowano `model_profiles.json` (`version: 2`, usunięcie sztywnego `mtp_adaptive_max_depth: 3`), zsynchronizowano `./switch-variant.sh 1` i przeładowano oMLX.
+  * **Re-test w [`omlx_bench.sh`](omlx_bench.sh) (`bench_results/20261123_041242`, `oMLX 0.8.3`):**
+    - **`Hy4-flash-oQ4h-mtp`:** poprawki `#5534` (utrzymanie historii tur po cache hit) i `#5476` (brak mieszania `<think>` z odpowiedzią) zadziałały w 100% — skok jakości z 3/10 (halucynacje i wyciek) do **10/10** (zero halucynacji, zero wycieku, **PASS `181.7s`**, **`35.7 tok/s`**, MTP **`84.9% / 2.96 tok/cykl`**, `3505 zn.`).
+    - **`Inkling-2-Mini-oQ4e-mtp`:** przyspieszenie o **-30% czasu** (`160.8s` $\rightarrow$ **`112.4s`**) i **+28% decode** (`32.2` $\rightarrow$ **`41.2 tok/s`**), **PASS** z tabelarycznym opisem (`3545 zn.`, `15.65 GB` RAM).
 - **Wdrożenie `Inkling-Small-mxfp4` i pełny benchmark wszystkich 19 modeli SSD (`19/19 PASS`, 23 Listopada 2026):**
   * **Nowy model `mlx-community/Inkling-Small-mxfp4` (`27` modeli w Hermesie / `29` w oMLX i OpenCode):** Skonfigurowano Thinking Machines Inkling 1 Small (`130.6 GB` RAM, VLM, 42 warstwy, 256 eksp. top-6, okno `256k` z natywnego `1M`, `temp 1.0`, `top_p 0.95`) w `model_settings*.json`, `config*.yaml` oraz `opencode.json*`, zsynchronizowano `./switch-variant.sh 1` i przeładowano oMLX.
   * **Pełny benchmark [`omlx_bench.sh`](omlx_bench.sh) (`bench_results/20261123_002131`, `oMLX 0.8.2` + `Splash 1.7.0-m1` + `OpenCode v2.3.2`, `--variant high --timeout 600`):** **19/19 PASS**, `0` błędów, `0` timeoutów i `0` powtórzonych wywołań narzędzi (`rep=0`) na całej stawce aktywnych modeli SSD!

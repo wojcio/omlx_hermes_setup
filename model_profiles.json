@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "profiles": {
     "Qwen3.5-122B-A10B-MLX-9bit": {
       "turbo": {
@@ -176,7 +176,6 @@
           "enable_thinking": true,
           "thinking_budget_enabled": false,
           "thinking_budget_tokens": 8192,
-          "mtp_adaptive_max_depth": 3,
           "turboquant_kv_enabled": true,
           "turboquant_kv_bits": 6.0,
           "qwen35_ane_prefill_enabled": false,
@@ -215,7 +214,6 @@
           "turboquant_kv_bits": 6.0,
           "turboquant_skip_last": true,
           "mtp_enabled": true,
-          "mtp_adaptive_max_depth": 3,
           "chat_template_kwargs": {
             "enable_thinking": true
           },
