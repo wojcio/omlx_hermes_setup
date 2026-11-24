@@ -77,19 +77,19 @@ Narzędzie bada historię użycia modeli w logach oMLX oraz bazie Hermesa, propo
 
 ## 2. Dobór Modeli pod Kątem Ról (Use Cases)
 
-Poniżej znajduje się zestawienie **7 ról użytkowników** wraz z przypisaniem najlepszych modeli spośród 18 dostępnych w naszym ekosystemie.
+Poniżej znajduje się zestawienie **7 ról użytkowników** wraz z przypisaniem najlepszych modeli spośród **27 dostępnych modeli w Hermesie (29 w oMLX)**.
 
 ```mermaid
 flowchart TD
     Roles["Role Użytkowników w Hermesie"]
     
-    Roles --> Dev["👨‍💻 Programista<br/>Coder390-27B VLM / flint-oQ8e / Coder-Next-9bit / DeepSeek-V4"]
-    Roles --> UI["🎨 UI Designer<br/>UI-Venus-1.5-30B / Qwen3.8-Flash-Speed"]
-    Roles --> Web["🌐 Web Developer<br/>Coder390-27B (VLM) + UI-Venus-1.5-30B"]
-    Roles --> Ops["⚙️ DevOps / SysAdmin<br/>flint-oQ8e / Qwen3.8-Flash-Speed / Qwen3.5-122B"]
-    Roles --> Sec["🛡️ Security Manager<br/>Coder390-27B / Ornith-35B-Abliterated / Qwen-27B-Uncensored"]
-    Roles --> User["🧑‍💼 Zwykły Użytkownik<br/>Qwen3.8-Flash-Speed / Qwen3.5-122B / Qwen-27B-SPLASH"]
-    Roles --> Office["🗂️ Sekretarka Biura<br/>olmOCR-2-7B / Unlimited-OCR / Qwen3.5-122B"]
+    Roles --> Dev["👨‍💻 Programista<br/>Inkling-Small / Hy4-flash / flint-oQ8e / Coder390-27B / Flash-oQ6e"]
+    Roles --> UI["🎨 UI Designer<br/>UI-Venus-1.5-30B / Inkling-2-Mini / Gemma-4-31B VLM"]
+    Roles --> Web["🌐 Web Developer<br/>Coder390-27B (VLM) + Inkling-Small + Inkling-2-Mini"]
+    Roles --> Ops["⚙️ DevOps / SysAdmin<br/>Inkling-2-Mini / flint-oQ8e / Nanbeige4.3 (512k)"]
+    Roles --> Sec["🛡️ Security Manager<br/>Ornith-35B-Abliterated / Inkling-Small / Qwen-27B-SPLASH"]
+    Roles --> User["🧑‍💼 Zwykły Użytkownik<br/>Inkling-2-Mini / Qwen3.8-Flash-oQ5e / Gemma-4-12B (Audio) / Bonsai-27B"]
+    Roles --> Office["🗂️ Sekretarka Biura<br/>olmOCR-2-7B / Unlimited-OCR / Gemma-4-12B (Audio) / Inkling-2-Mini"]
 ```
 
 ---
@@ -100,18 +100,19 @@ Programista potrzebuje dwóch trybów pracy: **błyskawicznej pętli edycji kodu
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Codzienny coding, szybkie diffy, TDD, tool-calling** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Wagi unquantized BF16 (~30.6 GB RAM), multimodalny VLM z MTP i akceleracją DFlash2. Generuje kod z prędkością aż **~34.6 tok/s** (4x szybciej niż modele MoE), czerpiąc z destylacji Opus 5.5, GPT-6 Astra, Grok 4.7 i DeepSeek V4 Pro. |
-| **Autonomiczna pętla agenta (SWE-bench, wieloetapowy coding, terminal)** | **`flint-oQ8e`** | Architektura MoE 39.8B (Recursive Flint, 256 ekspertów, top-6 = 2.5B aktywnych parametrów/token, ~39.4 GB RAM). Lider benchmarków programistycznych (SWE-bench Verified / Pro, Terminal-Bench 2.1), wyposażony w natywne myślenie `<think>` oraz błyskawiczny kernel decode (`omlx_flint_router_topk`), generujący do **74.1 tok/s**! |
-| **Ciężki refaktoring wielu plików, wysoka precyzja składni** | **`Qwen3-Coder-Next-MLX-9bit`** | Niemal bezstratna kwantyzacja 9-bitowa z rozszerzonym RoPE (theta 5M). Niezwykle stabilny przy generowaniu bardzo długich plików źródłowych i złożonych struktur. |
-| **Złożona architektura, trudne algorytmy, analiza bugów** | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** *(lub lżejszy `AWQ`)* | Flagowy model MoE (~155 GB, MTP depth 3) z potężnym łańcuchem rozumowania (`deepseek_v4`) i oknem 256k (natywnie do 1M). Najlepszy do rozwiązywania problemów, na których inne modele utknęły. |
+| **Głęboka architektura, wielowarstwowy refaktoring, TDD** | **`Inkling-Small-mxfp4`** | Flagowy model Thinking Machines Inkling 1 Small MoE VLM (42 warstwy, 256 ekspertów, top-6 = ~130.6 GB RAM). W benchmarku OpenCode zaliczył **PASS w 124.4s** ze stałą prędkością **40.2 tok/s** i zerową redundancją narzędzi (`rep=0`). Rewelacyjna spójność, doskonała analiza zależności i wysoka kultura kodu. |
+| **Złożona logika, parsery, unikanie pętli halucynacji** | **`Hy4-flash-oQ4h-mtp`** | Tencent Hy4-flash MoE VLM (42 warstwy, 512 ekspertów, top-16, innowacyjny format `oQh`, ~123.4 GB RAM). W oMLX 0.8.3 po poprawkach `#5534` i `#5476` zaliczył skok jakości z 3/10 do **10/10** (**PASS w 181.7s**, **35.7 tok/s**, akceptacja Lightning MTP aż **84.9% (`2.96 tok/cykl`)**). |
+| **Autonomiczna pętla agenta (SWE-bench, terminal coding)** | **`flint-oQ8e`** | MoE 39.8B (256 ekspertów, 2.5B akt./tok, ~39.4 GB RAM). Wyposażony w dedykowany kernel decode, reasoning `<think>`, generujący aż **60.6–74.1 tok/s**! Znakomity w autonomicznych pętlach naprawiania błędów w terminalu. |
+| **Codzienny coding, szybkie diffy, edycja komponentów** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Wagi unquantized BF16 (~30.6 GB RAM), multimodalny VLM z MTP i akceleracją DFlash2. Generuje kod z prędkością **~34.6 tok/s**, czerpiąc z destylacji Opus 5.5, GPT-6 Astra, Grok 4.7 i DeepSeek V4 Pro. |
+| **Precyzyjny refaktoring dużych repozytoriów (VLM 6-bit)** | **`Qwen3.8-Flash-Next-oQ6e-mtp`** | Wyższa precyzja wag 6-bit (~141.1 GB RAM), `activation_fp16_enabled`, Lightning MTP (**64.2 tok/s**, PASS w 129.1s w OpenCode). Świetny balans dokładności i prędkości. |
 
 **Przykładowe użycie:**
 ```bash
-# Szybka sesja programistyczna i naprawa testów
-hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 -z "Przeanalizuj błędy w pytest, znajdź przyczynę wyścigu wątków w module worker.py i zastosuj poprawkę."
+# Głęboka sesja programistyczna i refaktoring z Inkling Small
+hermes -m Inkling-Small-mxfp4 -z "Przeanalizuj architekturę modułu agenta, zoptymalizuj zarządzanie stanem i przygotuj zestaw testów jednostkowych w pytest."
 
-# Głęboki przegląd architektury na osobnej gałęzi roboczej
-hermes -m DeepSeek-V4-Flash-0731-MXFP4-MLX --worktree --reasoning high
+# Szybka sesja naprawy testów z Coder390
+hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 -z "Przeanalizuj błędy w pytest, znajdź przyczynę wyścigu wątków w module worker.py i zastosuj poprawkę."
 ```
 
 ---
@@ -122,9 +123,9 @@ UI Designer pracuje z obrazem: zrzutami ekranu aplikacji, eksportami z Figmy, si
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Analiza screenshotów UI, audyt UX, lokalizacja elementów** | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | Wyspecjalizowany model multimodalny (Qwen 3 VL MoE) wytrenowany bezpośrednio do rozumienia interfejsów graficznych, hierarchii komponentów, dostępności (WCag) i wykrywania błędów wizualnych. |
-| **Kreatywny brainstorming, copywriting UX, systemy designu** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Posiada wieżę wizyjną (`model-vision.safetensors`), a dzięki prędkości ~73.5 tok/s pozwala na błyskawiczne iterowanie wariantów mikrokopii (UX writing), palet kolorów i tokenów designu. |
-| **Analiza wielkich makiet i dokumentacji wizualnej** | **`MiniMax-M3-ConfigI-MLX`** | Potężny model VLM (60 warstw, 128 ekspertów) zdolny połączyć analizę obrazu z długą specyfikacją produktową (128k okna). |
+| **Analiza screenshotów UI, audyt UX, lokalizacja elementów** | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | Wyspecjalizowany model multimodalny (Qwen 3 VL MoE, ~30 GB RAM) wytrenowany do rozumienia interfejsów graficznych, hierarchii komponentów, dostępności (WCAG) i wykrywania błędów wizualnych (**54.7 tok/s**). |
+| **Lekki asystent UX, ocena spójności wizualnej w pętli** | **`Inkling-2-Mini-oQ4e-mtp`** | Niezwykle sprawny VLM MoE (128 ekspertów, pętla `3× pass`, zaledwie **15.65 GB RAM**). W oMLX 0.8.3 generuje **41.2 tok/s** (PASS w **112.4s**), tworząc przejrzyste, tabelaryczne audyty UI. |
+| **Szczegółowa analiza design systemów i typografii** | **`gemma-4-31B-it-oQ6e-mtp`** | Gęsty 31B VLM od Google (~26.3 GB RAM) z dedykowanym kernelem weryfikacji i MTP (88.4% akceptacji, **32.4–34.0 tok/s**). Świetnie analizuje złożone layouty graficzne. |
 
 **Przykładowe użycie:**
 ```bash
@@ -142,7 +143,8 @@ Web Developer łączy świat UI Designera i Programisty: musi przekształcić pr
 | :--- | :--- | :--- |
 | **Tworzenie komponentów React/Vue/Tailwind + podgląd wizji** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Model programistyczny z **aktywną wieżą wizyjną (`supports_vision: true`)** i pełną precyzją BF16! Możesz wkleić mu screenshot rozjechanego modala w przeglądarce, a on sam przejrzy kod CSS i naprawi flexbox/grid. |
 | **Konwersja makiety na kod (Screenshot-to-Code)** | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | Najdokładniej odwzorowuje układ przestrzenny z obrazka na strukturę DOM i klasy Tailwind CSS. |
-| **Budowa złożonego API, integracja bazy danych, SSR/Auth** | **`Qwen3-Coder-Next-MLX-9bit`** | Wysoka dokładność przy wielowarstwowych zmianach (Frontend + Backend + schematy Prisma/SQL + typy TypeScript). |
+| **Architektura Full-Stack, integracja API, SSR i bazy danych** | **`Inkling-Small-mxfp4`** | VLM z 256 ekspertami MoE (~130.6 GB RAM, **40.2 tok/s**). Perfekcyjnie łączy wizję UI ze złożoną logiką backendową w TypeScript / Next.js. |
+| **Błyskawiczne poprawki stylów i komponentów na żywo** | **`Inkling-2-Mini-oQ4e-mtp`** | Lekki VLM (**15.7 GB RAM**, **41.2 tok/s**). Idealny do natychmiastowych iteracji nad kodem frontendowym i podglądu zrzutów ekranu. |
 
 **Przykładowe użycie:**
 ```bash
@@ -158,74 +160,75 @@ Praca DevOpsa w Hermesie to wykonywanie dziesiątek komend diagnostycznych w ter
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Interaktywne debugowanie serwerów, szybkie komendy CLI** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Prędkość **~73.5 tok/s** i pełne okno **256k tokenów**. Błyskawicznie analizuje wyjścia komend systemowych i wykonuje kolejne kroki diagnostyczne bez czekania. |
-| **Analiza potężnych zrzutów logów i plików konfiguracyjnych** | **`Qwen3.5-122B-A10B-MLX-9bit`** *(lub `Step-3.5-Flash-4bit`)* | Domyślny model główny z 8-bitowym TurboQuant KV cache. Świetnie radzi sobie przy kontekście przekraczającym 150k–200k tokenów logów systemowych. |
-| **Skrypty Bash, potoki GitHub Actions / GitLab CI, Terraform** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Niska temperatura (`0.6`) i wysoka precyzja BF16 sprawiają, że generuje czyste, bezpieczne skrypty powłoki i bezbłędne konfiguracje YAML. |
+| **Szybkie pętle diagnostyczne w CLI, automatyzacja zadań** | **`Inkling-2-Mini-oQ4e-mtp`** | Niezwykle lekki (**15.65 GB RAM**), generuje aż **41.2 tok/s** i w benchmarku OpenCode ukończył zadanie w **112.4s** bez ani jednego błędu narzędzi (`rep=0`). Błyskawiczny start i minimalne obciążenie RAM. |
+| **Autonomiczne diagnozowanie awarii i naprawa skryptów** | **`flint-oQ8e`** | MoE 39.8B (~39.4 GB RAM, **60.6 tok/s**). Wyspecjalizowany w pracy terminalowej i wielokrokowym wykonywaniu komend diagnostycznych z natywnym myśleniem `<think>`. |
+| **Analiza gigantycznych zrzutów logów i konfiguracji (Okno 512k)** | **`Nanbeige4.3-33B-MLX-6bit`** | Gęsty model 33B z rekordowym oknem kontekstu **524 288 tokenów (512k)** (~25.2 GB RAM). Pozwala wczytać setki tysięcy linii logów systemowych w jednej sesji. |
+| **Maksymalna prędkość odpowiedzi przy komendach CLI** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Prędkość **~73.5 tok/s** i pełne okno **256k tokenów**. Błyskawicznie parsuje wyjścia komend systemowych. |
 
 **Przykładowe użycie:**
 ```bash
-# Diagnostyka usług systemowych i sieci
-hermes -m Qwen3.8-Flash-Next-MTPLX-Optimized-Speed -z "Sprawdź procesy obciążające pamięć, zweryfikuj status usług launchd związanych z omlx i przeanalizuj ostatnie 500 linii logów serwera pod kątem timeoutów."
+# Diagnostyka usług systemowych i logów z Inkling 2 Mini
+hermes -m Inkling-2-Mini-oQ4e-mtp -z "Sprawdź procesy obciążające pamięć, zweryfikuj status usług launchd związanych z omlx i przeanalizuj ostatnie 300 linii logów serwera pod kątem timeoutów."
 ```
 
 ---
 
 ### 🛡️ Rola 5: Security Manager / Pentester (Audyt Bezpieczeństwa, Red/Blue Team, DevSecOps)
 
-Specjaliści ds. bezpieczeństwa często napotykają problem w komercyjnych lub standardowych modelach: **fałszywe odmowy (refusals)** przy prośbach o analizę podatności, wygenerowanie testowego payloadu XSS/SQLi, analizę złośliwego skryptu czy weryfikację reguł WAF. Nasza konfiguracja posiada modele dedykowane dokładnie do tych zadań.
+Specjaliści ds. bezpieczeństwa często napotykają problem w komercyjnych modelach: **fałszywe odmowy (refusals)** przy prośbach o analizę podatności, wygenerowanie testowego payloadu XSS/SQLi, analizę złośliwego skryptu czy weryfikację reguł WAF.
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Audyt bezpieczeństwa kodu (SAST), testy CTF / CyBench** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Topowy model kodujący (BF16) z destylacjami Opus 5.5, GPT-6 Astra, Grok 4.7 i DeepSeek V4 Pro. Błyskawicznie (~34.6 tok/s) wykrywa podatności, analizuje kod i proponuje łaty. |
-| **Scenariusze Red-Team, analiza exploitów i malware (bez cenzury)** | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | Pełna precyzja **BF16** z usuniętymi wektorami odmów (*Abliterated*). Nie prawi morałów – rzeczowo analizuje złośliwy kod, uprawnienia i scenariusze penetracyjne. |
-| **Szybkie zapytania o polityki bezpieczeństwa i testy bez blokad** | **`Qwen3.8-27B-Uncensored-MLX`** | Lekki (~15 GB), bardzo szybki model *Uncensored* z oknem 256k. Idealny do szybkiej weryfikacji reguł, pisania raportów po audycie i analizy incydentów. |
+| **Scenariusze Red-Team, analiza exploitów i malware (bez cenzury)** | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | Pełna precyzja **BF16** (~64.6 GB RAM) z usuniętymi wektorami odmów (*Abliterated*). Bardzo szybki (**52.0 tok/s**, PASS w 70.9s w OpenCode!). Nie prawi morałów – rzeczowo analizuje złośliwy kod, uprawnienia i scenariusze penetracyjne. |
+| **Audyt architektury bezpieczeństwa, modelowanie zagrożeń (STRIDE)** | **`Inkling-Small-mxfp4`** | 256 ekspertów MoE VLM (~130.6 GB RAM, **40.2 tok/s**). Dokładnie bada zależności, architekturę sieciową, uprawnienia RBAC i przepływy danych pod kątem podatności logicznych. |
+| **Błyskawiczne zapytania o polityki i reguły (Splash Engine)** | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | Silnik Splash 1.7.0-m1.1 osiągający aż **72.9 tok/s** decode. Bezkompromisowa szybkość przy przeglądaniu reguł firewalla, polityk IAM i logów SIEM bez cenzury. |
+| **Audyt bezpieczeństwa kodu (SAST), testy CTF** | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | Topowy model kodujący BF16 (~30.6 GB RAM). Błyskawicznie wykrywa luki OWASP Top 10 w kodzie i proponuje bezpieczne łatki. |
 
 **Przykładowe użycie:**
 ```bash
-# Audyt kodu pod kątem OWASP Top 10 bez fałszywych blokad
-hermes -m Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2 -z "Przeprowadź audyt bezpieczeństwa katalogu ./api pod kątem SQL Injection, IDOR oraz wycieku sekretów. Wypisz podatne linie i przygotuj łatki."
-
-# Analiza scenariusza Red-Team / analiza podejrzanego skryptu
-hermes -m Ornith-1.5-35B-A3B-Abliterated-MLX-BF16 -z "Zdekoduj i przeanalizuj działanie tego zaciemnionego skryptu PowerShell znalezionego podczas analizy incydentu. Jakie IoC (Indicators of Compromise) zostawia w systemie?"
+# Analiza podejrzanego skryptu z Ornith Abliterated
+hermes -m Ornith-1.5-35B-A3B-Abliterated-MLX-BF16 -z "Zdekoduj i przeanalizuj działanie tego zaciemnionego skryptu PowerShell znalezionego podczas analizy incydentu. Jakie wskaźniki kompromitacji (IoC) zostawia w systemie?"
 ```
 
 ---
 
 ### 🧑‍💼 Rola 6: Zwykły Użytkownik (Everyday User – Asystent Codzienny, Nauka, Research)
 
-Do codziennych pytań, burzy mózgów, planowania podróży, tłumaczeń, streszczania artykułów czy nauki nowych tematów najważniejsze są: **naturalność języka, szybkość odpowiedzi oraz wysoka wiedza ogólna**.
+Do codziennych pytań, burzy mózgów, planowania podróży, tłumaczeń, streszczania artykułów czy nauki nowych tematów najważniejsze są: **naturalność języka, szybkość odpowiedzi, wysoka wiedza ogólna oraz multimodalność**.
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Błyskawiczny czat na każdy temat (0 czekania)** | **`Qwen3.8-Flash-Next-MTPLX-Optimized-Speed`** | Odpowiada niemal natychmiast (~73.5 tok/s). Posiada ogromną wiedzę (512 ekspertów) i potrafi także analizować wrzucone zdjęcia. |
-| **Najwyższa jakość odpowiedzi, złożone pytania i analizy** | **`Qwen3.5-122B-A10B-MLX-9bit`** *(lub `Qwen3.8-Flash-Next-oQ5e-mtp`)* | Nasz domyślny złoty środek (9-bitowa precyzja) lub wariant `oQ5e` od GBP-DE. Bardzo dojrzałe, wyważone i szczegółowe odpowiedzi. |
-| **Pytania i pisma po polsku, styl i redagowanie** | **`Qwen3.5-122B-A10B-MLX-9bit`** | Znakomita erudycja i styl językowy (9-bitowa precyzja, 256k okno). W samym oMLX dostępny jest również zarchiwizowany jako `[HDD]` model `Qwen3.8-27B-FP16_huzar_v1-SPLASH` (oraz na SSD `Qwen3.8-27B-FP16_huzar_v1`). |
+| **Codzienny, lekki i niezwykle dokładny asystent VLM** | **`Inkling-2-Mini-oQ4e-mtp`** | **Rewelacja na co dzień.** Zajmuje zaledwie **15.65 GB RAM**, generuje **41.2 tok/s** i tworzy wybitnie przejrzyste odpowiedzi z tabelami i podsumowaniami. Działa błyskawicznie, nie obciążając komputera. |
+| **Domyślny flagowiec do wszystkiego (Złoty Środek)** | **`Qwen3.8-Flash-Next-oQ5e-mtp`** | **Domyślny model systemu.** Świetny balans wiedzy, kodowania i wizji (format `oQ5e`, ~120 GB RAM, **61.0–97 tok/s**). |
+| **Asystent głosowy, transkrypcje i multimodalność Any-to-Any** | **`gemma-4-12B-it-oQ8e-mtp`** | Model Google Gemma 4 (~13.0 GB RAM) z natywną obsługą tekstu, obrazu oraz **audio**! Możesz przekazywać mu pliki dźwiękowe, dyktować notatki i otrzymywać odpowiedzi w prędkości **51.4–68.4 tok/s**. |
+| **Ekonomiczny model 27B w minimalnej pamięci RAM** | **`Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed`** | Kwantyzacja 2-bit Hadamard: pełny model 27B VLM mieszczący się w zaledwie **8.23 GB RAM** (**31.4 tok/s**). Pozwala na pracę w tle z minimalnym zużyciem pamięci. |
 
 **Przykładowe użycie:**
 ```bash
-# Codzienny szybki asystent
-hermes -m Qwen3.8-Flash-Next-MTPLX-Optimized-Speed -z "Wyjaśnij mi prostym językiem różnicę między oprocentowaniem stałym a zmiennym przy nadpłacaniu kredytu i policz symulację dla 300 tys. zł."
+# Codzienny asystent z Inkling 2 Mini
+hermes -m Inkling-2-Mini-oQ4e-mtp -z "Wyjaśnij mi w przystępnej tabeli różnicę między oprocentowaniem stałym a zmiennym przy nadpłacaniu kredytu i policz symulację dla 300 tys. zł."
 ```
 
 ---
 
-### 🗂️ Rola 7: Sekretarka Biura / Office Manager (Faktury, OCR Dokumentów, Pisma Urzędowe)
+### 🗂️ Rola 7: Sekretarka Biura / Office Manager (Faktury, OCR Dokumentów, Audio i Pisma)
 
-W pracy biurowej kluczowe są dwa obszary: **bezbłędne odczytywanie tekstu z trudnych skanów, faktur, paragonów i wielokolumnowych PDF-ów (OCR)** oraz **redagowanie nienagannych pism, maili i protokołów w języku polskim**.
+W pracy biurowej kluczowe są: **bezbłędne odczytywanie tekstu z trudnych skanów, faktur, paragonów i wielokolumnowych PDF-ów (OCR)**, **praca z nagraniami audio** oraz **redagowanie nienagannych pism, maili i protokołów w języku polskim**.
 
 | Zastosowanie | Rekomendowany Model | Dlaczego ten model? |
 | :--- | :--- | :--- |
-| **Odczyt skomplikowanych PDF-ów, umów, tabel i układów wielokolumnowych** | **`olmOCR-2-7B-1025-8bit`** | Wyspecjalizowany model VLM stworzony przez AllenAI ściśle do konwersji trudnych dokumentów PDF i skanów na czysty tekst i tabele Markdown (niska temperatura `0.2` zapobiega zmyślaniu cyfr). |
-| **Odczyt faktur, paragonów, etykiet kurierskich i zdjęć w wysokiej rozdzielczości** | **`Unlimited-OCR-8bit`** | Model OCR bez limitu rozdzielczości obrazu (wykorzystuje tiling 2D). Odczyta nawet drobny druk na sfotografowanej fakturze czy tabeli kosztorysowej. |
-| **Redagowanie pism urzędowych, maili do klientów, korekta językowa PL** | **`Qwen3.5-122B-A10B-MLX-9bit`** | Generuje naturalną, oficjalną polszczyznę biurową i urzędową z pełnym 256k oknem kontekstu i wysoką precyzją 9-bitową. |
+| **Odczyt skomplikowanych PDF-ów, umów, tabel i wielokolumnowych pism** | **`olmOCR-2-7B-1025-8bit`** | Wyspecjalizowany model VLM od AllenAI ściśle do konwersji trudnych dokumentów PDF i skanów na czysty tekst i tabele Markdown (niska temperatura `0.2` zapobiega zmyślaniu danych). |
+| **Odczyt faktur, paragonów, etykiet kurierskich w wysokiej rozdzielczości** | **`Unlimited-OCR-8bit`** | Model OCR bez limitu rozdzielczości obrazu (tiling 2D). Odczyta nawet drobny druk na sfotografowanej fakturze czy tabeli kosztorysowej. |
+| **Transkrypcja nagrań ze spotkań, notatek głosowych i dyktafonu** | **`gemma-4-12B-it-oQ8e-mtp`** | Multimodalny model Any-to-Any (~13.0 GB RAM, **51.4–68.4 tok/s**) z natywnym modułem **Audio**. Przetwarza nagrania dźwiękowe bezpośrednio na protokoły i zwięzłe podsumowania. |
+| **Analiza wielostronicowych pism, raportów i tworzenie zestawień** | **`Inkling-2-Mini-oQ4e-mtp`** | Lekki VLM (**15.65 GB RAM**, **41.2 tok/s**). Znakomicie radzi sobie z analizą wieloetapową i przygotowywaniem przejrzystych zestawień tabelarycznych. |
 
 **Przykładowe użycie:**
 ```bash
 # Krok 1: Wyciągnięcie danych z zeskanowanej faktury do tabeli (OCR)
 hermes -m Unlimited-OCR-8bit -z "Odczytaj wszystkie pozycje z faktury ./skan_faktury_04.jpg. Zwróć dane w tabeli: Nazwa towaru, Ilość, Cena netto, VAT, Kwota brutto oraz podaj NIP sprzedawcy i numer konta."
 
-# Krok 2: Przygotowanie oficjalnego pisma po polsku
-hermes -m Qwen3.5-122B-A10B-MLX-9bit -z "Napisz uprzejme, ale stanowcze wezwanie do zapłaty zaległej faktury nr FV/2026/10/04 na kwotę 4500 zł brutto z terminem 7 dni."
+# Krok 2: Przygotowanie protokołu z nagrania audio
+hermes -m gemma-4-12B-it-oQ8e-mtp -z "Przeanalizuj plik nagrania ./spotkanie_zarzadu.m4a i przygotuj oficjalny protokół ze spisem ustaleń i przypisanych zadań."
 ```
 
 ---
@@ -249,20 +252,22 @@ Poniższa tabela pozwala szybko porównać wszystkie 27 modeli pod kątem ich ro
 | 8 | **`Nanbeige4.3-33B-MLX-6bit`** | 📚 Gęsty 33B / Okno **512k** | **512k** | ~25.2 GB | Nie | Gęsty model 33B do zadań agentowych i analizy gigantycznych repozytoriów z oknem aż **524 288 tokenów (512k)** (**19.6 tok/s**). |
 | 9 | **`flint-oQ8e`** | 🤖 Autonomous Agent MoE | 256k | ~39.4 GB | Nie | **Lider agentic coding** (SWE-bench, Terminal-Bench), MoE 40B (256 eksp., 2.5B akt./tok), oQ8e iMatrix, dedykowany kernel decode, do **74.1 tok/s**. |
 | 10 | **`Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-`**<br>**`GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2`** | 💻 Top Coder VLM | 256k | ~30.6 GB | **Tak** | **Nowoczesne programowanie** (34.6 tok/s, destylacje Opus 5.5, GPT-6, Grok 4.7, VLM, natywne Lightning MTP `mtp-bf16`, 8-bit KV Cache). |
-| 11 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.6.1-m1.1** (One memory ledger, Idle KV, Metal/ANE split `0.26` + DFlash2, **69.2 tok/s śr. / 91.2 tok/s szczyt**); przypięty kompresor Wariantu 2. |
+| 11 | **`Qwen3.8-27B-Uncensored-MLX-SPLASH`** | ⚡ Splash Engine 27B / Kompresor | 256k | ~15 GB | Nie | Ultraszybki silnik **Splash 1.7.0-m1.1** (One memory ledger, Idle KV, Metal/ANE split `0.26` + DFlash2, **72.9 tok/s** decode, hotfix `#75`); przypięty kompresor Wariantu 2. |
 | 12 | **`Qwen3.8-27B-Uncensored-MLX`** | 🔓 Szybki Uncensored (MLX) | 256k | ~15 GB | Nie | Bardzo lekki model bez cenzury z natywnym dekodowaniem spekulatywnym **DFlash2 (`Qwen3.8-27B-DFlash2`)** i 8-bit KV Cache. |
 | 13 | **`DeepSeek-V4-Flash-0731-MXFP4-MLX`** | 🧠 Deep Reasoning | 256k | ~159 GB | Nie | Najtrudniejsze problemy algorytmiczne i architektoniczne (embedded DSpark MTP depth 3, **31–34.6 tok/s** do 45k, **~21–24 tok/s** przy >210k). |
 | 14 | **`DeepSeek-V4-Flash-0731-AWQ`** | 🧠 Reasoning (Lżejszy) | 256k | ~100 GB | Nie | Lżejsza alternatywa dla DeepSeek V4 (Lightning MTP + MLA), gdy potrzebujesz mniejszego zużycia RAM. |
 | 15 | **`MiniMax-M3-ConfigI-MLX`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Multimodal MoE) | 128k | ~156 GB | **Tak** | Zarchiwizowany na USB-C HDD (`/Volumes/Seagate_Expansion_Drive/LLM`); w oMLX 0.8.0 naprawiono `#5233` (`masked sparse fallback` >4k tok, `25.1 tok/s`). |
-| 16 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury. |
+| 16 | **`Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`** | 🔓 Uncensored BF16 | 256k | ~70 GB | Nie | Zadania Red-Team, pentesting i tematy wrażliwe w bezstratnej jakości BF16 bez cenzury (**52.0 tok/s**). |
 | 17 | **`Step-3.5-Flash-4bit`** | ⚙️ Szybki MoE (Sliding) | 256k | ~45 GB | Nie | Szybki model ogólny z oknem przesuwnym (sliding window 512) i Fused MoE do pracy narzędziowej. |
 | 18 | **`Laguna-S-2.1-MLX-8bit`** | 🛠️ Specjalistyczny Coding | 256k | ~25 GB | Nie | Model z natywnym parserem `laguna` w oMLX 0.7.2+, Fused MoE i sliding window 512 do zadań inżynierskich. |
-| 19 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych. |
+| 19 | **`UI-Venus-1.5-30B-A3B-qx86-hi-mlx`** | 🎨 UI / UX Vision | 256k | ~30 GB | **Tak** | Analiza interfejsów użytkownika, makiet, design-to-code i elementów graficznych (**54.7 tok/s**). |
 | 20 | **`olmOCR-2-7B-1025-8bit`** | 📄 Dokumenty OCR | 128k | ~8.8 GB | **Tak** | Konwersja skanów PDF, pism, tabel i układów wielokolumnowych na tekst. |
 | 21 | **`Unlimited-OCR-8bit`** | 🧾 Faktury Hi-Res OCR | 32k | ~3.7 GB | **Tak** | Odczyt faktur, paragonów i obrazów o dowolnie dużej rozdzielczości (tiling 2D). |
 | 22 | **`Qwen3.5-122B-A10B-MLX-9bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (MoE 122B) | 256k | ~128 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM` (zastąpiony przez serię `Qwen3.8-Flash-Next`). |
 | 23 | **`Qwen3-Coder-Next-MLX-9bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Coder 9-bit) | 256k | ~83 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM`. |
 | 24 | **`Qwen3-235B-A22B-MLX-4bit`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Kolos 235B) | 40k | ~116 GB | Nie | Zarchiwizowany na zewnętrznym dysku USB-C `/Volumes/Seagate_Expansion_Drive/LLM`. |
+| 25 | **`Qwen3.8-27B-FP16_huzar_v1`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Dense FP16) | 256k | ~54 GB | Nie | Wersja FP16 Huzar v1 zarchiwizowana na USB-C HDD. |
+| 26 | **`Qwen3.8-27B-FP16_huzar_v1-SPLASH`** *(`[HDD]`)* | 🗄️ Archiwum HDD (Splash FP16) | 256k | ~54 GB | Nie | Wariant Splash dla FP16 Huzar zarchiwizowany na USB-C HDD. |
 
 ---
 
@@ -278,9 +283,9 @@ Poniższa tabela pozwala szybko porównać wszystkie 27 modeli pod kątem ich ro
      * **Kiedy stosować:** Gdy często zmieniasz modele w zależności od roli lub gdy korzystasz z potężnych modeli (>150 GB RAM).
      * **Zalety:** 100% zunifikowanej pamięci (192 GB) pozostaje do dyspozycji aktywnego modelu, brak narzutu na dodatkowy model w RAM.
    - **Wybierz Wariant 2 (`./switch-variant.sh 2` – Dual-Model Resident):**
-     * **Zasada:** Model główny (np. `Qwen3.5-122B-A10B-MLX-9bit`) współistnieje w RAM z przypiętym na stałe małym, dedykowanym kompresorem `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15.2 GB, silnik **Splash 1.4.0-m1**).
-     * **Wydajność kompresora Splash:** Osiąga **63.99 tok/s** generowania podsumowań, minimalny TTFT **0.31 s**, akcelerację spekulatywną DFlash2 na poziomie **3.92 tok/cykl** oraz hybrydowy podział warstw FFN na Neural Engine (share `0.26`). Cały proces kompresji 2 168 tokenów kontekstu trwa zaledwie **10.5 s**.
-     * **Kiedy stosować:** Gdy prowadzisz długie, intensywne sesje na modelach o rozmiarze do ~130 GB RAM (np. `Qwen3.5-122B`, `Flash-Next`, `Coder390`, `Qwen 235B 4-bit`) i chcesz natychmiastowego, bezstratnego streszczania kontekstu bez odrywania modelu głównego.
+     * **Zasada:** Model główny (np. `Qwen3.8-Flash-Next-oQ5e-mtp`) współistnieje w RAM z przypiętym na stałe małym, dedykowanym kompresorem `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15.2 GB, silnik **Splash 1.7.0-m1.1**).
+     * **Wydajność kompresora Splash:** Osiąga aż **72.9 tok/s** decode (lider przepustowości w testach), minimalny TTFT **0.31 s**, akcelerację spekulatywną DFlash2 na poziomie **3.92 tok/cykl** oraz hybrydowy podział warstw FFN na Neural Engine (share `0.26`). Cały proces kompresji 2 168 tokenów kontekstu trwa zaledwie **10.5 s**.
+     * **Kiedy stosować:** Gdy prowadzisz długie, intensywne sesje na modelach o rozmiarze do ~130 GB RAM (np. `Qwen3.8-Flash-Next`, `Coder390`, `Inkling-2-Mini`, `Ternary-Bonsai`) i chcesz natychmiastowego, bezstratnego streszczania kontekstu bez odrywania modelu głównego.
 
 3. **Praca z bardzo dużymi modelami (>150 GB RAM) – Bezwzględny Wariant 1:**
    - Podczas korzystania z modeli:

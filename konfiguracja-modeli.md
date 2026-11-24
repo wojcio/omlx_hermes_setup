@@ -23,7 +23,7 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | 8 | [**Nanbeige4.3-33B-MLX-6bit**](https://huggingface.co/PocketAiHub/Nanbeige4.3-33B-MLX-6bit)<br>*(Llama Dense 33B · 512k)* | **512k** / **32k**<br>*(Dense)* | `0.6` / `0.95` / `20` / `1.05` | Gęsty 33B model agentowy i programistyczny (~25.2 GB RAM) z gigantycznym oknem **524 288 tokenów (512k)**, TurboQuant KV 8-bit (`skip_last`), **19.6 tok/s** |
 | 9 | [**flint-oQ8e**](https://huggingface.co/mlx-community/flint-oQ8e)<br>*(Recursive Flint MoE)* | **256k** / **32k**<br>*(SW: 513)* | `0.6` / `0.95` / `20` / `1.05` | MoE 39.8B (256 eksp., top-6 = 2.5B akt./tok), oQ8e iMatrix, dedykowany kernel MoE decode patch (`omlx_flint_router_topk`), reasoning `<think>`, do **74.1 tok/s** (~39.4 GB) |
 | 10 | [**Qwen3.8-27B-Coder390-...-MTP-DFlash2**](https://huggingface.co/nerkyor/Qwen3.8-27B-Coder390-EfficientThink-Opus5.5-GPT6Astra-Grok4.7-DSV4Pro-K3-SFT-RLOO-MTP-DFlash2)<br>*(Qwen 3.5 Dense VL · BF16)* | **256k** / **32k**<br>*(Dense)* | `0.6` / `0.95` / `40` / `1.05` | Wagi BF16 (~30.6 GB), VLM, natywne Lightning MTP (`mtp-bf16`), `activation_fp16_enabled`, KV 8-bit (`skip_last`), **34.6 tok/s**, destylacja Opus 5.5 / GPT-6 / Grok 4.7 |
-| 11 | [**Qwen3.8-27B-Uncensored-MLX-SPLASH**](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX)<br>*(Qwen 3.5 Dense · Splash)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Silnik Splash **1.6.1-m1.1** (Metal/ANE FFN split `0.26`, One memory ledger, Idle KV + DFlash2 draft), **69.2 tok/s śr.** (szczyt **91.2 tok/s**), kompresor Wariantu 2 |
+| 11 | [**Qwen3.8-27B-Uncensored-MLX-SPLASH**](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX)<br>*(Qwen 3.5 Dense · Splash)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Silnik Splash **1.7.0-m1.1** (Metal/ANE FFN split `0.26`, One memory ledger, Idle KV + DFlash2 draft), **72.9 tok/s** decode (lider szybkości), kompresor Wariantu 2 |
 | 12 | [**Qwen3.8-27B-Uncensored-MLX**](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX)<br>*(Qwen 3.5 Dense)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Lekki model (~15 GB), natywne spekulatywne dekodowanie DFlash2 (`Qwen3.8-27B-DFlash2`), TurboQuant KV 8-bit (`skip_last`) |
 | 13 | [**DeepSeek-V4-Flash-0731-MXFP4-MLX**](https://huggingface.co/TensorFold/DeepSeek-V4-Flash-0731-MXFP4-MLX)<br>*(DeepSeek V4 MoE)* | **256k** / **32k**<br>*(SW: 128)* | `0.6` / `0.95` / `40` / `1.00` | YaRN RoPE (factor 16), SW 128, embedded DSpark MTP (depth 3), `fp16` KV (*attention sinks*), 31–34.6 tok/s (<45k) / ~21–24 tok/s (>210k), ~159 GB |
 | 14 | [**DeepSeek-V4-Flash-0731-AWQ**](https://huggingface.co/True2456/DeepSeek-V4-Flash-0731-AWQ)<br>*(DeepSeek V4 MoE)* | **256k** / **32k**<br>*(SW: 128)* | `0.6` / `0.95` / `40` / `1.00` | YaRN RoPE (factor 16), sliding window 128, Lightning MTP, MLA Latent Attention (~100 GB) |
@@ -37,6 +37,8 @@ Dokumentacja parametrów kontekstu, okien uwagi oraz parametrów samplingu dla m
 | 22 | [**[HDD] Qwen3.5-122B-A10B-MLX-9bit**](https://huggingface.co/inferencerlabs/Qwen3.5-122B-A10B-MLX-9bit)<br>*(Qwen 3.5 MoE · Archiwum HDD)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | TurboQuant KV 8-bit (`skip_last`), Fused MoE Gate/Up, parser `qwen_3_5`, podlinkowany na `/Volumes/Seagate_Expansion_Drive/LLM` (~128 GB) |
 | 23 | [**[HDD] Qwen3-Coder-Next-MLX-9bit**](https://huggingface.co/inferencerlabs/Qwen3-Coder-Next-MLX-9bit)<br>*(Qwen 3 Next Coder · Archiwum HDD)* | **256k** / **32k**<br>*(Dense)* | `0.6` / `0.95` / `40` / `1.05` | RoPE theta 5M, TurboQuant KV 8-bit (`skip_last`), Fused MoE Gate/Up, podlinkowany na `/Volumes/Seagate_Expansion_Drive/LLM` (~83 GB) |
 | 24 | [**[HDD] Qwen3-235B-A22B-MLX-4bit**](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit)<br>*(Qwen 3 MoE · Archiwum HDD)* | **40k** / **8k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Natywne okno bazowe 40 960 tokenów, TurboQuant KV 8-bit (`skip_last`), podlinkowany na `/Volumes/Seagate_Expansion_Drive/LLM` (~116 GB) |
+| 25 | [**[HDD] Qwen3.8-27B-FP16_huzar_v1**](https://huggingface.co/orcarouter/Qwen3.8-27B-FP16_huzar_v1)<br>*(Qwen 3.5 Dense FP16 · Archiwum HDD)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Wersja FP16 Huzar v1 podlinkowana na `/Volumes/Seagate_Expansion_Drive/LLM` (~54 GB) |
+| 26 | [**[HDD] Qwen3.8-27B-FP16_huzar_v1-SPLASH**](https://huggingface.co/orcarouter/Qwen3.8-27B-FP16_huzar_v1)<br>*(Splash · Archiwum HDD)* | **256k** / **32k**<br>*(Dense)* | `0.7` / `0.95` / `20` / `1.05` | Wariant Splash dla FP16 Huzar podlinkowany na `/Volumes/Seagate_Expansion_Drive/LLM` |
 
 ---
 
@@ -73,6 +75,8 @@ Wszystkie modele znajdują się w lokalnym katalogu bazowym `~/.lmstudio/models/
 | 22 | `Qwen3.5-122B-A10B-MLX-9bit` *(`[HDD]`)* | [inferencerlabs/Qwen3.5-122B-A10B-MLX-9bit](https://huggingface.co/inferencerlabs/Qwen3.5-122B-A10B-MLX-9bit) | MLX 9-bit MoE (~128 GB · USB-C HDD) |
 | 23 | `Qwen3-Coder-Next-MLX-9bit` *(`[HDD]`)* | [inferencerlabs/Qwen3-Coder-Next-MLX-9bit](https://huggingface.co/inferencerlabs/Qwen3-Coder-Next-MLX-9bit) | MLX 9-bit MoE (~83 GB · USB-C HDD) |
 | 24 | `Qwen3-235B-A22B-MLX-4bit` *(`[HDD]`)* | [Qwen/Qwen3-235B-A22B-MLX-4bit](https://huggingface.co/Qwen/Qwen3-235B-A22B-MLX-4bit) | MLX 4-bit MoE (~116 GB · USB-C HDD) |
+| 25 | `Qwen3.8-27B-FP16_huzar_v1` *(`[HDD]`)* | [orcarouter/Qwen3.8-27B-FP16_huzar_v1](https://huggingface.co/orcarouter/Qwen3.8-27B-FP16_huzar_v1) | MLX Dense FP16 (~54 GB · USB-C HDD) |
+| 26 | `Qwen3.8-27B-FP16_huzar_v1-SPLASH` *(`[HDD]`)* | [orcarouter/Qwen3.8-27B-FP16_huzar_v1](https://huggingface.co/orcarouter/Qwen3.8-27B-FP16_huzar_v1) | Splash Dense FP16 (~54 GB · USB-C HDD) |
 | *LoRA* | `salakash/Minimalism` *(Adapter)* | [salakash/Minimalism](https://huggingface.co/salakash/Minimalism) | LoRA Adapter (Qwen2.5-0.5B) |
 
 ---
@@ -82,9 +86,9 @@ Wszystkie modele znajdują się w lokalnym katalogu bazowym `~/.lmstudio/models/
 Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### 🏆 Wariant 1: Zero-Swap Dynamic (Domyślny & Rekomendowany: Kompresor = Model Sesji)
-* **Model główny:** Dowolny z 24 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`)
+* **Model główny:** Dowolny z 27 modeli w Hermesie (29 w oMLX, domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`)
 * **Kompresor (`auxiliary.compression`):** `provider: auto`, `model: ""`
-* **Zasada działania:** Hermes dynamicznie używa do kompresji tego samego modelu, który aktualnie prowadzi konwersację (`Qwen3.8-Flash-Next`, `GLM-5.3-Flash`, `Gemma 4`, `flint-oQ8e` itd.).
+* **Zasada działania:** Hermes dynamicznie używa do kompresji tego samego modelu, który aktualnie prowadzi konwersację (`Qwen3.8-Flash-Next`, `GLM-5.3-Flash`, `Hy4-flash`, `Inkling-Small`, `Inkling-2-Mini`, `Gemma 4`, `flint-oQ8e` itd.).
 * **Zalety:**
   - **0 sekund opóźnienia przełączania modeli (Zero Swap)** – model jest już w RAM i w pamięci podręcznej KV.
   - Pełna dynamika: zmiana modelu w Hermesie automatycznie zmienia model wykonujący kompresję.
@@ -92,11 +96,11 @@ Dostępne są dwa zoptymalizowane warianty konfiguracji:
 
 ### ⚡ Wariant 2: Dual-Model Resident (Szybki Dedykowany Kompresor 27B)
 * **Model główny:** `Qwen3.8-Flash-Next-oQ5e-mtp` (256k, ~119.9 GB)
-* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB, silnik **Splash 1.6.1-m1.1**)
-* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu napędzany ultraszybkim silnikiem Splash 1.6.1-m1.1 z podziałem GPU/ANE (`share 0.26`), zarządcą pamięci `One memory ledger`, optymalizacją `Idle KV` oraz akceleracją spekulatywną DFlash2 (`3.5–3.92` tok/cykl).
+* **Kompresor (`auxiliary.compression`):** `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB, silnik **Splash 1.7.0-m1.1**)
+* **Zasada działania:** Dedykowany, mniejszy model 27B realizuje podsumowania kontekstu napędzany ultraszybkim silnikiem Splash 1.7.0-m1.1 z podziałem GPU/ANE (`share 0.26`), zarządcą pamięci `One memory ledger`, optymalizacją `Idle KV` oraz akceleracją spekulatywną DFlash2 (`3.5–3.92` tok/cykl).
 * **Integracja z Watchdogiem:** Model 27B Splash ma ustawioną flagę `"is_pinned": true` w `model_settings.json`, dzięki czemu demon Watchdoga nie wyładowuje go z pamięci obok modelu głównego.
 * **Pamięć RAM:** ~120 GB (`Flash-Next-oQ5e`) + 15 GB (`27B Splash`) + ~1.3 GB (`DFlash2 draft`) = **~136.3 GB** (swobodnie mieści się w 186 GB limitu Metal z ~50 GB zapasu).
-* **Zalety:** Błyskawiczny prefill, generowanie do **69.2 tok/s śr. / 91.2 tok/s szczyt**, minimalny TTFT **0.31s** i zerowe obciążenie głównego modelu podczas kompresji.
+* **Zalety:** Błyskawiczny prefill, generowanie do **72.9 tok/s** decode na Splash 1.7.0-m1.1, minimalny TTFT **0.31s** i zerowe obciążenie głównego modelu podczas kompresji.
 * **Ograniczenie:** Wariant 2 nie powinien być używany z gigantami >150 GB (`GLM-5.3-Flash-oQ4e-mtp` 173.9 GB, `DeepSeek-V4-Flash MXFP4` 159 GB, `MiniMax-M3` 156 GB), dla których należy aktywować Wariant 1 (Zero-Swap).
 
 ---
@@ -183,7 +187,57 @@ Bezpośrednie testy porównawcze na Mac Studio M2 Ultra (192 GB RAM, czyste wywo
 * **Zautomatyzowany benchmark [`./omlx_bench.sh`](omlx_bench.sh):** testuje wszystkie aktywne modele z SSD (pomijając `[HDD]`) tym samym wieloturowym zapytaniem narzędziowym OpenCode (`describe the repo in this directory`).
 * **`Splash 1.6.1-m1` (`Qwen3.8-27B-Uncensored-MLX-SPLASH`):** po aktualizacji silnika do **`1.6.1-m1`** model zaliczył pełny bieg OpenCode (`PASS w 197.2s | tury=4 tools=6(rep=0) max_prompt=28792 avg_tps=69.2 odp=3601 zn.`, szczyt **91.2 tok/s** w 2. turze).
 * **Archiwizacja `Qwen3.8-27B-FP16_huzar_v1-SPLASH` (`[HDD]`):** oznaczony jako `[HDD]` w `model_settings*.json` oraz OpenCode.
-* **Naprawa `MiniMax-M3-ConfigI-MLX` > 4096 tokenów w oMLX `0.8.0` (`jundot/omlx#5233` / PR `#5239`):** po aktualizacji do oMLX `0.8.0` (build `3789`) kernel automatycznie wykrywa limit threadgroup M2 Ultra i przełącza prefill na `masked sparse path` — re-test w `omlx_bench.sh` przeszedł czysto (**PASS**, `max_prompt=16376`, `25.1 tok/s` decode, `155.6 GB` RAM, bez błędów Metal; zimny prefill 15.4k trwa `211.7s`, kolejna tura z cache `20.5s`).
+* **Naprawa `MiniMax-M3-ConfigI-MLX` > 4096 tokenów w oMLX `0.8.0` (`jundot/omlx#5233` / PR `#5239`):** po aktualizacji do oMLX `0.8.0` (build `3789`) kernel automatycznie wykrywa limit threadgroup M2 Ultra i przełącza prefill na `masked sparse path` — re-test w `omlx_bench.sh` przeszedł czysto (**PASS**, `max_prompt=16376`, `25.1 tok/s` decode, `155.6 GB` RAM, bez błędów Metal; zimny prefill 15.4k trwa `211.7s`, kolejna tura z cache `20.5s`). Przeniesiony na HDD z uwagi na obecność szybszych alternatyw (`GLM-5.3-Flash`, `DeepSeek-V4-Flash MXFP4`).
+
+### 5.5. Pełny Benchmark 19 Modeli SSD w `omlx_bench.sh`, oMLX 0.8.3 & Splash 1.7.0-m1.1 (23 Listopada 2026)
+
+Test automatyczny [`./omlx_bench.sh`](omlx_bench.sh) w OpenCode (`describe the repo in this directory`, `--variant high --timeout 600`) na Mac Studio M2 Ultra (192 GB RAM, `iogpu.wired_limit_mb=186777`, oMLX 0.8.3, Splash 1.7.0-m1.1 z hotfixem `#75`):
+
+#### 📊 Tabela Zbiorcza Wyników (19/19 PASS, 0 błędów, 0 powtórzeń narzędzi):
+
+| # | Model | Status | Czas | Tury | Tools (powt.) | Max prompt | Avg tok/s | MTP accept (tok/cykl) | RAM freed | Długość odp. |
+|---:|:---|:---:|---:|---:|---:|---:|---:|:---:|---:|---:|
+| 1 | `Qwen3.8-Flash-Next-oQ5e-mtp` | **PASS** | 122.5s | 4 | 5 (0) | 28 504 | 61.0 | 81.3% (2.09) | 120.89 GB | 3482 zn. |
+| 2 | `Qwen3.8-Flash-Next-oQ6e-mtp` | **PASS** | 129.1s | 5 | 6 (0) | 27 622 | 64.2 | 81.4% (2.85) | 142.42 GB | 2842 zn. |
+| 3 | `Qwen3.8-Flash-Next-MTPLX-Optimized-Speed` | **PASS** | 143.3s | 8 | 11 (0) | 33 881 | 43.7 | - | - | 3992 zn. |
+| 4 | `GLM-5.3-Flash-oQ4e-mtp` | **PASS** | 491.2s | 3 | 4 (0) | 24 245 | 22.6 | 82.3% (2.86) | 173.79 GB | 2384 zn. |
+| 5 | `Hy4-flash-oQ4h-mtp` *(re-test v0.8.3)* | **PASS** | **181.7s** | 7 | 6 (0) | 24 818 | **35.7** | **84.9% (2.96)** | 123.38 GB | **3505 zn.** |
+| 6 | `Inkling-2-Mini-oQ4e-mtp` *(re-test v0.8.3)*| **PASS** | **112.4s** | 5 | 5 (0) | 30 279 | **41.2** | **71.1% (2.11)** | **15.65 GB** | **3545 zn.** |
+| 7 | `Inkling-Small-mxfp4` | **PASS** | **124.4s** | 4 | 3 (0) | 17 489 | **40.2** | - | 130.64 GB | 1355 zn. |
+| 8 | `gemma-4-12B-it-oQ8e-mtp` | **PASS** | 59.7s | 2 | 1 (0) | 17 156 | 35.8 | 77.4% (2.92) | 12.70 GB | 2636 zn. |
+| 9 | `gemma-4-31B-it-oQ6e-mtp` | **PASS** | 187.5s | 3 | 2 (0) | 21 468 | 24.2 | 78.9% (3.90) | 26.08 GB | 2421 zn. |
+| 10 | `Ternary-Bonsai-2-27B-MTPLX-Optimized-Speed` | **PASS** | 373.8s | 6 | 11 (0) | 38 691 | 27.8 | - | 8.01 GB | 4466 zn. |
+| 11 | `Nanbeige4.3-33B-MLX-6bit` | **PASS** | 459.8s | 5 | 8 (0) | 31 723 | 15.8 | - | 25.06 GB | 3838 zn. |
+| 12 | `Qwen3.8-27B-Uncensored-MLX` | **PASS** | 292.0s | 4 | 6 (0) | 30 825 | 30.3 | 74.8% (3.31) | 17.76 GB | 3673 zn. |
+| 13 | `DeepSeek-V4-Flash-0731-MXFP4-MLX` | **PASS** | 227.2s | 5 | 11 (0) | 34 989 | 32.5 | 89.1% (3.10) | 155.59 GB | 3601 zn. |
+| 14 | `Laguna-S-2.1-MLX-8bit` | **PASS** | 219.7s | 6 | 14 (0) | 54 340 | 34.8 | - | 116.33 GB | 136 zn. |
+| 15 | `Ornith-1.5-35B-A3B-Abliterated-MLX-BF16` | **PASS** | 70.9s | 4 | 7 (0) | 28 063 | 52.0 | - | 64.56 GB | 2765 zn. |
+| 16 | `Qwen3.8-27B-Uncensored-MLX-SPLASH` | **PASS** | 266.3s | 4 | 5 (0) | 24 144 | **72.9** | - | - | 3283 zn. |
+| 17 | `UI-Venus-1.5-30B-A3B-qx86-hi-mlx` | **PASS** | 29.7s | 1 | 0 (0) | 15 815 | 54.7 | - | 25.70 GB | 1822 zn. |
+| 18 | `Qwen3.8-27B-Coder390-...-MTP-DFlash2` | **PASS** | 246.3s | 5 | 6 (0) | 32 837 | 28.1 | 86.8% (3.42) | 30.05 GB | 3430 zn. |
+| 19 | `flint-oQ8e` | **PASS** | 92.4s | 4 | 7 (0) | 29 479 | 60.6 | - | 39.37 GB | 4157 zn. |
+
+#### 🔍 Szczegółowe Wnioski i Charakterystyka Nowych Modeli:
+
+1. **`Inkling-Small-mxfp4` (Thinking Machines Inkling 1 Small MoE VLM):**
+   - **Specyfikacja:** 42 warstwy, 256 ekspertów (top-6 aktywnych), format `mxfp4`, pamięć **130.6 GB RAM**.
+   - **Wydajność w OpenCode:** Wynik **PASS w 124.4s**, stała prędkość decode **40.2 tok/s**, zerowa redundancja narzędzi (`tools=3, rep=0`), prompt `17.5k`.
+   - **Charakterystyka:** Bardzo spójny, precyzyjny model programistyczno-architektoniczny o wysokiej kulturze kodu i natywnym wsparciu VLM.
+
+2. **`Inkling-2-Mini-oQ4e-mtp` (Thinking Machines Inkling 2 Mini MoE VLM):**
+   - **Specyfikacja:** 128 ekspertów (top-8), pętla `3× pass`, bundled DSpark (`block=8, depth=7`), zaledwie **15.65 GB RAM**.
+   - **Skok wydajności w oMLX 0.8.3:** Skrócenie czasu z `160.8s` do **`112.4s` (-30%)** oraz wzrost szybkości z `32.2 tok/s` do **`41.2 tok/s` (+28%)**.
+   - **Jakość odpowiedzi:** Generuje wybitnie szczegółowe, tabelaryczne opisy projektów (`3545 zn.`), działając bezbłędnie wieloturowo w pętli agenta.
+
+3. **`Hy4-flash-oQ4h-mtp` (Tencent Hy4-flash MoE VLM):**
+   - **Specyfikacja:** 42 warstwy, 512 ekspertów (top-16 aktywnych), innowacyjny format kwantyzacji `oQh` (Rotated Codes, `123.38 GB RAM`), Engram FP8, Lightning MTP.
+   - **Krytyczne poprawki w oMLX 0.8.3:** Fix `#5534` (utrzymanie historii tur po cache hit) oraz `#5476` (brak wycieku `<think>` do odpowiedzi) rozwiązały wcześniejsze problemy z pętlami.
+   - **Wydajność:** Skok jakości z 3/10 do **10/10** — czysty **PASS w 181.7s**, **35.7 tok/s** decode, rewelacyjna akceptacja MTP **84.9% (`2.96 tok/cykl`)**, precyzyjna analiza kodu (`3505 zn.`).
+
+4. **Liderzy Przepustowości Decode:**
+   - **Splash M1:** `Qwen3.8-27B-Uncensored-MLX-SPLASH` osiąga **72.9 tok/s** na silniku Splash 1.7.0-m1.1.
+   - **Rodzina Qwen 3.8 Flash Next:** `oQ6e-mtp` (**64.2 tok/s**), `oQ5e-mtp` (**61.0 tok/s**).
+   - **Lekkie MoE:** `flint-oQ8e` (**60.6 tok/s**), `UI-Venus-1.5-30B` (**54.7 tok/s**), `Ornith-1.5-35B` (**52.0 tok/s**).
 
 ---
 

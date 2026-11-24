@@ -516,5 +516,94 @@ Skrypt łączy dane z czterech niezależnych źródeł, zapewniając 100% precyz
 ### 3. Usunięcie `GLM-5.3-Flash-oQ2e-mtp`:
 * Z uwagi na świetne wyniki rodziny `Qwen3.8-Flash-Next` (`oQ5e`/`oQ6e`) oraz skłonność 2-bitowego `oQ2e` do zapętleń i gubienia warunków logicznych, model **`GLM-5.3-Flash-oQ2e-mtp`** został całkowicie usunięty z dysku SSD (**+103 GiB** wolnego miejsca) oraz ze wszystkich plików konfiguracyjnych oMLX (`26` modeli), Hermesa (`24` modele) i OpenCode (`26` modeli).
 
+---
+
+## 🛠️ 24. Aktualizacja do oMLX `0.8.0`, Splash `1.6.1-m1.1`, Weryfikacja Poprawki `MiniMax-M3` (`#5233`) i Archiwizacja `[HDD]` (20 Listopada 2026)
+
+### 1. Weryfikacja silnika Splash `1.6.1-m1.1`:
+- Zaktualizowano binary `/opt/homebrew/bin/splash-m1` z `1.6.1-m1` do wersji `1.6.1-m1.1`.
+- Zaimplementowano poprawkę streamowania ekspertów MoE (`#63`/`#65`) oraz opcjonalny dwuchunkowy prefill GPU+ANE dla modeli 27B (`#64`).
+
+### 2. Wdrożenie oMLX `0.8.0` (build `3789`):
+- Zweryfikowano schemat `model_settings.json` (`SETTINGS_VERSION = 2`, 86 pól, 26 modeli) oraz `model_profiles.json`.
+- Dodano parametr `integrations.splash_activations: "bf16"` (`#5337`) do `settings.json` i zsynchronizowano przez `./switch-variant.sh 1`.
+
+### 3. Weryfikacja naprawy `MiniMax-M3-ConfigI-MLX` (`jundot/omlx#5233` / PR `#5239`):
+- W oMLX 0.8.0 kernel weryfikuje limit grupy wątków Metal na architekturze `applegpu_g14d` i przy promptach >4096 tokenów automatycznie przełącza się na ścieżkę `masked sparse path`.
+- Re-test w `omlx_bench.sh` (`bench_results/20261120_194439`) zakończył się sukcesem (**PASS**, `max_prompt=16376`, `25.1 tok/s` decode, `155.6 GB` RAM, 0 błędów Metal).
+- Ze względu na obecność szybszych kolosów (`GLM-5.3-Flash-oQ4e-mtp` oraz `DeepSeek-V4-Flash-0731-MXFP4-MLX`), model `MiniMax-M3-ConfigI-MLX` (`155.61 GiB`) przeniesiono skryptem `./move_from_SSD_to_HDD.sh` na zewnętrzny dysk USB-C `/Volumes/Seagate_Expansion_Drive/LLM` z oznaczeniem `[HDD]`, odzyskując kolejne gigabajty na dysku SSD (**1108.8 GiB** wolnego miejsca).
+
+---
+
+## 🚀 25. Aktualizacja do oMLX `0.8.2`, Splash `1.7.0-m1` oraz Wdrożenie `Hy4-flash-oQ4h-mtp` i `Inkling-2-Mini-oQ4e-mtp` (21 Listopada 2026)
+
+### 1. Splash `1.7.0-m1`:
+- Zaktualizowano binary `/opt/homebrew/bin/splash-m1` do upstreamowego wydania `1.7.0-m1`.
+- Nowości: automatyczna kalibracja dwuchunkowego prefillu GPU+ANE (`#66`), szybszy 4-bit MLX decode (`#69`/`#70`), INT8 cached states (~3× mniejsze zapotrzebowanie pamięci).
+
+### 2. Nowe Modele:
+1. **`Jundot/Hy4-flash-oQ4h-mtp`** (`123.6 GB` RAM, VLM, 512 eksp. top-16, innowacyjny format kwantyzacji `oQh`, Lightning MTP `81.9%` / `2.91 tok/cykl`, okno `256k` z natywnego `1M`). Wstępny pomiar: **`35.0 tok/s`** śr. (do **`42.9 tok/s`**) przy kontekście `75.6k`.
+2. **`mlx-community/Inkling-2-Mini-oQ4e-mtp`** (`17.5 GB` RAM, VLM, 128 eksp. top-8, pętla `3× pass`, bundled DSpark `block=8 depth=7`, okno `256k` z natywnego `1M`). Wstępny pomiar w OpenCode: **PASS w `170.9s`** (`7` tur, `38.2 tok/s`, opis `4778 zn.`).
+- Łączna liczba modeli w systemie wzrosła do **26 w Hermesie (28 w oMLX)**.
+
+---
+
+## 🏆 26. Wdrożenie `Inkling-Small-mxfp4` i Pełny Benchmark Wszystkich 19 Modeli SSD (`19/19 PASS`, 23 Listopada 2026)
+
+### 1. Wdrożenie `mlx-community/Inkling-Small-mxfp4`:
+- Model Thinking Machines Inkling 1 Small MoE VLM (`130.6 GB` RAM, 42 warstwy, 256 ekspertów top-6 aktywnych, natywne okno 1M ograniczone do 256k, sampling `temp: 1.0`, `top_p: 0.95`).
+- Skonfigurowano w `model_settings*.json`, `config*.yaml` i `opencode.json*`, podnosząc stan biblioteki do **27 modeli w Hermesie (29 w oMLX)**.
+
+### 2. Wyniki Wielkiego Benchmarku OpenCode (`omlx_bench.sh`, `bench_results/20261123_002131`):
+- Przetestowano wszystkie 19 aktywnych modeli na SSD tym samym zadaniem repozytoryjnym (`describe the repo in this directory`, `--variant high --timeout 600`).
+- **Wynik ogólny: 19/19 PASS, 0 błędów, 0 timeoutów, 0 powtórzonych wywołań narzędzi (`rep=0`)!**
+- Liderzy prędkości dekodowania:
+  * `Qwen3.8-27B-Uncensored-MLX-SPLASH`: **`72.9 tok/s`** (Splash 1.7.0-m1)
+  * `Qwen3.8-Flash-Next-oQ6e-mtp`: **`64.2 tok/s`** (129.1s)
+  * `Qwen3.8-Flash-Next-oQ5e-mtp`: **`61.0 tok/s`** (122.5s)
+  * `flint-oQ8e`: **`60.6 tok/s`** (92.4s, 4157 zn.)
+  * `UI-Venus-1.5-30B-A3B-qx86-hi-mlx`: **`54.7 tok/s`** (29.7s)
+  * `Ornith-1.5-35B-A3B-Abliterated-MLX-BF16`: **`52.0 tok/s`** (70.9s)
+- Nowe modele:
+  * `Inkling-Small-mxfp4`: **PASS w 124.4s**, **`40.2 tok/s`**, `130.6 GB` RAM, 3 toole bez powtórzeń.
+  * `Hy4-flash-oQ4h-mtp`: **PASS w 185.4s**, `32.6 tok/s`, MTP `78.5%`, `3741 zn.`
+  * `Inkling-2-Mini-oQ4e-mtp`: **PASS w 160.8s**, `32.2 tok/s`, `15.7 GB` RAM, `3693 zn.`
+
+---
+
+## 🚀 27. Aktualizacja do oMLX `0.8.3` (build `3879`) & Splash `1.7.0-m1.1`, Migracja Schematu `v3` oraz Re-test `Hy4-flash` i `Inkling-2-Mini` (23 Listopada 2026)
+
+### 1. Splash `1.7.0-m1.1`:
+- Wdrożono hotfix `#75` w `/opt/homebrew/bin/splash-m1` (naprawa błędnych odpowiedzi na promptach 33–64 tokenów i po odtworzeniu prefix-cache).
+
+### 2. Migracja oMLX do `SETTINGS_VERSION = 3`:
+- Przemigrowano `model_settings*.json` do wersji 3 (`88` pól per model, obsługa LoRA `#5449`).
+- Poprawki w oMLX 0.8.3:
+  * `#5534`: Utrzymanie historii tur agenta po cache hit.
+  * `#5476`: Wyeliminowanie wycieku tagów myślenia `<think>` do właściwej odpowiedzi.
+
+### 3. Re-test w `omlx_bench.sh` (`bench_results/20261123_041242`):
+- **`Hy4-flash-oQ4h-mtp`:** Poprawki `#5534` i `#5476` zadziałały w 100%. Jakość wzrosła z 3/10 do **10/10** (zero halucynacji, czysty kanał odpowiedzi, **PASS w 181.7s**, **`35.7 tok/s`**, akceptacja MTP aż **`84.9% (2.96 tok/cykl)`**, `3505 zn.` wyczerpującego raportu).
+- **`Inkling-2-Mini-oQ4e-mtp`:** Znakomita optymalizacja czasu — skrócenie z `160.8s` do **`112.4s` (-30% czasu)** i wzrost prędkości z `32.2` do **`41.2 tok/s` (+28% decode)**, **PASS** z tabelarycznym podsumowaniem (`3545 zn.`, `15.65 GB` RAM).
+
+---
+
+## 🔒 28. Usunięcie Sekretów z Publicznych Repozytoriów i Rotacja Klucza oMLX API (23 Listopada 2026)
+
+### 1. Audyt i czyszczenie Git:
+- Usunięto śledzenie pliku `.env` w obu powiązanych repozytoriach (`omlx_hermes_setup` oraz `open_code_config`): `git rm --cached .env` i dopisano `.env` do `.gitignore`.
+- Utworzono wersjonowany szablon `.env.example` z placeholderami (`OMLX_API_KEY=your_secret_omlx_api_key_here`).
+- Zastąpiono jawne klucze placeholderami w śledzonym pliku `settings.json`.
+- Zabezpieczono skrypt `switch-variant.sh` (zachowuje lokalne klucze `auth.api_key` / `auth.secret_key` z `~/.omlx/settings.json` podczas synchronizacji) oraz `move_from_SSD_to_HDD.py` (dynamiczne pobieranie klucza ze zmiennych środowiskowych lub `~/.omlx/settings.json`).
+
+### 2. Rotacja kluczy i weryfikacja API:
+- Wygenerowano nowy, kryptograficznie bezpieczny zestaw kluczy `api_key` i `secret_key` w plikach lokalnych (`~/.omlx/settings.json`, `~/.hermes/.env`, `.env`, `~/.config/opencode/opencode.json*`).
+- Zrestartowano `oMLX.app`.
+- Potwierdzono poprawne uwierzytelnianie:
+  * Zapytanie z nowym kluczem: `HTTP 200 OK`.
+  * Zapytanie ze starym kluczem: `HTTP 401 Unauthorized`.
+- Weryfikacja repozytorium: `0` wycieków sekretów w plikach śledzonych przez git w obu projektach.
+
+
 
 
