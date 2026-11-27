@@ -10,12 +10,12 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
 
 1. **Pełna historia i decyzje sesji:**
    - Szczegółowy opis decyzji architektonicznych i ustaleń znajduje się w pliku [`SESJA_KONTEKST.md`](SESJA_KONTEKST.md).
-   - Tabela parametrów dla **27 modeli w Hermesie (29 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
+   - Tabela parametrów dla **28 modeli w Hermesie (30 w oMLX)** (okna do 512k/1M, sampling, parsery, VLM/OCR/Audio) oraz bezpośrednie linki do Hugging Face znajdują się w [`konfiguracja-modeli.md`](konfiguracja-modeli.md).
    - Praktyczny przewodnik obsługi CLI oraz dobór modeli pod kątem 7 ról zawodowych i użytkowych (Use Cases) znajduje się w [`HowTo_JakUzywac.md`](HowTo_JakUzywac.md).
 
 2. **Dwa Dostępne Warianty Konfiguracji:**
-   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 27 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
-   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.0-m1.1**) jako dedykowany szybki kompresor.
+   - **Wariant 1 (Domyślny / Zero-Swap Dynamic):** Kompresor = aktualny model sesji (`provider: auto`, `model: ''`), brak opóźnień przełączania i pełna dynamika dla wszystkich 28 modeli (domyślnie `Qwen3.8-Flash-Next-oQ5e-mtp`, limit pamięci Metal `186 GB`).
+   - **Wariant 2 (Dual-Model Resident):** `Qwen3.8-Flash-Next-oQ5e-mtp` (lub `Qwen3.5-122B-A10B-MLX-9bit`) jako model główny + `Qwen3.8-27B-Uncensored-MLX-SPLASH` (~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.3-m1**) jako dedykowany szybki kompresor.
    - Do przełączania wariantów służy skrypt: `./switch-variant.sh [1|2] [--local|--remote]`.
    - **Automatyczna detekcja oMLX:** Skrypt sam wykrywa, czy oMLX jest zainstalowany lokalnie. Jeśli nie, automatycznie konfiguruje Hermesa na zdalny serwer oMLX pobierając IP z pliku `.env` (domyślnie `100.123.37.101` via Tailscale VPN).
 
@@ -38,6 +38,13 @@ Ten katalog (`/Users/wojcio/Desktop/omlx_hermes_config`) zawiera centralną, wer
    - Zmiany zatwierdzaj i wypychaj do repozytorium GitHub: `https://github.com/wojcio/omlx_hermes_setup.git`.
 
 ## 🔄 Ostatnie Zmiany i Stan Projektu (Listopad 2026)
+- **Aktualizacja do oMLX `0.8.4` (build `3980`) & Splash `1.7.3-m1` oraz wdrożenie pary `Inkling-2-Mini` (oMLX vs Splash, 27 Listopada 2026):**
+  * **Splash `1.7.3-m1` + drafter `incoai/Inkling-2-Mini-DFlash2` (`944 MB`):** Zaktualizowano `/opt/homebrew/bin/splash-m1` do **`1.7.3-m1`** (natywna obsługa `Inkling-2-Mini` VLM+DFlash2 na M1/M2 `#86`, poprawka błędnych tokenów przy 3–4 równoczesnych żądaniach `#79`/`#80`, dzielony dispatch długiego prefillu `#89`).
+  * **oMLX `0.8.4` (`90` pól w `ModelSettings`, `SETTINGS_VERSION = 3`, `LoopCD`):** Dopisano `integrations.macos_say_enabled: false` do [`settings.json`](settings.json) oraz dodano drugi profil **`Inkling-2-Mini-oQ4e-mtp-SPLASH`** (`external_engine: "splash"`, symlink w `~/.lmstudio/models/mlx-community/`) do `model_settings*.json` (`30` modeli), `config*.yaml` (`28` modeli Hermesa) i `opencode.json*` (`30` modeli).
+  * **Benchmark łeb w łeb [`omlx_bench.sh`](omlx_bench.sh) (`bench_results/20261127_020000`):**
+    - **`Inkling-2-Mini-oQ4e-mtp` (natywny oMLX `0.8.4` + DSpark):** **PASS `112.9s`**, **`52.5 tok/s`** śr. (szczyt **`71.6 tok/s`**, `+27%` względem `0.8.3` i `+63%` względem `0.8.2`), zimny prefill 19.9k = **`16.87s`**, długa odpowiedź końcowa @33k = **`49.2 tok/s`**, `16.56 GB` RAM, jakość **10/10** (`5011 zn.`).
+    - **`Inkling-2-Mini-oQ4e-mtp-SPLASH` (`Splash 1.7.3-m1` + `DFlash2`):** **PASS `140.1s`** *(w tym pierwsza kalibracja ~32s)*, **`57.4 tok/s`** śr. (szczyt **`68.5 tok/s`**, szybkie tury tool-call z TTFT `1.62–1.66s`), długa odpowiedź końcowa @32.4k = `43.1 tok/s`, `23.06 GB` RAM, jakość **10/10** (`3426 zn.` po polsku).
+  * **Diagnostyka `401` w `server.log`:** Zidentyfikowano `/Users/wojcio/Desktop/Devel/port_registry/monitor.py:189` (PID `915`) odpytujący `GET /v1/models` co 2s bez nagłówka `Authorization`.
 - **Usunięcie sekretów z publicznych repozytoriów i rotacja klucza oMLX (23 Listopada 2026):**
   * **Czyszczenie repozytorium:** Odpięto `.env` z gita (`git rm --cached .env`) i dodano `.env` do [`.gitignore`](.gitignore); zastąpiono jawne klucze placeholderami w [`.env.example`](.env.example) i [`settings.json`](settings.json); zmodyfikowano [`switch-variant.sh`](switch-variant.sh) (zachowuje lokalne `auth.api_key`/`auth.secret_key` z `~/.omlx/settings.json` przy synchronizacji) oraz [`move_from_SSD_to_HDD.py`](move_from_SSD_to_HDD.py) (dynamiczne czytanie klucza z env/`~/.omlx/settings.json`).
   * **Rotacja i weryfikacja:** Wygenerowano nowy `api_key` i `secret_key` w lokalnych plikach (`~/.omlx/settings.json`, `~/.hermes/.env`, `.env`, `~/.config/opencode/opencode.json*`), zrestartowano `oMLX.app` i potwierdzono `HTTP 200` dla nowego klucza oraz `HTTP 401` dla starego (`0` wycieków w plikach śledzonych przez git w obu repozytoriach).

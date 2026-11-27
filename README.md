@@ -1,6 +1,6 @@
 # oMLX & Hermes Setup
 
-Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.3** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.7.0-m1.1**, **Lightning MTP**, **DSpark**, **DFlash2**, **oQh Rotated Codes**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **27 modeli w Hermesie (29 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
+Zestaw zoptymalizowanych konfiguracji dla **oMLX 0.8.4** (Apple **MLX 0.32.4**, `mlx-lm 0.32.3.dev8`, `mlx-vlm 0.7.11`, sufit pamięci **186 GB RAM**) oraz **Hermes Agent** z precyzyjnie dobranymi oknami kontekstu (`max_context` do **512k/1M**), limitami wyjściowymi (`max_tokens`), akceleracją sprzętową (**Splash M1 1.7.3-m1**, **Lightning MTP**, **DSpark**, **DFlash2**, **oQh Rotated Codes**, **LoopCD**, **Fused MoE & GDN/KDA**, **Affine `hc_fused`**, **FP16 Activation Recast**) oraz parametrami próbkowania (`temperature`, `top_p`, `top_k`, `repetition_penalty`, `min_p`, `presence_penalty`) dla **28 modeli w Hermesie (30 w oMLX)** na Apple Silicon (M2 Ultra / MLX).
 
 ---
 
@@ -44,7 +44,7 @@ Repozytorium udostępnia dwa gotowe warianty konfiguracji:
 
 2. **Wariant 2: `Dual-Model Resident` (Dedykowany Szybki Kompresor 27B)**
    - Model główny: `Qwen3.8-Flash-Next-oQ5e-mtp` (256k) lub `Qwen3.5-122B-A10B-MLX-9bit`
-   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.0-m1.1**)
+   - Kompresor: `Qwen3.8-27B-Uncensored-MLX-SPLASH` (256k, ~15 GB w RAM, `is_pinned: true`, silnik **Splash 1.7.3-m1**)
    - *Ultraszybki (**72.9 tok/s** decode na Splash 1.7.0-m1.1), dedykowany model Splash z podziałem GPU/ANE (share 0.26), off-loop kompilacją Metal i akceleracją DFlash2 (3.6–5.8 tok/cykl) do podsumowań kontekstu współistniejący z modelem głównym.*
 
 ### 🔄 Szybkie przełączanie wariantów:

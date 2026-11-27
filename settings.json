@@ -136,7 +136,8 @@
     "splash_max_memory_gb": null,
     "splash_ssd_cache_gb": null,
     "splash_ane_prefill": true,
-    "splash_activations": "bf16"
+    "splash_activations": "bf16",
+    "macos_say_enabled": false
   },
   "ui": {
     "language": "en",
